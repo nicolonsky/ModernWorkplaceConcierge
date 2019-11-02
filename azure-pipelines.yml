@@ -11,6 +11,7 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
+  group: 'IntuneConciergeKeyVault'
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
@@ -22,6 +23,15 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
+- task: replacetokens@3
+  inputs:
+    targetFiles: '**/*.config'
+    encoding: 'auto'
+    writeBOM: true
+    actionOnMissing: 'warn'
+    keepToken: false
+    tokenPrefix: '#{'
+    tokenSuffix: '}#'
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
