@@ -11,10 +11,13 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  group: 'IntuneConciergeKeyVault'
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+- group: 'IntuneConciergeKeyVault'
+- name: 'solution'
+  value: '**/*.sln'
+- name: 'buildPlatform'
+  value: 'Any CPU'
+- name: 'buildConfiguration'
+  value: 'Release' 
 
 steps:
 - task: NuGetToolInstaller@1
