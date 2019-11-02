@@ -44,7 +44,6 @@ steps:
     tokenPrefix: '#{'
     tokenSuffix: '}#'
 
--
 - task: AzureRmWebAppDeployment@4
   inputs:
     ConnectionType: 'AzureRM'
