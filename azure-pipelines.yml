@@ -29,28 +29,3 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: replacetokens@3
-  inputs:
-    targetFiles: '**/*.config'
-    encoding: 'auto'
-    writeBOM: true
-    actionOnMissing: 'warn'
-    keepToken: false
-    tokenPrefix: '#{'
-    tokenSuffix: '}#'
-
-- task: AzureRmWebAppDeployment@4
-  inputs:
-    ConnectionType: 'AzureRM'
-    azureSubscription: 'Visual Studio Enterprise – MPN(261f3711-6ea0-41fd-9071-e9bd61af70f1)'
-    appType: 'webApp'
-    WebAppName: 'IntuneConcierge'
-    deployToSlotOrASE: true
-    ResourceGroupName: 'intuneconcierge'
-    SlotName: 'production'
-    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
