@@ -4,7 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 #Scripts
-**/Scripts/*.js
+IntuneConcierge/Scripts/*
 
 # User-specific files
 *.rsuser
