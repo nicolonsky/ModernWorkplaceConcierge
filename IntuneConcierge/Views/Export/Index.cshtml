@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Current = "Export";
+}
+
+    <div class="jumbotron">
+        <h1>Export Intune configuration</h1>
+        <p class="lead">
+            Export:
+            <ul>
+                <li>Device configurations</li>
+                <li>App protection policies</li>
+                <li>Device compliance policies</li>
+            </ul>
+        </p>
+        @Html.ActionLink("Export", "DownloadAsync", "Export", new { area = "" }, new { @class = "btn btn-primary btn-large" })
+    </div>

@@ -1,0 +1,106 @@
+﻿<!-- Copyright (c) Microsoft Corporation. All rights reserved.
+     Licensed under the MIT License. -->
+
+@{
+    var alerts = TempData.ContainsKey(IntuneConcierge.Models.Alert.AlertKey) ?
+        (List<IntuneConcierge.Models.Alert>)TempData[IntuneConcierge.Models.Alert.AlertKey] :
+        new List<IntuneConcierge.Models.Alert>();
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intune Concierge</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+          integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt"
+          crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="container">
+            @Html.ActionLink("Intune Concierge", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        @Html.ActionLink("Home", "Index", "Home", new { area = "" },
+                            new { @class = ViewBag.Current == "Home" ? "nav-link active" : "nav-link" })
+                    </li>
+                    @if (Request.IsAuthenticated)
+                    {
+                       <li class="nav-item" data-turbolinks="false">
+                            @Html.ActionLink("Export", "Index", "Export", new { area = "" },
+                                new { @class = ViewBag.Current == "Export" ? "nav-link active" : "nav-link" })
+                        </li>
+                    }
+                </ul>
+                <ul class="navbar-nav justify-content-end">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://tech.nicolonsky.ch" target="_blank">
+                            <i class="fas fa-external-link-alt mr-1"></i>Docs
+                        </a>
+                    </li>
+                    @if (Request.IsAuthenticated) { 
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                @if (!string.IsNullOrEmpty(ViewBag.User.Avatar))
+                                {
+                                    <img src="@ViewBag.User.Avatar" class="rounded-circle align-self-center mr-2" style="width: 32px;">
+                                }
+                                else
+                                {
+                                    <i class="far fa-user-circle fa-lg rounded-circle align-self-center mr-2" style="width: 32px;"></i>
+                                }
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <h5 class="dropdown-item-text mb-0">@ViewBag.User.DisplayName</h5>
+                                <p class="dropdown-item-text text-muted mb-0">@ViewBag.User.Email</p>
+                                <div class="dropdown-divider"></div>
+                                @Html.ActionLink("Sign Out", "SignOut", "Account", new { area = "" }, new { @class = "dropdown-item" })
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Sign In", "SignIn", "Account", new { area = "" }, new { @class = "nav-link" })
+                        </li>
+                    }
+
+                    <li class="nav-item">
+                        <pre>Version: @System.Reflection.Assembly.GetAssembly(GetType()).GetName().Version.ToString()</pre>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main role="main" class="container">
+        @foreach (var alert in alerts)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p class="mb-3">@alert.Message</p>
+                @if (!string.IsNullOrEmpty(alert.Debug))
+                {
+                    <pre class="alert-pre border bg-light p-2"><code>@alert.Debug</code></pre>
+                }
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>
