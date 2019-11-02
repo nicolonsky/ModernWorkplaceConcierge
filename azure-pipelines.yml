@@ -11,9 +11,13 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+- group: 'IntuneConciergeKeyVault'
+- name: 'solution'
+  value: '**/*.sln'
+- name: 'buildPlatform'
+  value: 'Any CPU'
+- name: 'buildConfiguration'
+  value: 'Release' 
 
 steps:
 - task: NuGetToolInstaller@1
@@ -21,18 +25,6 @@ steps:
 - task: NuGetCommand@2
   inputs:
     restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
 
 - task: replacetokens@3
   inputs:
@@ -43,14 +35,15 @@ steps:
     keepToken: false
     tokenPrefix: '#{'
     tokenSuffix: '}#'
-
-- task: AzureRmWebAppDeployment@4
+- task: VSBuild@1
   inputs:
-    ConnectionType: 'AzureRM'
-    azureSubscription: 'Visual Studio Enterprise – MPN(261f3711-6ea0-41fd-9071-e9bd61af70f1)'
-    appType: 'webApp'
-    WebAppName: 'IntuneConcierge'
-    deployToSlotOrASE: true
-    ResourceGroupName: 'intuneconcierge'
-    SlotName: 'production'
-    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
