@@ -44,10 +44,14 @@ steps:
     tokenPrefix: '#{'
     tokenSuffix: '}#'
 
+-
 - task: AzureRmWebAppDeployment@4
   inputs:
     ConnectionType: 'AzureRM'
-    azureSubscription: 'da4d8775-e426-4044-87fa-5376c5136c08'
+    azureSubscription: 'Visual Studio Enterprise – MPN(261f3711-6ea0-41fd-9071-e9bd61af70f1)'
     appType: 'webApp'
     WebAppName: 'IntuneConcierge'
+    deployToSlotOrASE: true
+    ResourceGroupName: 'intuneconcierge'
+    SlotName: 'production'
     packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
