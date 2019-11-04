@@ -3,14 +3,16 @@
 }
 
     <div class="jumbotron">
-        <h1>Export Intune configuration</h1>
+        <h1>Export your Intune configuration</h1>
         <p class="lead">
-            Export:
+            Exported items:
             <ul>
-                <li>Device configurations</li>
-                <li>App protection policies</li>
-                <li>Device compliance policies</li>
+                <li>DeviceConfigurations</li>
+                <li>DeviceCompliancePolicies</li>
+                <li>ManagedAppPolicies</li>
+                <li>WindowsAutopilotDeploymentProfiles</li>
             </ul>
+            Items will be included in JSON format within a ZIP file.
         </p>
         @Html.ActionLink("Export", "DownloadAsync", "Export", new { area = "" }, new { @class = "btn btn-primary btn-large" })
     </div>
