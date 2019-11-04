@@ -7,6 +7,8 @@
 trigger:
 - master
 
+name: IntuneConcierge_$(date:yyyy).$(date:MM).$(date:dd)$(Rev:.r).
+
 pool:
   vmImage: 'windows-latest'
 
@@ -21,11 +23,9 @@ variables:
 
 steps:
 - task: NuGetToolInstaller@1
-
 - task: NuGetCommand@2
   inputs:
     restoreSolution: '$(solution)'
-
 - task: replacetokens@3
   inputs:
     targetFiles: '**/*.config'
@@ -35,13 +35,21 @@ steps:
     keepToken: false
     tokenPrefix: '#{'
     tokenSuffix: '}#'
+- task: VersionDotNetCoreAssemblies@2
+  inputs:
+    Path: '$(Build.SourcesDirectory)'
+    VersionNumber: '$(Build.BuildNumber)'
+    Injectversion: True
+    VersionRegex: '\d+\.\d+\.\d+\.\d+'
+    FilenamePattern: '.csproj'
+    SDKNames: 'Microsoft.NET.Sdk'
+    OutputVersion: 'OutputedVersion'
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
