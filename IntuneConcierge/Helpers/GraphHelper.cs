@@ -53,6 +53,16 @@ namespace IntuneConcierge.Helpers
             return events.CurrentPage;
         }
 
+        public static async Task <IEnumerable<WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
+        {
+            var graphClient = GetAuthenticatedClient();
+            graphClient.BaseUrl = graphEndpoint;
+
+            var events = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().GetAsync();
+
+            return events.CurrentPage;
+        }
+
         public static async Task<User> GetUserDetailsAsync(string accessToken)
         {
             var graphClient = new GraphServiceClient(

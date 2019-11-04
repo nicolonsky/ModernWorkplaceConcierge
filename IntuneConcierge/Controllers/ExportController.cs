@@ -32,6 +32,7 @@ namespace IntuneConcierge.Controllers
 
             var ManagedAppProtection = await GraphHelper.GetManagedAppProtectionAsync();
 
+            var WindowsAutopilotDeploymentProfiles = await GraphHelper.GetWindowsAutopilotDeploymentProfiles();
 
             using (MemoryStream ms = new MemoryStream())
             {
@@ -64,8 +65,14 @@ namespace IntuneConcierge.Controllers
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
+                    foreach (Microsoft.Graph.WindowsAutopilotDeploymentProfile item in WindowsAutopilotDeploymentProfiles)
+                    {
+                        byte[] temp = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
+                        var zipArchiveEntry = archive.CreateEntry("WindowsAutopilotDeploymentProfiles\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
 
+                        using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                    }
                 }
                 return File(ms.ToArray(), "application/zip", "Archive.zip");
             }
