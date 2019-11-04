@@ -35,14 +35,12 @@ steps:
     keepToken: false
     tokenPrefix: '#{'
     tokenSuffix: '}#'
-- task: VersionDotNetCoreAssemblies@2
+- task: VersionAssemblies@2
   inputs:
     Path: '$(Build.SourcesDirectory)'
     VersionNumber: '$(Build.BuildNumber)'
-    Injectversion: True
-    VersionRegex: '\d+\.\d+\.\d+\.\d+'
-    FilenamePattern: '.csproj'
-    SDKNames: 'Microsoft.NET.Sdk'
+    InjectVersion: true
+    FilenamePattern: 'AssemblyInfo.*'
     OutputVersion: 'OutputedVersion'
 - task: VSBuild@1
   inputs:
