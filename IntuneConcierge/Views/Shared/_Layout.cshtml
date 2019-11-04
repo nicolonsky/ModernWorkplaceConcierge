@@ -65,6 +65,7 @@
                             <div class="dropdown-menu dropdown-menu-right">
                                 <h5 class="dropdown-item-text mb-0">@ViewBag.User.DisplayName</h5>
                                 <p class="dropdown-item-text text-muted mb-0">@ViewBag.User.Email</p>
+                                <p class="dropdown-item-text text-muted mb-0">Version: @System.Reflection.Assembly.GetAssembly(GetType()).GetName().Version.ToString()</p>
                                 <div class="dropdown-divider"></div>
                                 @Html.ActionLink("Sign Out", "SignOut", "Account", new { area = "" }, new { @class = "dropdown-item" })
                             </div>
@@ -76,10 +77,6 @@
                             @Html.ActionLink("Sign In", "SignIn", "Account", new { area = "" }, new { @class = "nav-link" })
                         </li>
                     }
-
-                    <li class="nav-item">
-                        <pre>Version: @System.Reflection.Assembly.GetAssembly(GetType()).GetName().Version.ToString()</pre>
-                    </li>
                 </ul>
             </div>
         </div>

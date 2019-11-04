@@ -5,8 +5,6 @@
 
 #Scripts
 
-*.js
-
 # User-specific files
 *.rsuser
 *.suo
