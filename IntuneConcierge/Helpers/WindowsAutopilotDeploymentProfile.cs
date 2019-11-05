@@ -5,6 +5,7 @@ using System.Web;
 using Microsoft.Graph;
 using IntuneConcierge.Helpers;
 using ServiceStack;
+using Newtonsoft.Json;
 
 namespace IntuneConcierge.Helpers
 {
@@ -44,6 +45,7 @@ namespace IntuneConcierge.Helpers
         public int CloudAssignedForcedEnrollment;
         public String CloudAssignedTenantId;
         public String CloudAssignedTenantDomain;
+        public String CloudAssignedAadServerData;
         public ZeroTouchWindowsAutopilotDeploymentProfile ZeroTouchConfig;
 
         public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
@@ -126,7 +128,9 @@ namespace IntuneConcierge.Helpers
             }
 
             ZeroTouchConfig.ForcedEnrollment =  hideEscapeLink; 
-            ZeroTouchConfig.CloudAssignedTenantDomain = this.CloudAssignedTenantDomain;
+            ZeroTouchConfig.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
+
+            CloudAssignedAadServerData = JsonConvert.SerializeObject(ZeroTouchConfig, Formatting.Indented);
         }
     }
 }
