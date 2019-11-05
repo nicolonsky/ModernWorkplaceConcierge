@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Microsoft.Graph;
 using IntuneConcierge.Helpers;
+using ServiceStack;
 
 namespace IntuneConcierge.Helpers
 {
@@ -46,7 +47,7 @@ namespace IntuneConcierge.Helpers
         ZeroTouchWindowsAutopilotDeploymentProfile ZeroTouchConfig;
 
 
-        public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile)
+        public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
         {
             this.Comment_File = "Profile " + profile.DisplayName;
             this.Version = 2049;
@@ -106,12 +107,6 @@ namespace IntuneConcierge.Helpers
             {
                 this.CloudAssignedForcedEnrollment = 0;
             }
-
-
-            var task = GraphHelper.GetOrgDetailsAsync();
-
-            // get Org from Graph
-            Organization organization = task.Result; ;
 
             this.CloudAssignedTenantId = organization.Id;
 

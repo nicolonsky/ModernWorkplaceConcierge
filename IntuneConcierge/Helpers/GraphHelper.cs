@@ -86,7 +86,7 @@ namespace IntuneConcierge.Helpers
         public static async Task<Organization> GetOrgDetailsAsync()
         {
             var graphClient = GetAuthenticatedClient();
-
+               
             var org =  await graphClient.Organization.Request().GetAsync();
 
             Organization organization = org.CurrentPage.First();

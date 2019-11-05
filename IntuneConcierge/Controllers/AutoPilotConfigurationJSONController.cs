@@ -31,9 +31,9 @@ namespace IntuneConcierge.Controllers
 
            var profile =  await GraphHelper.GetWindowsAutopilotDeploymentProfiles(Id);
 
+            var org = await GraphHelper.GetOrgDetailsAsync();
 
-
-            Helpers.WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = new Helpers.WindowsAutopilotDeploymentProfile(profile);
+            Helpers.WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = new Helpers.WindowsAutopilotDeploymentProfile(profile, org);
 
             byte[] autopilotconfiguraton = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile, Formatting.Indented).ToString());
 
