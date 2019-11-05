@@ -9,12 +9,14 @@ using Newtonsoft.Json;
 
 namespace IntuneConcierge.Helpers
 {
-    public class ZeroTouchConfig 
-    {
+    public class CloudAssignedAadServerData {
         public String CloudAssignedTenantDomain;
         public String CloudAssignedTenantUpn;
         public int ForcedEnrollment;
 
+    }
+    public class ZeroTouchConfig : CloudAssignedAadServerData
+    {
         public ZeroTouchConfig(String CloudAssignedTenantDomain, int ForcedEnrollment)
         {
             this.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
@@ -116,7 +118,7 @@ namespace IntuneConcierge.Helpers
                 hideEscapeLink = 1;
             }
 
-            ZeroTouchConfig zeroTouchConfig = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
+            CloudAssignedAadServerData zeroTouchConfig = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
 
             cloudAssignedAadServerData = JsonConvert.SerializeObject(zeroTouchConfig,
                 new JsonSerializerSettings()
