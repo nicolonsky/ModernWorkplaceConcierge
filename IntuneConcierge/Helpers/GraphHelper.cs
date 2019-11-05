@@ -83,11 +83,13 @@ namespace IntuneConcierge.Helpers
             return ret ;
         }
 
-        public static Organization GetOrgDetailsAsync()
+        public static async Task<Organization> GetOrgDetailsAsync()
         {
             var graphClient = GetAuthenticatedClient();
 
-            Organization organization = (Organization) graphClient.Organization.Request();
+            var org =  await graphClient.Organization.Request().GetAsync();
+
+            Organization organization = org.CurrentPage.First();
 
             return organization;
         }

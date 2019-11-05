@@ -108,8 +108,10 @@ namespace IntuneConcierge.Helpers
             }
 
 
+            var task = GraphHelper.GetOrgDetailsAsync();
+
             // get Org from Graph
-            Organization organization = GraphHelper.GetOrgDetailsAsync();
+            Organization organization = task.Result; ;
 
             this.CloudAssignedTenantId = organization.Id;
 
