@@ -36,7 +36,7 @@
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Detail", new { id = item.Id }) |
                     @Html.ActionLink("Download", "DownloadAutopilotConfigurationJSON", new { id = item.Id })
                 </td>
             </tr>

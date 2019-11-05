@@ -9,16 +9,7 @@ using Newtonsoft.Json;
 
 namespace IntuneConcierge.Helpers
 {
-    public class CloudAssignedAadServerData
-    {
-        public String ZeroTouchConfig;
-       public CloudAssignedAadServerData()
-        {
-
-        }
-    }
-
-    public class ZeroTouchConfig : CloudAssignedAadServerData
+    public class ZeroTouchConfig 
     {
         public String CloudAssignedTenantDomain;
         public String CloudAssignedTenantUpn;
@@ -50,7 +41,7 @@ namespace IntuneConcierge.Helpers
         {
             Comment_File = "Profile " + profile.DisplayName;
             Version = 2049;
-            ZtdCorrelationId = profile.GetId().ToString();
+            ZtdCorrelationId = profile.Id;
 
             if (profile.ODataType.Equals("#microsoft.graph.activeDirectoryWindowsAutopilotDeploymentProfile"))
             {
@@ -127,7 +118,7 @@ namespace IntuneConcierge.Helpers
 
             ZeroTouchConfig zeroTouchConfig = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
 
-            cloudAssignedAadServerData = JsonConvert.SerializeObject(JsonConvert.SerializeObject(zeroTouchConfig));
+            cloudAssignedAadServerData = JsonConvert.SerializeObject(zeroTouchConfig);
 
         }
     }
