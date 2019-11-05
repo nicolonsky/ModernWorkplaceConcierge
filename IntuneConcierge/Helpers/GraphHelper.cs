@@ -53,7 +53,7 @@ namespace IntuneConcierge.Helpers
             return events.CurrentPage;
         }
 
-        public static async Task <IEnumerable<WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
+        public static async Task <IEnumerable<Microsoft.Graph.WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
         {
             var graphClient = GetAuthenticatedClient();
             graphClient.BaseUrl = graphEndpoint;
@@ -61,6 +61,31 @@ namespace IntuneConcierge.Helpers
             var events = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().GetAsync();
 
             return events.CurrentPage;
+        }
+
+        public static async Task<Microsoft.Graph.WindowsAutopilotDeploymentProfile> GetWindowsAutopilotDeploymentProfiles(string Id)
+        {
+            var graphClient = GetAuthenticatedClient();
+            graphClient.BaseUrl = graphEndpoint;
+
+            List<QueryOption> options = new List<QueryOption>
+            {
+                 new QueryOption("$filter", "=equals('id',"+Id+")")
+
+            };
+
+            Microsoft.Graph.WindowsAutopilotDeploymentProfile profile = (Microsoft.Graph.WindowsAutopilotDeploymentProfile) await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request(options).GetAsync();
+
+            return profile;
+        }
+
+        public static Organization GetOrgDetailsAsync()
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            Organization organization = (Organization) graphClient.Organization.Request();
+
+            return organization;
         }
 
         public static async Task<User> GetUserDetailsAsync(string accessToken)

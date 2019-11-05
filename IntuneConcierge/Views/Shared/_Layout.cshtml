@@ -37,9 +37,13 @@
                     </li>
                     @if (Request.IsAuthenticated)
                     {
-                       <li class="nav-item" data-turbolinks="false">
+                        <li class="nav-item" data-turbolinks="false">
                             @Html.ActionLink("Export", "Index", "Export", new { area = "" },
                                 new { @class = ViewBag.Current == "Export" ? "nav-link active" : "nav-link" })
+                        </li>
+                        <li class="nav-item" data-turbolinks="false">
+                            @Html.ActionLink("AutoPilotConfiguration", "Index", "AutoPilotConfigurationJSON", new { area = "" },
+                                new { @class = ViewBag.Current == "AutoPilotConfigurationJSON" ? "nav-link active" : "nav-link" })
                         </li>
                     }
                 </ul>
