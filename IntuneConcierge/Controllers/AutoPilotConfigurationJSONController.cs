@@ -28,8 +28,7 @@ namespace IntuneConcierge.Controllers
 
         public async System.Threading.Tasks.Task<FileResult> DownloadAutopilotConfigurationJSON(string Id)
         {
-
-           var profile =  await GraphHelper.GetWindowsAutopilotDeploymentProfiles(Id);
+            var profile =  await GraphHelper.GetWindowsAutopilotDeploymentProfiles(Id);
 
             var org = await GraphHelper.GetOrgDetailsAsync();
 

@@ -9,28 +9,24 @@ using Newtonsoft.Json;
 
 namespace IntuneConcierge.Helpers
 {
-    public class EmbeddedWindowsAutopilotDeploymentProfile
+    public class CloudAssignedAadServerData
     {
-        public String CloudAssignedTenantDomain;
-        public String CloudAssignedTenantUpn;
-        public int ForcedEnrollment;
-
-        public EmbeddedWindowsAutopilotDeploymentProfile()
+       public CloudAssignedAadServerData()
         {
 
         }
     }
 
-    public class ZeroTouchWindowsAutopilotDeploymentProfile : EmbeddedWindowsAutopilotDeploymentProfile
+    public class ZeroTouchConfig : CloudAssignedAadServerData
     {
+        public String CloudAssignedTenantDomain;
+        public String CloudAssignedTenantUpn;
+        public int ForcedEnrollment;
 
-        public EmbeddedWindowsAutopilotDeploymentProfile EmbeddedWindowsAutopilotDeploymentProfile;
-
-        public ZeroTouchWindowsAutopilotDeploymentProfile(EmbeddedWindowsAutopilotDeploymentProfile embedded)
+        public ZeroTouchConfig(String CloudAssignedTenantDomain, int ForcedEnrollment)
         {
-            EmbeddedWindowsAutopilotDeploymentProfile.ForcedEnrollment = embedded.ForcedEnrollment;
-            EmbeddedWindowsAutopilotDeploymentProfile.CloudAssignedTenantUpn = embedded.CloudAssignedTenantUpn;
-            EmbeddedWindowsAutopilotDeploymentProfile.CloudAssignedTenantDomain = embedded.CloudAssignedTenantDomain;
+            this.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
+            this.ForcedEnrollment = ForcedEnrollment;
         }
     }
 
@@ -47,8 +43,7 @@ namespace IntuneConcierge.Helpers
         public int CloudAssignedForcedEnrollment;
         public String CloudAssignedTenantId;
         public String CloudAssignedTenantDomain;
-        public String CloudAssignedAadServerData;
-        public ZeroTouchWindowsAutopilotDeploymentProfile ZeroTouchConfig;
+        public CloudAssignedAadServerData cloudAssignedAadServerData;
 
         public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
         {
@@ -129,10 +124,8 @@ namespace IntuneConcierge.Helpers
                 hideEscapeLink = 1;
             }
 
-            ZeroTouchConfig.EmbeddedWindowsAutopilotDeploymentProfile.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
-            ZeroTouchConfig.EmbeddedWindowsAutopilotDeploymentProfile.ForcedEnrollment = hideEscapeLink;
+            cloudAssignedAadServerData = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
 
-            CloudAssignedAadServerData = JsonConvert.SerializeObject(ZeroTouchConfig, Formatting.Indented);
         }
     }
 }
