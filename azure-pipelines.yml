@@ -39,7 +39,7 @@ steps:
   inputs:
     Path: '$(Build.SourcesDirectory)'
     VersionNumber: '$(Build.BuildNumber)'
-    InjectVersion: true
+    InjectVersion: false
     FilenamePattern: 'AssemblyInfo.*'
     OutputVersion: 'OutputedVersion'
 - task: VSBuild@1
