@@ -1,6 +1,8 @@
 ﻿@model  Microsoft.Graph.WindowsAutopilotDeploymentProfile
+
 @using System.ComponentModel.DataAnnotations
 @using System.Reflection
+
 @{
     ViewBag.Current = "Detail";
 }
@@ -17,7 +19,7 @@
     </tr>
     @foreach (var item in Model.GetType().GetProperties())
     {
-        var label = item.GetCustomAttribute<DisplayAttribute>().Name;
+        var label = item.GetCustomAttribute<DisplayAttribute>().AutoGenerateField;
         var value = item.GetValue(Model);
         <tr>
             <td>@label</td>

@@ -19,6 +19,8 @@ namespace IntuneConcierge.Helpers
     {
         public ZeroTouchConfig(String CloudAssignedTenantDomain, int ForcedEnrollment)
         {
+            _ = new ZeroTouchConfig(CloudAssignedTenantDomain, ForcedEnrollment);
+            
             this.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
             this.ForcedEnrollment = ForcedEnrollment;
         }
