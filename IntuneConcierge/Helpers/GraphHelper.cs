@@ -68,19 +68,9 @@ namespace IntuneConcierge.Helpers
             var graphClient = GetAuthenticatedClient();
             graphClient.BaseUrl = graphEndpoint;
 
-            List<QueryOption> options = new List<QueryOption>
-            {
-                 new QueryOption("?$filter", "=id eq "+"'"+Id+"'")
+            Microsoft.Graph.WindowsAutopilotDeploymentProfile profile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[Id].Request().GetAsync();
 
-                 //?$filter=Id eq 'c28ad95d-a84b-41ef-b858-6ba5b91c3432'
-
-            };
-
-            var profile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().Top(1).GetAsync();
-
-            Microsoft.Graph.WindowsAutopilotDeploymentProfile ret = profile.CurrentPage.First();
-
-            return ret ;
+            return profile;
         }
 
         public static async Task<Organization> GetOrgDetailsAsync()

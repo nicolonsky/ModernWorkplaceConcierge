@@ -49,17 +49,17 @@ namespace IntuneConcierge.Helpers
 
         public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
         {
-            this.Comment_File = "Profile " + profile.DisplayName;
-            this.Version = 2049;
-            this.ZtdCorrelationId = profile.Id;
+            Comment_File = "Profile " + profile.DisplayName;
+            Version = 2049;
+            ZtdCorrelationId = profile.Id;
 
-            if (profile.ODataType == "#microsoft.graph.activeDirectoryWindowsAutopilotDeploymentProfile")
+            if (profile.ODataType.Equals("#microsoft.graph.activeDirectoryWindowsAutopilotDeploymentProfile"))
             {
-                this.CloudAssignedDomainJoinMethod = 1;
+                CloudAssignedDomainJoinMethod = 1;
             }
             else
             {
-                this.CloudAssignedDomainJoinMethod = 0;
+                CloudAssignedDomainJoinMethod = 0;
             }
 
             if (profile.DeviceNameTemplate.Length > 0)
