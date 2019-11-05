@@ -63,7 +63,7 @@ namespace IntuneConcierge.Helpers
             return events.CurrentPage;
         }
 
-        public static async Task<IEnumerable<Microsoft.Graph.WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles(string Id)
+        public static async Task<Microsoft.Graph.WindowsAutopilotDeploymentProfile> GetWindowsAutopilotDeploymentProfiles(string Id)
         {
             var graphClient = GetAuthenticatedClient();
             graphClient.BaseUrl = graphEndpoint;
@@ -76,9 +76,9 @@ namespace IntuneConcierge.Helpers
 
             };
 
-            var profile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request(options).GetAsync();
+            Microsoft.Graph.WindowsAutopilotDeploymentProfile profile = (Microsoft.Graph.WindowsAutopilotDeploymentProfile) await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request(options).Top(1).GetAsync();
 
-            return profile.CurrentPage;
+            return profile;
         }
 
         public static Organization GetOrgDetailsAsync()
