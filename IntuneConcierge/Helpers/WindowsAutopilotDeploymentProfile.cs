@@ -11,6 +11,7 @@ namespace IntuneConcierge.Helpers
 {
     public class CloudAssignedAadServerData
     {
+        public String ZeroTouchConfig;
        public CloudAssignedAadServerData()
         {
 
@@ -49,7 +50,7 @@ namespace IntuneConcierge.Helpers
         {
             Comment_File = "Profile " + profile.DisplayName;
             Version = 2049;
-            ZtdCorrelationId = profile.Id;
+            ZtdCorrelationId = profile.GetId().ToString();
 
             if (profile.ODataType.Equals("#microsoft.graph.activeDirectoryWindowsAutopilotDeploymentProfile"))
             {
@@ -125,6 +126,8 @@ namespace IntuneConcierge.Helpers
             }
 
             cloudAssignedAadServerData = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
+
+            cloudAssignedAadServerData.ZeroTouchConfig = JsonConvert.SerializeObject(cloudAssignedAadServerData);
 
         }
     }
