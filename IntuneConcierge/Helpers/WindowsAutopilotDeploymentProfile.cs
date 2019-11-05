@@ -126,8 +126,8 @@ namespace IntuneConcierge.Helpers
                 hideEscapeLink = 1;
             }
 
-            this.ZeroTouchConfig.ForcedEnrollment =  hideEscapeLink; 
-            this.ZeroTouchConfig.CloudAssignedTenantDomain = this.CloudAssignedTenantDomain;
+            //this.ZeroTouchConfig.ForcedEnrollment =  hideEscapeLink; 
+            //this.ZeroTouchConfig.CloudAssignedTenantDomain = this.CloudAssignedTenantDomain;
         }
     }
 }
