@@ -1,5 +1,6 @@
 ﻿@model  Microsoft.Graph.WindowsAutopilotDeploymentProfile
-
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
 @{
     ViewBag.Current = "Detail";
 }
@@ -9,23 +10,21 @@
     <p>The downloaded profile can be used for offline Windows Autopilot deployments. Store downloaded file under "C:\Windows\Provisioning\Autopilot\AutoPilotConfigurationFile.json" </p>
 </div>
 
-<table class="table">
+<table>
     <tr>
-        <th>
-            Key
-        </th>
-        <th>
-            Value
-        </th>
+        <th>Key</th>
+        <th>Value</th>
     </tr>
-    <tr>
-        <td>DisplayName</td>
-        <td>@Model.DisplayName</td>
-    </tr>
-    <tr>
-        <td>EnableWhiteGlove</td>
-        <td>@Model.EnableWhiteGlove</td>
-    </tr>
+    @foreach (var item in Model.GetType().GetProperties())
+    {
+        var label = item.GetCustomAttribute<DisplayAttribute>().Name;
+        var value = item.GetValue(Model);
+        <tr>
+            <td>@label</td>
+            <td>@value</td>
+        </tr>
+
+    }
 </table>
 
 
