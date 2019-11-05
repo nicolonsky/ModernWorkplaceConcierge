@@ -24,7 +24,7 @@ namespace IntuneConcierge.Helpers
 
     public class WindowsAutopilotDeploymentProfile
     {
-
+        //https://docs.microsoft.com/en-us/windows/deployment/windows-autopilot/existing-devices
         public String Comment_File;
         public int Version;
         public String ZtdCorrelationId;
@@ -118,7 +118,12 @@ namespace IntuneConcierge.Helpers
 
             ZeroTouchConfig zeroTouchConfig = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
 
-            cloudAssignedAadServerData = JsonConvert.SerializeObject(zeroTouchConfig);
+            cloudAssignedAadServerData = JsonConvert.SerializeObject(zeroTouchConfig,
+                new JsonSerializerSettings()
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                }
+                );
 
         }
     }
