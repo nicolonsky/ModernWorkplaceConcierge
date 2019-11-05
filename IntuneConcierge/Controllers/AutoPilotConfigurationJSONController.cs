@@ -12,14 +12,14 @@ namespace IntuneConcierge.Controllers
     public class AutoPilotConfigurationJSONController : BaseController
     {
         // GET: AutoPilotConfigurationJSON
-        public async System.Threading.Tasks.Task<ActionResult> IndexAsync()
+        public async System.Threading.Tasks.Task<ActionResult> Index()
         {
             var AutopilotProfiles = await GraphHelper.GetWindowsAutopilotDeploymentProfiles();
 
             return View(AutopilotProfiles);
         }
 
-        public async System.Threading.Tasks.Task<ActionResult> DetailAsync(String Id)
+        public async System.Threading.Tasks.Task<ActionResult> Detail(String Id)
         {
             var AutopilotProfiles = await GraphHelper.GetWindowsAutopilotDeploymentProfiles(Id);
 
