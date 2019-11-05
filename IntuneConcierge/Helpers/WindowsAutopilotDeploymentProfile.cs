@@ -47,7 +47,7 @@ namespace IntuneConcierge.Helpers
         public int ForcedEnrollment;
         public ZeroTouchWindowsAutopilotDeploymentProfile ZeroTouchConfig;
 
-        WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
+        public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
         {
             Comment_File = "Profile " + profile.DisplayName;
             Version = 2049;
