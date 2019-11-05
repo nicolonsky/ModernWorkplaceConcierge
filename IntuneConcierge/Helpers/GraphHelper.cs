@@ -70,7 +70,7 @@ namespace IntuneConcierge.Helpers
 
             List<QueryOption> options = new List<QueryOption>
             {
-                 new QueryOption("$filter", "id eq"+Id)
+                 new QueryOption("$filter", "id eq "+"'"+Id+"'")
 
                  //?$filter=Id eq 'c28ad95d-a84b-41ef-b858-6ba5b91c3432'
 
