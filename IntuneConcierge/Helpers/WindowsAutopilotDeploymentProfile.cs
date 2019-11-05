@@ -18,9 +18,7 @@ namespace IntuneConcierge.Helpers
     public class ZeroTouchConfig : CloudAssignedAadServerData
     {
         public ZeroTouchConfig(String CloudAssignedTenantDomain, int ForcedEnrollment)
-        {
-            _ = new ZeroTouchConfig(CloudAssignedTenantDomain, ForcedEnrollment);
-            
+        {         
             this.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
             this.ForcedEnrollment = ForcedEnrollment;
         }
@@ -29,6 +27,7 @@ namespace IntuneConcierge.Helpers
     public class WindowsAutopilotDeploymentProfile
     {
         //https://docs.microsoft.com/en-us/windows/deployment/windows-autopilot/existing-devices
+
         public String Comment_File;
         public int Version;
         public String ZtdCorrelationId;
@@ -128,7 +127,6 @@ namespace IntuneConcierge.Helpers
                     NullValueHandling = NullValueHandling.Ignore
                 }
                 );
-
         }
     }
 }
