@@ -76,9 +76,11 @@ namespace IntuneConcierge.Helpers
 
             };
 
-            Microsoft.Graph.WindowsAutopilotDeploymentProfile profile = (Microsoft.Graph.WindowsAutopilotDeploymentProfile) await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request(options).Top(1).GetAsync();
+            var profile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request(options).Top(1).GetAsync();
 
-            return profile;
+            Microsoft.Graph.WindowsAutopilotDeploymentProfile ret = profile.CurrentPage.First();
+
+            return ret ;
         }
 
         public static Organization GetOrgDetailsAsync()
