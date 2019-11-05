@@ -7,7 +7,7 @@
 trigger:
 - master
 
-name: IntuneConcierge_$(date:yyyy).$(date:MM).$(date:dd)$(Rev:.r)
+name: $(date:yyyy).$(date:MM).$(date:dd)$(Rev:.r)
 
 pool:
   vmImage: 'windows-latest'
@@ -39,7 +39,7 @@ steps:
   inputs:
     Path: '$(Build.SourcesDirectory)'
     VersionNumber: '$(Build.BuildNumber)'
-    InjectVersion: true
+    InjectVersion: false
     FilenamePattern: 'AssemblyInfo.*'
     OutputVersion: 'OutputedVersion'
 - task: VSBuild@1
