@@ -257,6 +257,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Export\Index.cshtml" />
     <Content Include="Views\AutoPilotConfigurationJSON\Index.cshtml" />
+    <Content Include="Views\AutoPilotConfigurationJSON\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

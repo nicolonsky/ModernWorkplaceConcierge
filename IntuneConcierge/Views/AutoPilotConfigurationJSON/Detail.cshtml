@@ -1,0 +1,32 @@
+﻿@model  Microsoft.Graph.WindowsAutopilotDeploymentProfile
+
+@{
+    ViewBag.Current = "Detail";
+}
+
+<div class="jumbotron">
+    <h1>Windows Autopilot Profiles</h1>
+    <p>The downloaded profile can be used for offline Windows Autopilot deployments. Store downloaded file under "C:\Windows\Provisioning\Autopilot\AutoPilotConfigurationFile.json" </p>
+</div>
+
+<table class="table">
+    <tr>
+        <th>
+            Key
+        </th>
+        <th>
+            Value
+        </th>
+    </tr>
+    <tr>
+        <td>DisplayName</td>
+        <td>@Model.DisplayName</td>
+    </tr>
+    <tr>
+        <td>EnableWhiteGlove</td>
+        <td>@Model.EnableWhiteGlove</td>
+    </tr>
+</table>
+
+
+
