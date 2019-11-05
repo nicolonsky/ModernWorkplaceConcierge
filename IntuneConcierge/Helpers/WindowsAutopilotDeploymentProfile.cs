@@ -11,7 +11,7 @@ namespace IntuneConcierge.Helpers
     public class EmbeddedWindowsAutopilotDeploymentProfile
     {
         public String CloudAssignedTenantDomain;
-        String CloudAssignedTenantUpn;
+        public String CloudAssignedTenantUpn;
         public int ForcedEnrollment;
 
         public EmbeddedWindowsAutopilotDeploymentProfile()
@@ -23,11 +23,11 @@ namespace IntuneConcierge.Helpers
     public class ZeroTouchWindowsAutopilotDeploymentProfile : EmbeddedWindowsAutopilotDeploymentProfile
     {
 
-        EmbeddedWindowsAutopilotDeploymentProfile EmbeddedWindowsAutopilotDeploymentProfile;
+        public EmbeddedWindowsAutopilotDeploymentProfile EmbeddedWindowsAutopilotDeploymentProfile;
 
-        ZeroTouchWindowsAutopilotDeploymentProfile(EmbeddedWindowsAutopilotDeploymentProfile embedded)
+        public ZeroTouchWindowsAutopilotDeploymentProfile(EmbeddedWindowsAutopilotDeploymentProfile embedded)
         {
-            this.EmbeddedWindowsAutopilotDeploymentProfile = embedded;
+            EmbeddedWindowsAutopilotDeploymentProfile = embedded;
         }
     }
 
@@ -44,7 +44,6 @@ namespace IntuneConcierge.Helpers
         public int CloudAssignedForcedEnrollment;
         public String CloudAssignedTenantId;
         public String CloudAssignedTenantDomain;
-        public int ForcedEnrollment;
         public ZeroTouchWindowsAutopilotDeploymentProfile ZeroTouchConfig;
 
         public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
@@ -126,8 +125,8 @@ namespace IntuneConcierge.Helpers
                 hideEscapeLink = 1;
             }
 
-            //this.ZeroTouchConfig.ForcedEnrollment =  hideEscapeLink; 
-            //this.ZeroTouchConfig.CloudAssignedTenantDomain = this.CloudAssignedTenantDomain;
+            ZeroTouchConfig.ForcedEnrollment =  hideEscapeLink; 
+            ZeroTouchConfig.CloudAssignedTenantDomain = this.CloudAssignedTenantDomain;
         }
     }
 }
