@@ -26,9 +26,10 @@ namespace IntuneConcierge.Helpers
         public String CloudAssignedTenantDomain;
 
         public ZeroTouchConfig(String CloudAssignedTenantDomain, int ForcedEnrollment)
-        {         
-            this.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
+        {
+            this.CloudAssignedTenantUpn = "";
             this.ForcedEnrollment = ForcedEnrollment;
+            this.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
         }
     }
 
@@ -42,8 +43,8 @@ namespace IntuneConcierge.Helpers
         public int Version;
         public String Comment_File;
         public string CloudAssignedAadServerData;
-        public int CloudAssignedOobeConfig;
         public int CloudAssignedDomainJoinMethod;
+        public int CloudAssignedOobeConfig;
         public String ZtdCorrelationId;
         public String CloudAssignedTenantDomain;
         public String CloudAssignedLanguage;
