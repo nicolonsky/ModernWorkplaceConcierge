@@ -10,13 +10,21 @@ using Newtonsoft.Json;
 namespace IntuneConcierge.Helpers
 {
     public class CloudAssignedAadServerData {
+
+        ZeroTouchConfig zeroTouchConfig;
+
+        public CloudAssignedAadServerData(ZeroTouchConfig zeroTouchConfig) {
+            this.zeroTouchConfig = zeroTouchConfig;
+        }
+      
+
+    }
+    public class ZeroTouchConfig
+    {
         public String CloudAssignedTenantDomain;
         public String CloudAssignedTenantUpn;
         public int ForcedEnrollment;
 
-    }
-    public class ZeroTouchConfig : CloudAssignedAadServerData
-    {
         public ZeroTouchConfig(String CloudAssignedTenantDomain, int ForcedEnrollment)
         {         
             this.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
@@ -38,7 +46,7 @@ namespace IntuneConcierge.Helpers
         public int CloudAssignedForcedEnrollment;
         public String CloudAssignedTenantId;
         public String CloudAssignedTenantDomain;
-        public string cloudAssignedAadServerData;
+        public string CloudAssignedAadServerData;
 
         public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
         {
@@ -119,9 +127,12 @@ namespace IntuneConcierge.Helpers
                 hideEscapeLink = 1;
             }
 
-            CloudAssignedAadServerData zeroTouchConfig = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
 
-            cloudAssignedAadServerData = JsonConvert.SerializeObject(zeroTouchConfig,
+            ZeroTouchConfig temp = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
+            CloudAssignedAadServerData zeroTouchConfig = new CloudAssignedAadServerData(temp);
+                
+
+            CloudAssignedAadServerData = JsonConvert.SerializeObject(zeroTouchConfig,
                 new JsonSerializerSettings()
                 {
                     NullValueHandling = NullValueHandling.Ignore
