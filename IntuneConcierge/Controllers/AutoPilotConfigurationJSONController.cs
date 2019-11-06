@@ -35,7 +35,7 @@ namespace IntuneConcierge.Controllers
 
             Helpers.WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = new Helpers.WindowsAutopilotDeploymentProfile(profile, org);
 
-            byte[] autopilotconfiguraton = System.Text.Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
+            byte[] autopilotconfiguraton = System.Text.Encoding.Default.GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
 
                  new JsonSerializerSettings()
                  {

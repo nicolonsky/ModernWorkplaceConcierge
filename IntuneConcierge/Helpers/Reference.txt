@@ -1,13 +1,13 @@
-﻿ {
-  "CloudAssignedTenantId":  "7955e1b3-cbad-49eb-9a84-e14aed7f3400",
-  "CloudAssignedForcedEnrollment":  1,
-  "Version":  2049,
-  "Comment_File":  "Profile Nicolonsky Tech Hybrid",
-  "CloudAssignedAadServerData":  "{\"ZeroTouchConfig\":{\"CloudAssignedTenantUpn\":\"\",\"ForcedEnrollment\":1,\"CloudAssignedTenantDomain\":\"nicolasuter.ch\"}}",
-  "CloudAssignedTenantDomain":  "nicolasuter.ch",
-  "CloudAssignedDomainJoinMethod":  0,
-  "CloudAssignedOobeConfig":  28,
-  "ZtdCorrelationId":  "7F9E6025-1E13-45F3-BF82-A3E8C5B59EAC"
+﻿{
+    "CloudAssignedTenantId":  "7955e1b3-cbad-49eb-9a84-e14aed7f3400",
+    "CloudAssignedForcedEnrollment":  1,
+    "Version":  2049,
+    "Comment_File":  "Profile Nicolonsky Tech Hybrid",
+    "CloudAssignedAadServerData":  "{\"ZeroTouchConfig\":{\"CloudAssignedTenantUpn\":\"\",\"ForcedEnrollment\":1,\"CloudAssignedTenantDomain\":\"nicolasuter.ch\"}}",
+    "CloudAssignedTenantDomain":  "nicolasuter.ch",
+    "CloudAssignedDomainJoinMethod":  1,
+    "CloudAssignedOobeConfig":  28,
+    "ZtdCorrelationId":  "49cef410-0dc4-4c7c-9ba3-e6792565ff1f"
 }
 
 {
@@ -19,7 +19,6 @@
     "CloudAssignedAadServerData":  "{\"ZeroTouchConfig\":{\"CloudAssignedTenantUpn\":\"\",\"ForcedEnrollment\":1,\"CloudAssignedTenantDomain\":\"nicolasuter.ch\"}}",
     "CloudAssignedOobeConfig":  30,
     "CloudAssignedDomainJoinMethod":  0,
-    "ZtdCorrelationId":  "7F9E6025-1E13-45F3-BF82-A3E8C5B59EAC",
+    "ZtdCorrelationId":  "c28ad95d-a84b-41ef-b858-6ba5b91c3432",
     "CloudAssignedTenantDomain":  "nicolasuter.ch"
 }
-
