@@ -13,6 +13,11 @@ namespace IntuneConcierge.Helpers
 
         public ZeroTouchConfig zeroTouchConfig;
 
+        public CloudAssignedAadServerData (ZeroTouchConfig zeroTouchConfig)
+        {
+            this.zeroTouchConfig = new ZeroTouchConfig(zeroTouchConfig.CloudAssignedTenantDomain, zeroTouchConfig.ForcedEnrollment);
+        }
+
     }
     public class ZeroTouchConfig
     {
@@ -122,10 +127,8 @@ namespace IntuneConcierge.Helpers
                 hideEscapeLink = 1;
             }
 
-            CloudAssignedAadServerData zeroTouchConfig = new CloudAssignedAadServerData();
-
-            zeroTouchConfig.zeroTouchConfig.CloudAssignedTenantDomain = CloudAssignedTenantDomain;
-            zeroTouchConfig.zeroTouchConfig.ForcedEnrollment = hideEscapeLink;
+            ZeroTouchConfig touchConfig = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
+            CloudAssignedAadServerData zeroTouchConfig = new CloudAssignedAadServerData(touchConfig);
 
                 
             this.CloudAssignedAadServerData = JsonConvert.SerializeObject(zeroTouchConfig,
