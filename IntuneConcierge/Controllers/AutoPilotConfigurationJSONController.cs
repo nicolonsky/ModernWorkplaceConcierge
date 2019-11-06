@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 
 namespace IntuneConcierge.Controllers
 {
+    [Authorize]
     public class AutoPilotConfigurationJSONController : BaseController
     {
         // GET: AutoPilotConfigurationJSON

@@ -11,6 +11,7 @@ using Microsoft.Graph;
 
 namespace IntuneConcierge.Controllers
 {
+    [Authorize]
     public class ExportController : BaseController
     {
         // GET: Export

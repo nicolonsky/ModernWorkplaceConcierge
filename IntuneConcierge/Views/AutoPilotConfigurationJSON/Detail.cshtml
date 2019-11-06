@@ -5,8 +5,8 @@
 }
 
 <div class="jumbotron">
-    <h1>Windows Autopilot Profiles</h1>
-    <p>The downloaded profile can be used for offline Windows Autopilot deployments. Store downloaded file under "C:\Windows\Provisioning\Autopilot\AutoPilotConfigurationFile.json" </p>
+    <h1>@Model.DisplayName</h1>
+    <p>WindowsAutopilotDeploymentProfile</p>
 </div>
 
 <table>
@@ -31,12 +31,35 @@
         <td>@Model.EnableWhiteGlove</td>
     </tr>
     <tr>
-        <td>OutOfBoxExperienceSettings</td>
-        <td>@Model.OutOfBoxExperienceSettings.ToString()</td>
+        <td>OutOfBoxExperienceSettings.DeviceUsageType</td>
+        <td>@Model.OutOfBoxExperienceSettings.DeviceUsageType</td>
     </tr>
-
-
+    <tr>
+        <td>OutOfBoxExperienceSettings.HideEULA</td>
+        <td>@Model.OutOfBoxExperienceSettings.HideEULA</td>
+    </tr>
+    <tr>
+        <td>OutOfBoxExperienceSettings.HidePrivacySettings</td>
+        <td>@Model.OutOfBoxExperienceSettings.HidePrivacySettings</td>
+    </tr>
+    <tr>
+        <td>OutOfBoxExperienceSettings.SkipKeyboardSelectionPage</td>
+        <td>@Model.OutOfBoxExperienceSettings.SkipKeyboardSelectionPage</td>
+    </tr>
+    <tr>
+        <td>OutOfBoxExperienceSettings.UserType</td>
+        <td>@Model.OutOfBoxExperienceSettings.UserType</td>
+    </tr>
+    <tr>
+        <td>Language</td>
+        <td>@Model.Language</td>
+    </tr>
+    <tr>
+        <td>Id</td>
+        <td>@Model.Id</td>
+    </tr>
 </table>
 
+@Html.ActionLink("Back", "Index", "AutoPilotConfigurationJSON", new { area = "" }, new { @class = "btn btn-default btn-large" })
 
 

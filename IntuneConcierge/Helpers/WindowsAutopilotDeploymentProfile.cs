@@ -21,9 +21,9 @@ namespace IntuneConcierge.Helpers
     }
     public class ZeroTouchConfig
     {
-        public String CloudAssignedTenantDomain;
         public String CloudAssignedTenantUpn;
         public int ForcedEnrollment;
+        public String CloudAssignedTenantDomain;
 
         public ZeroTouchConfig(String CloudAssignedTenantDomain, int ForcedEnrollment)
         {         
@@ -36,22 +36,24 @@ namespace IntuneConcierge.Helpers
     {
         //https://docs.microsoft.com/en-us/windows/deployment/windows-autopilot/existing-devices
 
-        public String Comment_File;
-        public int Version;
-        public String ZtdCorrelationId;
-        public int CloudAssignedDomainJoinMethod;
-        public String CloudAssignedDeviceName;
-        public int CloudAssignedOobeConfig;
-        public String CloudAssignedLanguage;
-        public int CloudAssignedForcedEnrollment;
         public String CloudAssignedTenantId;
-        public String CloudAssignedTenantDomain;
+        public String CloudAssignedDeviceName;
+        public int CloudAssignedForcedEnrollment;
+        public int Version;
+        public String Comment_File;
         public string CloudAssignedAadServerData;
-
+        public int CloudAssignedOobeConfig;
+        public int CloudAssignedDomainJoinMethod;
+        public String ZtdCorrelationId;
+        public String CloudAssignedTenantDomain;
+        public String CloudAssignedLanguage;
+        
         public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
         {
-            Comment_File = "Profile " + profile.DisplayName;
+            Comment_File = "Offline Autopilot Profile " + profile.DisplayName;
+
             Version = 2049;
+
             ZtdCorrelationId = profile.Id;
 
             if (profile.ODataType.Equals("#microsoft.graph.activeDirectoryWindowsAutopilotDeploymentProfile"))
@@ -127,10 +129,11 @@ namespace IntuneConcierge.Helpers
                 hideEscapeLink = 1;
             }
 
+            // Nest a ZeroTouchConfig within the CloudAssignedAadServerData object -> required for the JSON
             ZeroTouchConfig touchConfig = new ZeroTouchConfig(CloudAssignedTenantDomain, hideEscapeLink);
             CloudAssignedAadServerData zeroTouchConfig = new CloudAssignedAadServerData(touchConfig);
 
-                
+            // Serialize ZeroTouchConfig as JSON string
             this.CloudAssignedAadServerData = JsonConvert.SerializeObject(zeroTouchConfig,
                 new JsonSerializerSettings()
                 {
