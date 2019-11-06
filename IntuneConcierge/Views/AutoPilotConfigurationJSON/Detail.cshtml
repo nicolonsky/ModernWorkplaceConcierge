@@ -1,8 +1,5 @@
 ﻿@model  Microsoft.Graph.WindowsAutopilotDeploymentProfile
 
-@using System.ComponentModel.DataAnnotations
-@using System.Reflection
-
 @{
     ViewBag.Current = "Detail";
 }
@@ -17,16 +14,28 @@
         <th>Key</th>
         <th>Value</th>
     </tr>
-    @foreach (var item in Model.GetType().GetProperties())
-    {
-        var label = item.GetCustomAttribute<DisplayAttribute>().AutoGenerateField;
-        var value = item.GetValue(Model);
-        <tr>
-            <td>@label</td>
-            <td>@value</td>
-        </tr>
+    <tr>
+        <td>DisplayName</td>
+        <td>@Model.DisplayName</td>
+    </tr>
+    <tr>
+        <td>DeviceType</td>
+        <td>@Model.DeviceType</td>
+    </tr>
+    <tr>
+        <td>DeviceNameTemplate</td>
+        <td>@Model.DeviceNameTemplate</td>
+    </tr>
+    <tr>
+        <td>EnableWhiteGlove</td>
+        <td>@Model.EnableWhiteGlove</td>
+    </tr>
+    <tr>
+        <td>OutOfBoxExperienceSettings</td>
+        <td>@Model.OutOfBoxExperienceSettings.ToString()</td>
+    </tr>
 
-    }
+
 </table>
 
 

@@ -14,7 +14,8 @@ namespace IntuneConcierge.Helpers
         ZeroTouchConfig zeroTouchConfig;
 
         public CloudAssignedAadServerData(ZeroTouchConfig zeroTouchConfig) {
-            this.zeroTouchConfig = zeroTouchConfig;
+            this.zeroTouchConfig.CloudAssignedTenantDomain = zeroTouchConfig.CloudAssignedTenantDomain;
+            this.zeroTouchConfig.ForcedEnrollment = zeroTouchConfig.ForcedEnrollment;
         }
       
 
