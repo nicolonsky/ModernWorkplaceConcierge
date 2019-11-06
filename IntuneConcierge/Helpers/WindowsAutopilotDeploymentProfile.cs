@@ -11,11 +11,11 @@ namespace IntuneConcierge.Helpers
 {
     public class CloudAssignedAadServerData {
 
-        public ZeroTouchConfig zeroTouchConfig;
+        public ZeroTouchConfig ZeroTouchConfig;
 
         public CloudAssignedAadServerData (ZeroTouchConfig zeroTouchConfig)
         {
-            this.zeroTouchConfig = new ZeroTouchConfig(zeroTouchConfig.CloudAssignedTenantDomain, zeroTouchConfig.ForcedEnrollment);
+            this.ZeroTouchConfig = new ZeroTouchConfig(zeroTouchConfig.CloudAssignedTenantDomain, zeroTouchConfig.ForcedEnrollment);
         }
 
     }
