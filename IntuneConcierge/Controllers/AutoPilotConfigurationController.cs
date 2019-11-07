@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 namespace IntuneConcierge.Controllers
 {
     [Authorize]
-    public class AutoPilotConfigurationJSONController : BaseController
+    public class AutoPilotConfigurationController : BaseController
     {
         // GET: AutoPilotConfigurationJSON
         public async System.Threading.Tasks.Task<ActionResult> Index()
@@ -38,7 +38,7 @@ namespace IntuneConcierge.Controllers
             AutopilotConfiguration windowsAutopilotDeploymentProfile = new AutopilotConfiguration(profile, org);
 
             // 1250 is ANSI encoding required for the AutopilotConfiguration.json!
-            byte[] autopilotconfiguraton = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
+            byte[] autopilotconfiguraton = Encoding.GetEncoding(1250).GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
                 // remove nullvalues from output and pretty format that JSON
                  new JsonSerializerSettings()
                  {
@@ -46,8 +46,6 @@ namespace IntuneConcierge.Controllers
                      Formatting = Formatting.Indented
                  } 
                 ).ToString());
-
-
 
             Response.Clear();
             Response.AddHeader("Content-Disposition", "attachment; filename=" + "AutoPilotConfiguration.json");
@@ -58,8 +56,6 @@ namespace IntuneConcierge.Controllers
             Response.BinaryWrite(autopilotconfiguraton);
             Response.End();
             return null;
-
-
 
             //return File(autopilotconfiguraton, "application/json", "AutoPilotConfiguration.json");
         }

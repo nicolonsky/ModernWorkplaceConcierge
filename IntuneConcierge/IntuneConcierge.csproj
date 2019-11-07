@@ -211,8 +211,9 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\AutoPilotConfigurationJSONController.cs" />
+    <Compile Include="Controllers\AutoPilotConfigurationController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\ConditionalAccessController.cs" />
     <Compile Include="Controllers\ExportController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -257,11 +258,12 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Export\Index.cshtml" />
-    <Content Include="Views\AutoPilotConfigurationJSON\Index.cshtml" />
-    <Content Include="Views\AutoPilotConfigurationJSON\Detail.cshtml" />
+    <Content Include="Views\AutoPilotConfiguration\Index.cshtml" />
+    <Content Include="Views\AutoPilotConfiguration\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\ConditionalAccess\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
