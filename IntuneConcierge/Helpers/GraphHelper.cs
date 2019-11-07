@@ -26,7 +26,7 @@ namespace IntuneConcierge.Helpers
         private static string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
 
-        public static async Task<IEnumerable<ConditionalAccessPolicy>> GetConditionalAccessPoliciesAsync()
+        public static async Task<string> GetConditionalAccessPoliciesAsync()
         {
             var graphClient = GetAuthenticatedClient();
             graphClient.BaseUrl = graphEndpoint;
@@ -41,9 +41,8 @@ namespace IntuneConcierge.Helpers
             // Send the request and get the response.
             HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
-            IEnumerable<ConditionalAccessPolicy> policy = JsonConvert.DeserializeObject<IEnumerable<ConditionalAccessPolicy>>(response.Content.ToString());
-
-            return policy;
+           
+            return response.Content.ToString();
         }
 
         public static async Task<IEnumerable<DeviceConfiguration>> GetDeviceConfigurationsAsync()

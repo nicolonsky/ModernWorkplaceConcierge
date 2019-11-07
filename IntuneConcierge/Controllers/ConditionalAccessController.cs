@@ -1,7 +1,9 @@
 ﻿using IntuneConcierge.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -15,11 +17,14 @@ namespace IntuneConcierge.Controllers
              */
 
         // GET: ConditionalAccess
-        public async System.Threading.Tasks.Task<ActionResult> Index()
+        public async System.Threading.Tasks.Task<FileResult> Index()
         {
             var ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
 
-            return View(ca);
+            byte[] autopilotconfiguraton = Encoding.GetEncoding(1250).GetBytes(ca);
+
+          return File(autopilotconfiguraton, "application/json", "CA.json");
+
         }
     }
 }
