@@ -38,7 +38,7 @@ namespace IntuneConcierge.Controllers
             AutopilotConfiguration windowsAutopilotDeploymentProfile = new AutopilotConfiguration(profile, org);
 
             // 1250 is ANSI encoding required for the AutopilotConfiguration.json!
-            byte[] autopilotconfiguraton = Encoding.GetEncoding(1250).GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
+            byte[] autopilotconfiguraton = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
                 // remove nullvalues from output and pretty format that JSON
                  new JsonSerializerSettings()
                  {
