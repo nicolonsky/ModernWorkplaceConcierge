@@ -218,7 +218,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\WindowsAutopilotDeploymentProfile.cs" />
+    <Compile Include="Helpers\AutopilotConfiguration.cs" />
     <Compile Include="Helpers\GraphHelper.cs" />
     <Compile Include="Models\Alert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

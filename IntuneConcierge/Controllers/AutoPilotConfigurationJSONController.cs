@@ -22,9 +22,9 @@ namespace IntuneConcierge.Controllers
 
         public async System.Threading.Tasks.Task<ActionResult> Detail(String Id)
         {
-            var AutopilotProfiles = await GraphHelper.GetWindowsAutopilotDeploymentProfiles(Id);
+            var AutopilotProfile = await GraphHelper.GetWindowsAutopilotDeploymentProfiles(Id);
 
-            return View(AutopilotProfiles);
+            return View(AutopilotProfile);
         }
 
         public async System.Threading.Tasks.Task<FileResult> DownloadAutopilotConfigurationJSON(string Id)
@@ -33,10 +33,12 @@ namespace IntuneConcierge.Controllers
 
             var org = await GraphHelper.GetOrgDetailsAsync();
 
-            Helpers.WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = new Helpers.WindowsAutopilotDeploymentProfile(profile, org);
+            // Create a new AutopilotConfiguration based on custom model and pass AutopilotProfile and Organizational details from Graph
+            AutopilotConfiguration windowsAutopilotDeploymentProfile = new AutopilotConfiguration(profile, org);
 
-            byte[] autopilotconfiguraton = System.Text.Encoding.Default.GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
-
+            // 1250 is ANSI encoding required for the AutopilotConfiguration.json!
+            byte[] autopilotconfiguraton = System.Text.Encoding.GetEncoding(1250).GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
+                // remove nullvalues from output and pretty format that JSON
                  new JsonSerializerSettings()
                  {
                      NullValueHandling = NullValueHandling.Ignore,
@@ -44,6 +46,7 @@ namespace IntuneConcierge.Controllers
                  } 
                 ).ToString());
 
+            Response.ContentEncoding = System.Text.Encoding.GetEncoding(1250);
             return File(autopilotconfiguraton, "application/json", "AutoPilotConfiguration.json");
         }
     }

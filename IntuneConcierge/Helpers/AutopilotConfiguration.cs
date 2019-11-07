@@ -33,7 +33,7 @@ namespace IntuneConcierge.Helpers
         }
     }
 
-    public class WindowsAutopilotDeploymentProfile
+    public class AutopilotConfiguration
     {
         //https://docs.microsoft.com/en-us/windows/deployment/windows-autopilot/existing-devices
 
@@ -49,7 +49,7 @@ namespace IntuneConcierge.Helpers
         public String CloudAssignedTenantDomain;
         public String CloudAssignedLanguage;
         
-        public WindowsAutopilotDeploymentProfile (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
+        public AutopilotConfiguration (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
         {
             Comment_File = "Offline Autopilot Profile " + profile.DisplayName;
 
