@@ -24,7 +24,7 @@
 <body>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <div class="container">
-            @Html.ActionLink("Intune Concierge", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            @Html.ActionLink("Modern Workplace Concierge", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                     aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -38,12 +38,16 @@
                     @if (Request.IsAuthenticated)
                     {
                         <li class="nav-item" data-turbolinks="false">
-                            @Html.ActionLink("Export", "Index", "Export", new { area = "" },
+                            @Html.ActionLink("Intune", "Index", "Export", new { area = "" },
                                 new { @class = ViewBag.Current == "Export" ? "nav-link active" : "nav-link" })
                         </li>
                         <li class="nav-item" data-turbolinks="false">
                             @Html.ActionLink("AutoPilotConfiguration", "Index", "AutoPilotConfiguration", new { area = "" },
                                 new { @class = ViewBag.Current == "AutoPilotConfiguration" ? "nav-link active" : "nav-link" })
+                        </li>
+                        <li class="nav-item" data-turbolinks="false">
+                            @Html.ActionLink("ConditionalAccess", "Index", "ConditionalAccess", new { area = "" },
+                                new { @class = ViewBag.Current == "ConditionalAccess" ? "nav-link active" : "nav-link" })
                         </li>
                     }
                 </ul>

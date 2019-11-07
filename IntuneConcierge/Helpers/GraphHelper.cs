@@ -26,6 +26,25 @@ namespace IntuneConcierge.Helpers
         private static string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
 
+        public static async Task<string> GetMicrosoftGraphItemAsync(string resource)
+        {
+            var graphClient = GetAuthenticatedClient();
+           
+            string requestUrl = graphEndpoint + resource;
+
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
+
+            string result = await response.Content.ReadAsStringAsync(); //right!
+
+            return result;
+        }
+
         public static async Task<string> GetConditionalAccessPoliciesAsync()
         {
             var graphClient = GetAuthenticatedClient();
@@ -49,51 +68,46 @@ namespace IntuneConcierge.Helpers
         public static async Task<IEnumerable<DeviceConfiguration>> GetDeviceConfigurationsAsync()
         {
             var graphClient = GetAuthenticatedClient();
-            graphClient.BaseUrl = graphEndpoint;
 
-            var events = await graphClient.DeviceManagement.DeviceConfigurations.Request().GetAsync();
+            var deviceConfigurations = await graphClient.DeviceManagement.DeviceConfigurations.Request().GetAsync();
                 
-            return events.CurrentPage;
+            return deviceConfigurations.CurrentPage;
         }
 
         public static async Task<IEnumerable<DeviceCompliancePolicy>> GetDeviceCompliancePoliciesAsync()
         {
             var graphClient = GetAuthenticatedClient();
-            graphClient.BaseUrl = graphEndpoint;
 
-            var events = await graphClient.DeviceManagement.DeviceCompliancePolicies.Request().GetAsync();
+            var deviceCompliancePolicies = await graphClient.DeviceManagement.DeviceCompliancePolicies.Request().GetAsync();
 
-            return events.CurrentPage;
+            return deviceCompliancePolicies.CurrentPage;
         }
 
         public static async Task<IEnumerable<ManagedAppPolicy>> GetManagedAppProtectionAsync()
         {
             var graphClient = GetAuthenticatedClient();
-            graphClient.BaseUrl = graphEndpoint;
+            
+            var managedAppProtection = await graphClient.DeviceAppManagement.ManagedAppPolicies.Request().GetAsync();
 
-            var events = await graphClient.DeviceAppManagement.ManagedAppPolicies.Request().GetAsync();
-
-            return events.CurrentPage;
+            return managedAppProtection.CurrentPage;
         }
 
         public static async Task <IEnumerable<Microsoft.Graph.WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
         {
             var graphClient = GetAuthenticatedClient();
-            graphClient.BaseUrl = graphEndpoint;
 
-            var events = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().GetAsync();
+            var windowsAutopilotDeploymentProfiles = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().GetAsync();
 
-            return events.CurrentPage;
+            return windowsAutopilotDeploymentProfiles.CurrentPage;
         }
 
         public static async Task<Microsoft.Graph.WindowsAutopilotDeploymentProfile> GetWindowsAutopilotDeploymentProfiles(string Id)
         {
             var graphClient = GetAuthenticatedClient();
-            graphClient.BaseUrl = graphEndpoint;
 
-            Microsoft.Graph.WindowsAutopilotDeploymentProfile profile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[Id].Request().GetAsync();
+            Microsoft.Graph.WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[Id].Request().GetAsync();
 
-            return profile;
+            return windowsAutopilotDeploymentProfile;
         }
 
         public static async Task<Organization> GetOrgDetailsAsync()

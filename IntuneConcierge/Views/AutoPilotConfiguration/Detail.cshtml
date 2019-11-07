@@ -4,14 +4,12 @@
     ViewBag.Current = "Detail";
 }
 
-<div class="jumbotron">
-    <h1>@Model.DisplayName</h1>
-    <p>WindowsAutopilotDeploymentProfile settings</p>
-    <br />
-</div>
 
+<h1>WindowsAutopilotDeploymentProfile: @Model.DisplayName</h1>
+
+<br />
 <table class="table">
-    <thead class="thead-dark">
+    <thead class="thead-light">
         <tr>
             <th>Key</th>
             <th>Value</th>
@@ -62,5 +60,6 @@
         <td>@Model.Id</td>
     </tr>
 </table>
+<br />
 
-@Html.ActionLink("Back", "Index", "AutoPilotConfigurationJSON", new { area = "" }, new { @class = "btn btn-secondary btn-large" })
+@Html.ActionLink("Back", "Index", "AutoPilotConfiguration", new { area = "" }, new { @class = "btn btn-light btn-large" })
