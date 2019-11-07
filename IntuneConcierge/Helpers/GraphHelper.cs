@@ -41,8 +41,9 @@ namespace IntuneConcierge.Helpers
             // Send the request and get the response.
             HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
-           
-            return response.Content.ToString();
+            string result = await response.Content.ReadAsStringAsync(); //right!
+
+            return result;
         }
 
         public static async Task<IEnumerable<DeviceConfiguration>> GetDeviceConfigurationsAsync()
