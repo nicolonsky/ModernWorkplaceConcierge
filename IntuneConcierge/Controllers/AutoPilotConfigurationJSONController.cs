@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using IntuneConcierge.Helpers;
@@ -46,7 +47,11 @@ namespace IntuneConcierge.Controllers
                  } 
                 ).ToString());
 
+            Response.Clear();
+            Response.Charset = System.Text.Encoding.GetEncoding(1250).WebName;
+            Response.HeaderEncoding = System.Text.Encoding.GetEncoding(1250);
             Response.ContentEncoding = System.Text.Encoding.GetEncoding(1250);
+                       
             return File(autopilotconfiguraton, "application/json", "AutoPilotConfiguration.json");
         }
     }
