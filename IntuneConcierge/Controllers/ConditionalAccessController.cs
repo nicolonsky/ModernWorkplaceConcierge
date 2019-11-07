@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IntuneConcierge.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -14,9 +15,11 @@ namespace IntuneConcierge.Controllers
              */
 
         // GET: ConditionalAccess
-        public ActionResult Index()
+        public async System.Threading.Tasks.Task<ActionResult> Index()
         {
-            return View();
+            var ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
+
+            return View(ca);
         }
     }
 }

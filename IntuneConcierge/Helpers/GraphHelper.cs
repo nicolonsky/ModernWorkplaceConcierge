@@ -11,6 +11,9 @@ using System.Configuration;
 using System.Linq;
 using System.Security.Claims;
 using System.Web;
+using System.Net.Http;
+using IntuneConcierge.Helpers;
+using Newtonsoft.Json;
 
 namespace IntuneConcierge.Helpers
 {
@@ -22,7 +25,27 @@ namespace IntuneConcierge.Helpers
         private static string redirectUri = ConfigurationManager.AppSettings["ida:RedirectUri"];
         private static string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
-        
+
+        public static async Task<IEnumerable<ConditionalAccessPolicy>> GetConditionalAccessPoliciesAsync()
+        {
+            var graphClient = GetAuthenticatedClient();
+            graphClient.BaseUrl = graphEndpoint;
+
+            string requestUrl = graphEndpoint + "/conditionalAccess/policies";
+
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
+
+            IEnumerable<ConditionalAccessPolicy> policy = JsonConvert.DeserializeObject<IEnumerable<ConditionalAccessPolicy>>(response.Content.ToString());
+
+            return policy;
+        }
+
         public static async Task<IEnumerable<DeviceConfiguration>> GetDeviceConfigurationsAsync()
         {
             var graphClient = GetAuthenticatedClient();

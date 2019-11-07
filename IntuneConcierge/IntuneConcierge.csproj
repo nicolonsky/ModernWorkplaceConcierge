@@ -220,6 +220,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AutopilotConfiguration.cs" />
+    <Compile Include="Helpers\ConditionalAccessPolicy.cs" />
     <Compile Include="Helpers\GraphHelper.cs" />
     <Compile Include="Models\Alert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -260,10 +261,10 @@
     <Content Include="Views\Export\Index.cshtml" />
     <Content Include="Views\AutoPilotConfiguration\Index.cshtml" />
     <Content Include="Views\AutoPilotConfiguration\Detail.cshtml" />
+    <Content Include="Views\ConditionalAccess\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\ConditionalAccess\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
