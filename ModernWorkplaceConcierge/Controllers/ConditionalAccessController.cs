@@ -32,15 +32,9 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             string ca = await GraphHelper.GetConditionalAccessPolicyAsync(Id);
 
-            // 1250 is ANSI encoding required for the AutopilotConfiguration.json!
-            byte[] capolicy = Encoding.GetEncoding(1250).GetBytes(JsonConvert.SerializeObject(ca,
-                 // remove nullvalues from output and pretty format that JSON
-                 new JsonSerializerSettings()
-                 {
-                     //NullValueHandling = NullValueHandling.Ignore,
-                     Formatting = Formatting.Indented
-                 }
-                ));
+            ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(ca);
+
+            byte[] capolicy = Encoding.GetEncoding(1250).GetBytes(JsonConvert.SerializeObject(conditionalAccessPolicy, Formatting.Indented).ToString());
 
           
             return File(capolicy, "application/json", "CA-Policy" + Id + ".json");
