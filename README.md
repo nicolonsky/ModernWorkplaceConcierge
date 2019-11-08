@@ -2,12 +2,12 @@
 
 ## About
 
-The [Intune Concierge](https://intuneconcierge.azurewebsites.net) is a helper tool to simplify your daily work with Microsoft Intune. It allows you to:
+The [Modern Workplace Concierge](https://mwconcierge.azurewebsites.net/) is a helper tool to simplify your daily work with Microsoft 365 services. It allows you to:
 
 * export (backup) various of your Intune configurations like device configurations and other configurations
 * download Autopilot offline Profiles to do Autopilot deployments with a AutopilotConfiguration.json 
 * [comming soon] import (restore) your exported Intune configurations (also helpful when managing multiple tenants)
 
-The tool is built on ASP.NET and works with the Microsoft Graph Beta API (because on the Beta endpoint are more Intune objects available).
+The tool is built on ASP.NET and works with the Microsoft Graph Beta API (because on the Beta endpoint are more entities available).
 To Authenticate with the Microsoft Graph API a multi tenant Azure AD application performs authentication and you will need to consent to the Azure AD application before you can use this tool.
 
