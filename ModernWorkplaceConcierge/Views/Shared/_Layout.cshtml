@@ -50,11 +50,13 @@
                                 new { @class = ViewBag.Current == "ConditionalAccess" ? "nav-link active" : "nav-link" })
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-item dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class=" dropdown-item">Export</a>
-                                <a class=" dropdown-item">Import</a>
-                                <a class=" dropdown-item">PowerShell scripts</a>
+                                @Html.ActionLink("Export", "Index", "Intune", new { area = "" },
+                                new { @class = ViewBag.Current == "Intune" ? "nav-link active" : "dropdown-item" })
+                                <a class="dropdown-item" href="">Export</a>
+                                <a class="dropdown-item">Import</a>
+                                <a class="dropdown-item">PowerShell scripts</a>
                             </div>
                         </li>
                     }

@@ -26,11 +26,11 @@ namespace ModernWorkplaceConcierge.Helpers
         private static string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
 
-        public static async Task<string> GetMicrosoftGraphItemAsync(string resource)
+        public static async Task<string> GetDeviceManagementScriptsAsync()
         {
             var graphClient = GetAuthenticatedClient();
            
-            string requestUrl = graphEndpoint + resource;
+            string requestUrl = graphEndpoint + "/deviceManagement/deviceManagementScripts";
 
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
 
