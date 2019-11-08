@@ -5,14 +5,13 @@
 }
 
 <div class="jumbotron">
-    <h1>ConditionalAccessPolicy</h1>
-    <p>ConditionalAccessPolicy</p>
+    <h1>ConditionalAccessPolicies</h1>
 </div>
 
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.DisplayName)
+            @Html.DisplayNameFor(model => model.displayName)
         </th>
         <th></th>
     </tr>
@@ -21,12 +20,10 @@
     {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.DisplayName)
+                @Html.DisplayFor(modelItem => item.displayName)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                @Html.ActionLink("Download", "Edit", new { id = item.id }) |
             </td>
         </tr>
     }

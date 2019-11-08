@@ -1,6 +1,7 @@
 ﻿using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,13 +18,13 @@ namespace ModernWorkplaceConcierge.Controllers
              */
 
         // GET: ConditionalAccess
-        public async System.Threading.Tasks.Task<FileResult> Index()
+        public async System.Threading.Tasks.Task<ViewResult> Index()
         {
             var ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
 
-            byte[] autopilotconfiguraton = Encoding.GetEncoding(1250).GetBytes(ca);
-
-          return File(autopilotconfiguraton, "application/json", "CA.json");
+            ConditionalAccessPolicies policies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
+                       
+            return View(policies.Value);
 
         }
     }
