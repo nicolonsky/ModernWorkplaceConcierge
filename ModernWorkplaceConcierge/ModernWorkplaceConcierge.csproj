@@ -221,7 +221,6 @@
     </Compile>
     <Compile Include="Helpers\AutopilotConfiguration.cs" />
     <Compile Include="Helpers\ConditionalAccessPolicy.cs" />
-    <Compile Include="Helpers\DeviceManagementScript.cs" />
     <Compile Include="Helpers\GraphHelper.cs" />
     <Compile Include="Models\Alert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -269,6 +268,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\IntuneConcierge - Web Deploy.pubxml" />
+    <Content Include="Views\Intune\DeviceManagementScripts.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

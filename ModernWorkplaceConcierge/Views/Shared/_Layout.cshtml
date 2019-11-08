@@ -37,9 +37,15 @@
                     </li>
                     @if (Request.IsAuthenticated)
                     {
-                        <li class="nav-item" data-turbolinks="false">
-                            @Html.ActionLink("Intune", "Index", "Intune", new { area = "" },
-                                new { @class = ViewBag.Current == "Intune" ? "nav-link active" : "nav-link" })
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                @Html.ActionLink("Export", "Index", "Intune", new { area = "" },
+                                new { @class = ViewBag.Current == "Export" ? "nav-link active" : "dropdown-item" })
+                                <a class="dropdown-item">Import</a>
+                                @Html.ActionLink("DeviceManagementScripts", "DeviceManagementScripts", "Intune", new { area = "" },
+                                new { @class = ViewBag.Current == "Export" ? "nav-link active" : "dropdown-item" })
+                            </div>
                         </li>
                         <li class="nav-item" data-turbolinks="false">
                             @Html.ActionLink("AutoPilotConfiguration", "Index", "AutoPilotConfiguration", new { area = "" },
@@ -49,16 +55,7 @@
                             @Html.ActionLink("ConditionalAccess", "Index", "ConditionalAccess", new { area = "" },
                                 new { @class = ViewBag.Current == "ConditionalAccess" ? "nav-link active" : "nav-link" })
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                @Html.ActionLink("Export", "Index", "Intune", new { area = "" },
-                                new { @class = ViewBag.Current == "Intune" ? "nav-link active" : "dropdown-item" })
-                                <a class="dropdown-item" href="">Export</a>
-                                <a class="dropdown-item">Import</a>
-                                <a class="dropdown-item">PowerShell scripts</a>
-                            </div>
-                        </li>
+                        
                     }
                 </ul>
                 <ul class="navbar-nav justify-content-end">

@@ -26,23 +26,22 @@ namespace ModernWorkplaceConcierge.Helpers
         private static string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
 
-        public static async Task<string> GetDeviceManagementScriptsAsync()
+        public static async Task<IEnumerable<DeviceManagementScript>> GetDeviceManagementScriptsAsync()
         {
             var graphClient = GetAuthenticatedClient();
            
-            string requestUrl = graphEndpoint + "/deviceManagement/deviceManagementScripts";
+            var deviceManagementScripts = await graphClient.DeviceManagement.DeviceManagementScripts.Request().GetAsync();
 
-            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            return deviceManagementScripts.CurrentPage;
+        }
 
-            // Authenticate (add access token) our HttpRequestMessage
-            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+        public static async Task<DeviceManagementScript> GetDeviceManagementScriptsAsync(string Id)
+        {
+            var graphClient = GetAuthenticatedClient();
 
-            // Send the request and get the response.
-            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
+            var deviceManagementScript = await graphClient.DeviceManagement.DeviceManagementScripts[Id].Request().GetAsync();
 
-            string result = await response.Content.ReadAsStringAsync(); //right!
-
-            return result;
+            return deviceManagementScript;
         }
 
         public static async Task<string> GetConditionalAccessPoliciesAsync()

@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Microsoft.Graph.DeviceManagementScript>
+
+@{
+    ViewBag.Current = "Intune";
+}
+
+<div class="jumbotron">
+    <h1>DeviceManagementScript</h1>
+    <p>Download DeviceManagementScripts uploaded to your Intune tenant.</p>
+</div>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.displayName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.fileName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.lastModifiedDateTime)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.displayName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.fileName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.lastModifiedDateTime)
+            </td>
+            <td>
+                @Html.ActionLink("Download", "DownloadDeviceManagementScript", new { Id = item.id })
+            </td>
+        </tr>
+    }
+
+</table>
