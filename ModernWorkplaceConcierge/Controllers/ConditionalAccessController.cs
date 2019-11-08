@@ -27,5 +27,23 @@ namespace ModernWorkplaceConcierge.Controllers
             return View(policies.Value);
 
         }
+
+        public async System.Threading.Tasks.Task<FileResult> Download(String Id)
+        {
+            string ca = await GraphHelper.GetConditionalAccessPolicyAsync(Id);
+
+            // 1250 is ANSI encoding required for the AutopilotConfiguration.json!
+            byte[] capolicy = Encoding.GetEncoding(1250).GetBytes(JsonConvert.SerializeObject(ca,
+                 // remove nullvalues from output and pretty format that JSON
+                 new JsonSerializerSettings()
+                 {
+                     //NullValueHandling = NullValueHandling.Ignore,
+                     Formatting = Formatting.Indented
+                 }
+                ));
+
+          
+            return File(capolicy, "application/json", "CA-Policy" + Id + ".json");
+        }
     }
 }

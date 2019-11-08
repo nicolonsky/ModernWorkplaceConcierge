@@ -65,6 +65,26 @@ namespace ModernWorkplaceConcierge.Helpers
             return result;
         }
 
+        public static async Task<string> GetConditionalAccessPolicyAsync(string Id)
+        {
+            var graphClient = GetAuthenticatedClient();
+            graphClient.BaseUrl = graphEndpoint;
+
+            string requestUrl = graphEndpoint + "/conditionalAccess/policies/" + Id;
+
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
+
+            string result = await response.Content.ReadAsStringAsync(); 
+
+            return result;
+        }
+
         public static async Task<IEnumerable<DeviceConfiguration>> GetDeviceConfigurationsAsync()
         {
             var graphClient = GetAuthenticatedClient();

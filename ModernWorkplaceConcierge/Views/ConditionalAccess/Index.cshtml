@@ -6,12 +6,19 @@
 
 <div class="jumbotron">
     <h1>ConditionalAccessPolicies</h1>
+    <p>Download single policy or all at once. Please note that baseline policies are not available from Microsoft Graph. Same applies for policies wit the "Monitor" option enabled.</p>
 </div>
 
 <table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.displayName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.state)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.modifiedDateTime)
         </th>
         <th></th>
     </tr>
@@ -23,7 +30,13 @@
                 @Html.DisplayFor(modelItem => item.displayName)
             </td>
             <td>
-                @Html.ActionLink("Download", "Edit", new { id = item.id }) |
+                @Html.DisplayFor(modelItem => item.state)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.modifiedDateTime)
+            </td>
+            <td>
+                @Html.ActionLink("Download", "Download", new { Id = item.id })
             </td>
         </tr>
     }
