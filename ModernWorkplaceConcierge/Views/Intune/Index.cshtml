@@ -2,17 +2,19 @@
     ViewBag.Current = "Intune";
 }
 
-    <div class="jumbotron">
-        <h1>Export your Intune configuration</h1>
-        <p class="lead">
-            Exported items:
-            <ul>
-                <li>DeviceConfigurations</li>
-                <li>DeviceCompliancePolicies</li>
-                <li>ManagedAppPolicies</li>
-                <li>WindowsAutopilotDeploymentProfiles</li>
-            </ul>
-            Items will be included in JSON format within a ZIP file.
-        </p>
-        @Html.ActionLink("Export", "DownloadAsync", "Intune", new { area = "" }, new { @class = "btn btn-primary btn-large" })
-    </div>
+<div class="jumbotron">
+    <h1>Export Intune configurations and settings</h1>
+</div>
+
+<p>Items available in export:</p>
+<ul>
+    <li>DeviceConfigurations</li>
+    <li>DeviceCompliancePolicies</li>
+    <li>ManagedAppPolicies</li>
+    <li>WindowsAutopilotDeploymentProfiles</li>
+    <li>DeviceManagementScripts</li>
+</ul>
+
+@Html.ActionLink("Export", "DownloadAsync", "Intune", new { area = "" }, new { @class = "btn btn-primary btn-large" })
+
+<p>Items will be included in JSON format within a ZIP file.</p>

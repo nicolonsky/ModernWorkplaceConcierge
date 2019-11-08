@@ -93,6 +93,8 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     foreach (DeviceManagementScript item in DeviceManagementScripts)
                     {
+                        var cont = item.ScriptContent;
+
                         byte[] temp = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
                         var zipArchiveEntry = archive.CreateEntry("DeviceManagementScripts\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
