@@ -10,7 +10,7 @@ using System.Web.Mvc;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
-    public class ConditionalAccessController : Controller
+    public class ConditionalAccessController : BaseController
     {
 
         /*
