@@ -33,13 +33,7 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             DeviceManagementScript script = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
 
-            byte[] data = System.Convert.FromBase64String(script.ScriptContent.ToString());
-
-            String base64Decoded = Encoding.GetEncoding(1250).GetString(data);
-
-            byte[] res = Encoding.GetEncoding(1250).GetBytes(base64Decoded);
-
-            return File(res, "text/plain", script.FileName);
+            return File(script.ScriptContent, "text/plain", script.FileName);
         }
 
         //https://medium.com/@xavierpenya/how-to-download-zip-files-in-asp-net-core-f31b5c371998

@@ -29,7 +29,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<IEnumerable<DeviceManagementScript>> GetDeviceManagementScriptsAsync()
         {
             var graphClient = GetAuthenticatedClient();
-           
+
             var deviceManagementScripts = await graphClient.DeviceManagement.DeviceManagementScripts.Request().GetAsync();
 
             return deviceManagementScripts.CurrentPage;
@@ -39,7 +39,7 @@ namespace ModernWorkplaceConcierge.Helpers
         {
             var graphClient = GetAuthenticatedClient();
 
-            var deviceManagementScript = await graphClient.DeviceManagement.DeviceManagementScripts[Id].Request().GetAsync();
+            DeviceManagementScript deviceManagementScript = await graphClient.DeviceManagement.DeviceManagementScripts[Id].Request().GetAsync();
 
             return deviceManagementScript;
         }
