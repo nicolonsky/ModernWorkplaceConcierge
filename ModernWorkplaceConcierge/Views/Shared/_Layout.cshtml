@@ -49,6 +49,15 @@
                             @Html.ActionLink("ConditionalAccess", "Index", "ConditionalAccess", new { area = "" },
                                 new { @class = ViewBag.Current == "ConditionalAccess" ? "nav-link active" : "nav-link" })
                         </li>
+                        <li class="nav-item" data-turbolinks="false">
+                            @Html.ActionLink("Intune", "Index", "Intune", new { area = "" },
+                                new { @class = ViewBag.Current == "Intune" ? "nav-link active" : "nav-link" })
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Export</a></li>
+                                <li><a href="#">Import</a></li>
+                                <li><a href="#">PowerShell Scripts</a></li>
+                            </ul>
+                        </li>
                     }
                 </ul>
                 <ul class="navbar-nav justify-content-end">
