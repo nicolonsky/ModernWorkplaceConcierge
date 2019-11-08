@@ -26,6 +26,17 @@ namespace ModernWorkplaceConcierge.Helpers
         private static string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
 
+
+        // Get's ESP, Enrollment restrictions, WHFB settings etc...
+        public static async Task<IEnumerable<DeviceEnrollmentConfiguration>> GetDeviceEnrollmentConfigurationsAsync()
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            var deviceManagementScripts = await graphClient.DeviceManagement.DeviceEnrollmentConfigurations.Request().GetAsync();
+
+            return deviceManagementScripts.CurrentPage;
+        }
+
         public static async Task<IEnumerable<DeviceManagementScript>> GetDeviceManagementScriptsAsync()
         {
             var graphClient = GetAuthenticatedClient();
