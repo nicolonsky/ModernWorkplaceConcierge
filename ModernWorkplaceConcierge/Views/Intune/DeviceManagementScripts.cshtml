@@ -12,13 +12,13 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.displayName)
+            @Html.DisplayNameFor(model => model.DisplayName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.fileName)
+            @Html.DisplayNameFor(model => model.FileName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.lastModifiedDateTime)
+            @Html.DisplayNameFor(model => model.LastModifiedDateTime)
         </th>
         <th></th>
     </tr>
@@ -27,16 +27,16 @@
     {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.displayName)
+                @Html.DisplayFor(modelItem => item.DisplayName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.fileName)
+                @Html.DisplayFor(modelItem => item.FileName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.lastModifiedDateTime)
+                @Html.DisplayFor(modelItem => item.LastModifiedDateTime)
             </td>
             <td>
-                @Html.ActionLink("Download", "DownloadDeviceManagementScript", new { Id = item.id })
+                @Html.ActionLink("Download", "DownloadDeviceManagementScript", new { Id = item.Id })
             </td>
         </tr>
     }
