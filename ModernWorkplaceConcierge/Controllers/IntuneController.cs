@@ -12,7 +12,7 @@ using Microsoft.Graph;
 namespace ModernWorkplaceConcierge.Controllers
 {
     [Authorize]
-    public class ExportController : BaseController
+    public class IntuneController : BaseController
     {
         // GET: Export
         public ActionResult Index()
