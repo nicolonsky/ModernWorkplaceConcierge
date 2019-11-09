@@ -33,6 +33,13 @@ namespace ModernWorkplaceConcierge.Controllers
              return RedirectToAction("Import");
         }
 
+        public ViewResult Import()
+        {
+
+            return View();
+
+        }
+
         /*
             CA policies: https://docs.microsoft.com/en-us/graph/api/conditionalaccessroot-list-policies?view=graph-rest-beta&tabs=http
                 */
