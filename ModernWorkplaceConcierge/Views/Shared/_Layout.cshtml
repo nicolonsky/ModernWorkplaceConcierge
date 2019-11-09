@@ -38,30 +38,30 @@
                     @if (Request.IsAuthenticated)
                     {
                         <li class="nav-item dropdown">
-                            <a class="dropdown-toggle @((ViewBag.Current == "Export" ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
+                            <a class="dropdown-toggle @((ViewBag.Current == "Export" || ViewBag.Current == "Import" || ViewBag.Current == "DeviceManagementScripts" || ViewBag.Current == "AutoPilotConfiguration"   ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
                             <div class="dropdown-menu dropdown-menu-right">
                                 @Html.ActionLink("Export", "Index", "Intune", new { area = "" },
                                 new { @class = ViewBag.Current == "Export" ? "dropdown-item active" : "dropdown-item" })
 
                                 @Html.ActionLink("Import", "Import", "Intune", new { area = "" },
-                               new { @class = ViewBag.Current == "Import" ? "nav-link active" : "dropdown-item" })
+                               new { @class = ViewBag.Current == "Import" ? "dropdown-item active" : "dropdown-item" })
 
                                 @Html.ActionLink("DeviceManagementScripts", "DeviceManagementScripts", "Intune", new { area = "" },
-                                new { @class = ViewBag.Current == "DeviceManagementScripts" ? "nav-link active" : "dropdown-item" })
+                                new { @class = ViewBag.Current == "DeviceManagementScripts" ? "dropdown-item active" : "dropdown-item" })
 
                                 @Html.ActionLink("AutoPilotConfiguration", "Index", "AutoPilotConfiguration", new { area = "" },
-                               new { @class = ViewBag.Current == "AutoPilotConfiguration" ? "nav-link active" : "dropdown-item" })
+                               new { @class = ViewBag.Current == "AutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
                             </div>
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="dropdown-toggle @((ViewBag.Current == "Export" ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ConditionalAccess</a>
+                            <a class="dropdown-toggle @((ViewBag.Current == "Export" || ViewBag.Current == "Import"  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ConditionalAccess</a>
                             <div class="dropdown-menu dropdown-menu-right">
                                 @Html.ActionLink("Export", "Index", "ConditionalAccess", new { area = "" },
-                                new { @class = ViewBag.Current == "ConditionalAccess" ? "nav-link active" : "dropdown-item" })
+                                new { @class = ViewBag.Current == "Import" ? "dropdown-item active" : "dropdown-item" })
 
                                 @Html.ActionLink("Import", "Index", "ConditionalAccess", new { area = "" },
-                               new { @class = ViewBag.Current == "ConditionalAccess" ? "nav-link active" : "dropdown-item" })
+                               new { @class = ViewBag.Current == "Import" ? "dropdown-item active" : "dropdown-item" })
                             </div>
                         </li>
 

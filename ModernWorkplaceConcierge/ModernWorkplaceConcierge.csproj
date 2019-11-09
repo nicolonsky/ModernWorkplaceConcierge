@@ -271,6 +271,7 @@
     <None Include="Properties\PublishProfiles\IntuneConcierge - Web Deploy.pubxml" />
     <Content Include="Views\Intune\DeviceManagementScripts.cshtml" />
     <Content Include="Views\Intune\Import.cshtml" />
+    <Content Include="Views\ConditionalAccess\Import.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

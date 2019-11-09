@@ -15,6 +15,7 @@ using System.Net.Http;
 using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
 using IntuneConcierge.Helpers;
+using System.Text;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
@@ -26,6 +27,28 @@ namespace ModernWorkplaceConcierge.Helpers
         private static string redirectUri = ConfigurationManager.AppSettings["ida:RedirectUri"];
         private static string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
+
+
+        public static async Task<bool> AddConditionalAccessPolicyAsync(string ConditionalAccessPolicyJSON)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            string requestUrl = graphEndpoint + "/conditionalAccess/policies";
+
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+            {
+                Content = new StringContent(ConditionalAccessPolicyJSON, Encoding.UTF8, "application/json")
+            };
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
+
+            return response.IsSuccessStatusCode;
+        }
+
 
 
         // Get's ESP, Enrollment restrictions, WHFB settings etc...

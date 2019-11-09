@@ -7,16 +7,35 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.IO;
+
 
 namespace ModernWorkplaceConcierge.Controllers
 {
     [Authorize]
     public class ConditionalAccessController : BaseController
     {
+        [HttpPost]
+        public async System.Threading.Tasks.Task<ActionResult> UploadAsync(HttpPostedFileBase file)
+        {
+
+            if (file.FileName.Contains(".json"))
+            {
+                BinaryReader b = new BinaryReader(file.InputStream);
+                byte[] binData = b.ReadBytes(file.ContentLength);
+
+                string result = System.Text.Encoding.UTF8.GetString(binData);
+
+                bool res = await GraphHelper.AddConditionalAccessPolicyAsync(result);
+
+            }
+           
+             return RedirectToAction("Import");
+        }
 
         /*
-         CA policies: https://docs.microsoft.com/en-us/graph/api/conditionalaccessroot-list-policies?view=graph-rest-beta&tabs=http
-             */
+            CA policies: https://docs.microsoft.com/en-us/graph/api/conditionalaccessroot-list-policies?view=graph-rest-beta&tabs=http
+                */
 
         // GET: ConditionalAccess
         public async System.Threading.Tasks.Task<ViewResult> Index()
