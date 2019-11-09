@@ -41,9 +41,20 @@ namespace ModernWorkplaceConcierge.Helpers
         {
             var graphClient = GetAuthenticatedClient();
 
-            var deviceManagementScripts = await graphClient.DeviceManagement.DeviceManagementScripts.Request().GetAsync();
+            string requestUrl = graphEndpoint + "/deviceManagement/deviceManagementScripts";
 
-            return deviceManagementScripts.CurrentPage;
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
+
+            var result = JsonConvert.DeserializeObject<IEnumerable<DeviceManagementScript>>(await response.Content.ReadAsStringAsync()); //right!
+
+            return result;
+
         }
 
         public static async Task<DeviceManagementScript> GetDeviceManagementScriptsAsync(string Id)
@@ -58,7 +69,6 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<string> GetConditionalAccessPoliciesAsync()
         {
             var graphClient = GetAuthenticatedClient();
-            graphClient.BaseUrl = graphEndpoint;
 
             string requestUrl = graphEndpoint + "/conditionalAccess/policies";
 
