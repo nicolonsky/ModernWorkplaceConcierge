@@ -42,19 +42,9 @@ namespace ModernWorkplaceConcierge.Helpers
         {
             var graphClient = GetAuthenticatedClient();
 
-            string requestUrl = graphEndpoint + "/deviceManagement/deviceManagementScripts";
+            var result = await graphClient.DeviceManagement.DeviceManagementScripts.Request().GetAsync();
 
-            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-
-            // Authenticate (add access token) our HttpRequestMessage
-            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
-
-            // Send the request and get the response.
-            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
-
-            var result = JsonConvert.DeserializeObject<DeviceManagementScripts>(await response.Content.ReadAsStringAsync()); //right!
-
-            return result.value;
+            return result.CurrentPage;
 
         }
 
@@ -65,6 +55,25 @@ namespace ModernWorkplaceConcierge.Helpers
             DeviceManagementScript deviceManagementScript = await graphClient.DeviceManagement.DeviceManagementScripts[Id].Request().GetAsync();
 
             return deviceManagementScript;
+        }
+
+        public static async Task<string> GetDeviceManagementScriptRawAsync(string Id)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            string requestUrl = graphEndpoint + "/deviceManagement/deviceManagementScripts/"+Id;
+
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
+
+            string result = await response.Content.ReadAsStringAsync(); //right!
+
+            return result;
         }
 
         public static async Task<string> GetConditionalAccessPoliciesAsync()
