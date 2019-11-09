@@ -16,19 +16,14 @@ namespace ModernWorkplaceConcierge.Controllers
     public class ConditionalAccessController : BaseController
     {
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> UploadAsync(HttpPostedFileBase file)
+        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase file)
         {
-
-            if (file.FileName.Contains(".json"))
-            {
                 BinaryReader b = new BinaryReader(file.InputStream);
                 byte[] binData = b.ReadBytes(file.ContentLength);
 
                 string result = System.Text.Encoding.UTF8.GetString(binData);
 
                 bool res = await GraphHelper.AddConditionalAccessPolicyAsync(result);
-
-            }
            
              return RedirectToAction("Import");
         }
