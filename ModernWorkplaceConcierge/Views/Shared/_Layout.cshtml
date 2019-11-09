@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
           integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt"
           crossorigin="anonymous">
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
 </head>
 
 <body>
@@ -55,13 +57,13 @@
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="dropdown-toggle @((ViewBag.Current == "Export" || ViewBag.Current == "Import"  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ConditionalAccess</a>
+                            <a class="dropdown-toggle @((ViewBag.Current.StartsWith("ConditionalAccess")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ConditionalAccess</a>
                             <div class="dropdown-menu dropdown-menu-right">
                                 @Html.ActionLink("Export", "Index", "ConditionalAccess", new { area = "" },
-                                new { @class = ViewBag.Current == "Import" ? "dropdown-item active" : "dropdown-item" })
+                                new { @class = ViewBag.Current == "ConditionalAccessExport" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("Import", "Index", "ConditionalAccess", new { area = "" },
-                               new { @class = ViewBag.Current == "Import" ? "dropdown-item active" : "dropdown-item" })
+                                @Html.ActionLink("Import", "Import", "ConditionalAccess", new { area = "" },
+                               new { @class = ViewBag.Current == "ConditionalAccessImport" ? "dropdown-item active" : "dropdown-item" })
                             </div>
                         </li>
 
