@@ -24,9 +24,19 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public async System.Threading.Tasks.Task<ViewResult> DeviceManagementScripts()
         {
-            var scripts = await GraphHelper.GetDeviceManagementScriptsAsync();
+            try
+            {
+                var scripts = await GraphHelper.GetDeviceManagementScriptsAsync();
 
-            return View(scripts);
+                return View(scripts);
+
+            }
+            catch (Exception e)
+            {
+                Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
+
+                return View();
+            }
         }
 
         public async System.Threading.Tasks.Task<FileResult> DownloadDeviceManagementScript(String Id)
@@ -91,7 +101,7 @@ namespace ModernWorkplaceConcierge.Controllers
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
-                    foreach (DeviceManagementScript item in DeviceManagementScripts)
+                    foreach (DeviceManagementScript item in DeviceManagementScripts.value)
                     {
                         var cont = item.ScriptContent;
 

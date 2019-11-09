@@ -14,6 +14,7 @@ using System.Web;
 using System.Net.Http;
 using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
+using IntuneConcierge.Helpers;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
@@ -37,7 +38,7 @@ namespace ModernWorkplaceConcierge.Helpers
             return deviceManagementScripts.CurrentPage;
         }
 
-        public static async Task<IEnumerable<DeviceManagementScript>> GetDeviceManagementScriptsAsync()
+        public static async Task<DeviceManagementScripts> GetDeviceManagementScriptsAsync()
         {
             var graphClient = GetAuthenticatedClient();
 
@@ -51,7 +52,7 @@ namespace ModernWorkplaceConcierge.Helpers
             // Send the request and get the response.
             HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
-            var result = JsonConvert.DeserializeObject<IEnumerable<DeviceManagementScript>>(await response.Content.ReadAsStringAsync()); //right!
+            var result = JsonConvert.DeserializeObject<DeviceManagementScripts>(await response.Content.ReadAsStringAsync()); //right!
 
             return result;
 
@@ -127,9 +128,18 @@ namespace ModernWorkplaceConcierge.Helpers
         {
             var graphClient = GetAuthenticatedClient();
             
-            var managedAppProtection = await graphClient.DeviceAppManagement.ManagedAppPolicies.Request().GetAsync();
+            var managedAppProtection = await graphClient.DeviceAppManagement.IosManagedAppProtections.Request().GetAsync();
 
             return managedAppProtection.CurrentPage;
+        }
+
+        public static async Task<ManagedAppPolicy> GetManagedAppProtectionAsync(string Id)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            var managedAppProtection = await graphClient.DeviceAppManagement.IosManagedAppProtections[Id].Request().GetAsync();
+
+            return managedAppProtection;
         }
 
         public static async Task <IEnumerable<Microsoft.Graph.WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
