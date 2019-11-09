@@ -1,0 +1,24 @@
+﻿@{
+    ViewBag.Current = "Intune";
+}
+
+<div class="jumbotron">
+    <h1>Import Intune configuration</h1>
+    <p>Import previously exported data to your Intune tenant. Please note that no items will be overwritten as this tool performs only POST requests.</p>
+</div>
+
+
+<form>
+    <div class="custom-file">
+        <input type="file" class="custom-file-input" id="customFile">
+        <label class="custom-file-label" for="customFile">Choose file</label>
+    </div>
+</form>
+
+<script>
+// Add the following code if you want the name of the file appear on select
+$(".custom-file-input").on("change", function() {
+  var fileName = $(this).val().split("\\").pop();
+  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+});
+</script>

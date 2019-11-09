@@ -42,9 +42,12 @@
                             <div class="dropdown-menu dropdown-menu-right">
                                 @Html.ActionLink("Export", "Index", "Intune", new { area = "" },
                                 new { @class = ViewBag.Current == "Export" ? "nav-link active" : "dropdown-item" })
-                                <a class="dropdown-item">Import</a>
+
+                                @Html.ActionLink("Import", "Import", "Intune", new { area = "" },
+                               new { @class = ViewBag.Current == "Import" ? "nav-link active" : "dropdown-item" })
+
                                 @Html.ActionLink("DeviceManagementScripts", "DeviceManagementScripts", "Intune", new { area = "" },
-                                new { @class = ViewBag.Current == "Export" ? "nav-link active" : "dropdown-item" })
+                                new { @class = ViewBag.Current == "DeviceManagementScripts" ? "nav-link active" : "dropdown-item" })
                             </div>
                         </li>
                         <li class="nav-item" data-turbolinks="false">
@@ -55,7 +58,6 @@
                             @Html.ActionLink("ConditionalAccess", "Index", "ConditionalAccess", new { area = "" },
                                 new { @class = ViewBag.Current == "ConditionalAccess" ? "nav-link active" : "nav-link" })
                         </li>
-                        
                     }
                 </ul>
                 <ul class="navbar-nav justify-content-end">

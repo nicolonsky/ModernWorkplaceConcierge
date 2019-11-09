@@ -15,6 +15,12 @@ namespace ModernWorkplaceConcierge.Controllers
     [Authorize]
     public class IntuneController : BaseController
     {
+        public ActionResult Import()
+        {
+           
+            return View();
+        }
+
         // GET: Export
         public ActionResult Index()
         {
