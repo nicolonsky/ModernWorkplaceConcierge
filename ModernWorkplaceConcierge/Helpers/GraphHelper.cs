@@ -38,7 +38,7 @@ namespace ModernWorkplaceConcierge.Helpers
             return deviceManagementScripts.CurrentPage;
         }
 
-        public static async Task<DeviceManagementScripts> GetDeviceManagementScriptsAsync()
+        public static async Task<IEnumerable<DeviceManagementScript>> GetDeviceManagementScriptsAsync()
         {
             var graphClient = GetAuthenticatedClient();
 
@@ -54,7 +54,7 @@ namespace ModernWorkplaceConcierge.Helpers
 
             var result = JsonConvert.DeserializeObject<DeviceManagementScripts>(await response.Content.ReadAsStringAsync()); //right!
 
-            return result;
+            return result.value;
 
         }
 
