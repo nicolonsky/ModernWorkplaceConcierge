@@ -103,7 +103,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     foreach (DeviceManagementScript item in DeviceManagementScripts)
                     {
-                        var cont = item.ScriptContent;
+                        item.ScriptContent = item.ScriptContent;
 
                         byte[] temp = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
