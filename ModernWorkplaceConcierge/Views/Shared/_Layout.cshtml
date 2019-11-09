@@ -61,11 +61,6 @@
                     }
                 </ul>
                 <ul class="navbar-nav justify-content-end">
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://tech.nicolonsky.ch" target="_blank">
-                            <i class="fas fa-external-link-alt mr-1"></i>Docs
-                        </a>
-                    </li>
                     @if (Request.IsAuthenticated) { 
 
                         <li class="nav-item dropdown">
@@ -115,6 +110,5 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
-
 </body>
 </html>
