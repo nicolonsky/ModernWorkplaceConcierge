@@ -101,7 +101,7 @@ namespace ModernWorkplaceConcierge.Controllers
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
-                    foreach (DeviceManagementScript item in DeviceManagementScripts.value)
+                    foreach (DeviceManagementScript item in DeviceManagementScripts)
                     {
                         var cont = item.ScriptContent;
 
