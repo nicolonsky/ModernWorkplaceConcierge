@@ -18,14 +18,23 @@ namespace ModernWorkplaceConcierge.Controllers
         [HttpPost]
         public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase file)
         {
+            try
+            {
                 BinaryReader b = new BinaryReader(file.InputStream);
                 byte[] binData = b.ReadBytes(file.ContentLength);
 
                 string result = System.Text.Encoding.UTF8.GetString(binData);
 
                 bool res = await GraphHelper.AddConditionalAccessPolicyAsync(result);
-           
-             return RedirectToAction("Import");
+
+            }
+            catch (Exception e)
+            {
+                Flash(e.Message);
+
+            }
+
+            return RedirectToAction("Import");
         }
 
         public ViewResult Import()
@@ -42,12 +51,22 @@ namespace ModernWorkplaceConcierge.Controllers
         // GET: ConditionalAccess
         public async System.Threading.Tasks.Task<ViewResult> Index()
         {
-            var ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
+            try
+            {
+                var ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
 
-            ConditionalAccessPolicies policies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
-                       
-            return View(policies.Value);
+                ConditionalAccessPolicies policies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
 
+                return View(policies.Value);
+
+            }
+            catch (Exception e)
+            {
+                Flash(e.Message);
+
+            }
+
+            return View();
         }
 
         public async System.Threading.Tasks.Task<FileResult> Download(String Id)
