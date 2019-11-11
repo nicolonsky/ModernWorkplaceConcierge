@@ -4,12 +4,14 @@
     ViewBag.Current = "ConditionalAccessExport";
 }
 
-<div class="jumbotron">
-    <h1>ConditionalAccessPolicies</h1>
-    <p>
-        Download individual Conditional Access policies or all at once. Helpful for testing, backup and documentation purposes. <br />
-        Please note that baseline policies and policies with the "Monitor" option enabled are not available from Microsoft Graph. </p>
-</div>
+    <div class="jumbotron">
+        <h1>ConditionalAccessPolicies</h1>
+        <p>
+            Download individual Conditional Access policies or all at once. Helpful for testing, backup and documentation purposes. <br />
+            Please note that baseline policies and policies with the "Monitor" option enabled are not available from Microsoft Graph.
+        </p>
+        @Html.ActionLink("Export Conditional Access configuration", "Download", "ConditionalAccess", new { area = "" }, new { @class = "btn btn-primary btn-large" })
+    </div>
 
 <table class="table">
     <tr>
@@ -42,13 +44,4 @@
             </td>
         </tr>
     }
-
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>
-            @Html.ActionLink("Export Conditional Access configuration", "Download", "ConditionalAccess", new { area = "" }, new { @class = "btn btn-primary btn-large" })
-        </td>
-    </tr>
 </table>

@@ -83,12 +83,13 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public async System.Threading.Tasks.Task<FileResult> Download()
         {
-            string ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
+            try {
+                string ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
 
-            ConditionalAccessPolicies conditionalAccessPolicies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
+                ConditionalAccessPolicies conditionalAccessPolicies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
 
-               using (MemoryStream ms = new MemoryStream())
-               {
+                using (MemoryStream ms = new MemoryStream())
+                {
                     using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
                     {
                         foreach (ConditionalAccessPolicy item in conditionalAccessPolicies.Value)
@@ -101,8 +102,16 @@ namespace ModernWorkplaceConcierge.Controllers
                         }
                     }
 
-                return File(ms.ToArray(), "application/zip", "Archive.zip");
-               }
+                    return File(ms.ToArray(), "application/zip", "Archive.zip");
+                }
+            }
+            catch (Exception e)
+            {
+                Flash(e.Message);
+
+            }
+
+            return null;
         }
     }
 }
