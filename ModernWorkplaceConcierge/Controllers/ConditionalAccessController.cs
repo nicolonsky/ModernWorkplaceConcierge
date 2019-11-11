@@ -20,12 +20,18 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             try
             {
-                BinaryReader b = new BinaryReader(file.InputStream);
-                byte[] binData = b.ReadBytes(file.ContentLength);
+                List<string> policy = new List<string>(); ;
 
-                string result = System.Text.Encoding.UTF8.GetString(binData);
+                using (System.IO.StreamReader reader = new System.IO.StreamReader(file.InputStream))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        policy.Append(reader.ReadLine());
 
-                bool res = await GraphHelper.AddConditionalAccessPolicyAsync(result);
+                    }
+                }
+
+                bool res = await GraphHelper.AddConditionalAccessPolicyAsync(policy.ToString());
 
             }
             catch (Exception e)
