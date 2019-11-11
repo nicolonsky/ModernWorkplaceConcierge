@@ -3,8 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+#Config
+ModernWorkplaceConcierge/PrivateSettings.config
+
 #Scripts
-IntuneConcierge/Scripts/*
+ModernWorkplaceConcierge/Scripts/*
 
 # User-specific files
 *.rsuser
@@ -341,3 +344,4 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
