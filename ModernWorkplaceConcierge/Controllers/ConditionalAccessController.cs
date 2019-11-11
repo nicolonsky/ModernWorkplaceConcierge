@@ -8,7 +8,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
-
+using System.IO.Compression;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -77,8 +77,32 @@ namespace ModernWorkplaceConcierge.Controllers
 
             byte[] capolicy = Encoding.GetEncoding(1250).GetBytes(JsonConvert.SerializeObject(conditionalAccessPolicy, Formatting.Indented).ToString());
 
-          
+
             return File(capolicy, "application/json", "CA-Policy" + Id + ".json");
+        }
+
+        public async System.Threading.Tasks.Task<FileResult> Download()
+        {
+            string ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
+
+            ConditionalAccessPolicies conditionalAccessPolicies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
+
+               using (MemoryStream ms = new MemoryStream())
+               {
+                    using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
+                    {
+                        foreach (ConditionalAccessPolicy item in conditionalAccessPolicies.Value)
+                        {
+                            byte[] temp = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
+
+                            var zipArchiveEntry = archive.CreateEntry(item.displayName + "_" + item.id + ".json", CompressionLevel.Fastest);
+
+                            using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                        }
+                    }
+
+                return File(ms.ToArray(), "application/zip", "Archive.zip");
+               }
         }
     }
 }
