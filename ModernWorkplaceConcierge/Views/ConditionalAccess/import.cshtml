@@ -10,21 +10,23 @@
 
 @using (Html.BeginForm("Upload", "ConditionalAccess", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <div class="form-group">
-        <div class="custom-file">
-            <input type="file" name="file" class="custom-file-input" id="file">
-            <label class="custom-file-label" for="file">Choose file</label>
-        </div>
+<div class="form-group">
+    <div class="custom-file">
+        <input type="file" name="file" class="custom-file-input" id="file">
+        <label class="custom-file-label" for="file">Choose file</label>
+    </div>
 
-        <script>
-            // Add the following code if you want the name of the file appear on select
-            $(".custom-file-input").on("change", function () {
-                var fileName = $(this).val().split("\\").pop();
-                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-            });
-        </script>
-        <br />
-        <input type="submit" class="btn btn-primary pull-left" value="Upload" />
+    <script>
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
 
-    </div>  
+    <br/>
+    <br/>
+    <input type="submit" class="btn btn-primary" value="Upload" />
+
+</div>  
 }
