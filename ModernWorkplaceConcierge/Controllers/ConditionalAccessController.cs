@@ -81,7 +81,7 @@ namespace ModernWorkplaceConcierge.Controllers
             return File(capolicy, "application/json", "CA-Policy" + Id + ".json");
         }
 
-        public async System.Threading.Tasks.Task<FileResult> Download()
+        public async System.Threading.Tasks.Task<FileResult> DownloadAll()
         {
             try {
                 string ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
