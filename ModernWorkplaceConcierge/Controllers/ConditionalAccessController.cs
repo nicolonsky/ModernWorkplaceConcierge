@@ -32,10 +32,13 @@ namespace ModernWorkplaceConcierge.Controllers
 
                 string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
                 {
-                    NullValueHandling = NullValueHandling.Ignore
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = Formatting.Indented
                 });
 
-                bool res = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+                var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+
+                ViewBag.CaInfo = requestContent;
 
                 b.Dispose();
 
