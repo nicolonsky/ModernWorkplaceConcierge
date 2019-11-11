@@ -28,24 +28,16 @@ namespace ModernWorkplaceConcierge.Controllers
                 ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(result);
 
                 conditionalAccessPolicy.id = null;
-                conditionalAccessPolicy.modifiedDateTime = null;
-
+                
                 string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
                 {
                     NullValueHandling = NullValueHandling.Ignore,
                     Formatting = Formatting.Indented
                 });
 
-                Flash(result, requestContent);
-
                 var success = await GraphHelper.AddConditionalAccessPolicyAsync(result);
 
-  
-
-
-                ViewBag.CaInfo = requestContent;
-
-                b.Dispose();
+                Flash(success + " : "+ result, requestContent);
 
             }
             catch (Exception e)
