@@ -36,7 +36,12 @@ namespace ModernWorkplaceConcierge.Controllers
                     Formatting = Formatting.Indented
                 });
 
-                var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+                Flash(result, requestContent);
+
+                var success = await GraphHelper.AddConditionalAccessPolicyAsync(result);
+
+  
+
 
                 ViewBag.CaInfo = requestContent;
 
