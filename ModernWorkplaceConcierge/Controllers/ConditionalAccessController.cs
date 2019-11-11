@@ -35,10 +35,12 @@ namespace ModernWorkplaceConcierge.Controllers
                     Formatting = Formatting.Indented
                 });
 
-                var success = await GraphHelper.AddConditionalAccessPolicyAsync(result);
+                Flash(result, requestContent);
 
-                Flash(success + " : "+ result, requestContent);
+                var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
 
+                Flash("Success: " + result);
+                
             }
             catch (Exception e)
             {
