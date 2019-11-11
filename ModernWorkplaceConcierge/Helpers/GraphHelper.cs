@@ -38,6 +38,7 @@ namespace ModernWorkplaceConcierge.Helpers
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {
                 Content = new StringContent(ConditionalAccessPolicyJSON, Encoding.UTF8, "application/json")
+             
             };
 
             // Authenticate (add access token) our HttpRequestMessage
