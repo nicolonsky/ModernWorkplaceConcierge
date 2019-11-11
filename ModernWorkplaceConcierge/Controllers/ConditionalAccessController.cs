@@ -25,7 +25,17 @@ namespace ModernWorkplaceConcierge.Controllers
 
                 string result = System.Text.Encoding.UTF8.GetString(binData);
 
-                bool res = await GraphHelper.AddConditionalAccessPolicyAsync(result);
+                ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(result);
+
+                conditionalAccessPolicy.id = null;
+                conditionalAccessPolicy.modifiedDateTime = null;
+
+                string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
+
+                bool res = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
 
                 b.Dispose();
 
