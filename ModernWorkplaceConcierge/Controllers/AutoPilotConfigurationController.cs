@@ -37,27 +37,16 @@ namespace ModernWorkplaceConcierge.Controllers
             // Create a new AutopilotConfiguration based on custom model and pass AutopilotProfile and Organizational details from Graph
             AutopilotConfiguration windowsAutopilotDeploymentProfile = new AutopilotConfiguration(profile, org);
 
-            // 1250 is ANSI encoding required for the AutopilotConfiguration.json!
-            byte[] autopilotconfiguraton = Encoding.GetEncoding(1250).GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
+            byte[] autopilotconfiguraton = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
                 // remove nullvalues from output and pretty format that JSON
-                 new JsonSerializerSettings()
-                 {
-                     NullValueHandling = NullValueHandling.Ignore,
-                     Formatting = Formatting.Indented
-                 } 
-                ).ToString());
+                new JsonSerializerSettings()
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = Formatting.Indented
+                }
+               ));
 
-            Response.Clear();
-            Response.AddHeader("Content-Disposition", "attachment; filename=" + "AutoPilotConfiguration.json");
-            Response.Charset = Encoding.GetEncoding(1250).WebName;
-            Response.HeaderEncoding = Encoding.GetEncoding(1250);
-            Response.ContentEncoding = Encoding.GetEncoding(1250);
-            Response.ContentType = "application/json";
-            Response.BinaryWrite(autopilotconfiguraton);
-            Response.End();
-            return null;
-
-            //return File(autopilotconfiguraton, "application/json", "AutoPilotConfiguration.json");
+            return File(autopilotconfiguraton, "application/json", "AutoPilotConfiguration.json");
         }
     }
 }

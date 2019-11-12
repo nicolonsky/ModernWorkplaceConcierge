@@ -33,7 +33,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 {
                     NullValueHandling = NullValueHandling.Ignore,
                     Formatting = Formatting.Indented
-                });
+                }).ToString();
 
                 Flash(result, requestContent);
 
