@@ -31,14 +31,14 @@ namespace ModernWorkplaceConcierge.Controllers
         public async System.Threading.Tasks.Task<FileResult> DownloadAutopilotConfigurationJSON(string Id)
         {
             var profile =  await GraphHelper.GetWindowsAutopilotDeploymentProfiles(Id);
-
             var org = await GraphHelper.GetOrgDetailsAsync();
 
-            // Create a new AutopilotConfiguration based on custom model and pass AutopilotProfile and Organizational details from Graph
             AutopilotConfiguration windowsAutopilotDeploymentProfile = new AutopilotConfiguration(profile, org);
 
-            byte[] autopilotconfiguraton = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
-                // remove nullvalues from output and pretty format that JSON
+            var enc = Encoding.GetEncoding(1252);
+
+            byte[] autopilotconfiguraton = enc.GetBytes(JsonConvert.SerializeObject(windowsAutopilotDeploymentProfile,
+                // remove nullvalues from output and pretty format JSON
                 new JsonSerializerSettings()
                 {
                     NullValueHandling = NullValueHandling.Ignore,
@@ -46,7 +46,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 }
                ));
 
-            return File(autopilotconfiguraton, "application/json", "AutoPilotConfiguration.json");
+            return File(autopilotconfiguraton, "application/json", "AutoPilotConfigurationFile.json");
         }
     }
 }
