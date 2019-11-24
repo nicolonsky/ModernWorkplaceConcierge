@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using Newtonsoft.Json;
 using Microsoft.Graph;
 using System.Text;
+using static System.Net.WebRequestMethods;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -19,6 +20,36 @@ namespace ModernWorkplaceConcierge.Controllers
         {
            
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult Upload(HttpPostedFileBase file)
+        {
+            try
+            {
+                BinaryReader b = new BinaryReader(file.InputStream);
+                byte[] binData = b.ReadBytes(file.ContentLength);
+
+                if (file.FileName.Contains(".zip")) {
+
+                    System.IO.Compression.ZipArchive zip = new ZipArchive(b.BaseStream);
+
+                    foreach (ZipArchiveEntry entry in zip.Entries)
+                    {
+                        var stream = entry.Open();
+                        //Do awesome stream stuff!!
+
+                        if (entry.FullName.Contains("DeviceConfigurations")) {
+
+                            //DeviceConfiguration deviceConfiguration = JsonConvert.DeserializeObject<DeviceConfiguration>(Encoding.ASCII.GetBytes(stream.Read));
+                        
+                        }
+                    }
+                }
+            }
+            catch { }
+
+                return View();
         }
 
         // GET: Export

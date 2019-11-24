@@ -36,7 +36,8 @@ namespace ModernWorkplaceConcierge.Helpers
 
     public class Grantcontrols
     {
-        public string _operator { get; set; }
+        [JsonProperty("operator")]
+        public string op { get; set; }
         public string[] builtInControls { get; set; }
         public object[] customAuthenticationFactors { get; set; }
         public object[] termsOfUse { get; set; }
