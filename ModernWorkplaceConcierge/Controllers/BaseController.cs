@@ -28,6 +28,21 @@ namespace ModernWorkplaceConcierge.Controllers
             TempData[Alert.AlertKey] = alerts;
         }
 
+        protected void Message(string message, string debug = null)
+        {
+            var messages = TempData.ContainsKey(Info.SessKey) ?
+                (List<Info>)TempData[Info.SessKey] :
+                new List<Info>();
+
+            messages.Add(new Info
+            {
+                Message = message,
+                Debug = debug
+            });
+
+            TempData[Info.SessKey] = messages;
+        }
+
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             if (Request.IsAuthenticated)

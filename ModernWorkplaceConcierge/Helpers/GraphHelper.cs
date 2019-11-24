@@ -29,7 +29,7 @@ namespace ModernWorkplaceConcierge.Helpers
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
 
 
-        public static async Task<bool> AddConditionalAccessPolicyAsync(string ConditionalAccessPolicyJSON)
+        public static async Task<string> AddConditionalAccessPolicyAsync(string ConditionalAccessPolicyJSON)
         {
             var graphClient = GetAuthenticatedClient();
 
@@ -47,7 +47,7 @@ namespace ModernWorkplaceConcierge.Helpers
             // Send the request and get the response.
             HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
-            return response.IsSuccessStatusCode;
+            return await response.Content.ReadAsStringAsync();
         }
 
 

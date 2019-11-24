@@ -16,37 +16,39 @@ namespace ModernWorkplaceConcierge.Controllers
     public class ConditionalAccessController : BaseController
     {
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase file)
+        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files)
         {
-            try
+            foreach (HttpPostedFileBase file in files)
             {
-                BinaryReader b = new BinaryReader(file.InputStream);
-                byte[] binData = b.ReadBytes(file.ContentLength);
-
-                string result = System.Text.Encoding.UTF8.GetString(binData);
-
-                ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(result);
-
-                conditionalAccessPolicy.id = null;
-                
-                string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
+                try
                 {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    Formatting = Formatting.Indented
-                }).ToString();
+                    BinaryReader b = new BinaryReader(file.InputStream);
+                    byte[] binData = b.ReadBytes(file.ContentLength);
 
-                var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+                    string result = Encoding.UTF8.GetString(binData);
 
-                
-                Flash("Success: " + result);
-                
+                    ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(result);
+
+                    conditionalAccessPolicy.id = null;
+
+                    string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        Formatting = Formatting.Indented
+                    }).ToString();
+
+                    var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+
+                    Message("Success", success.ToString());
+
+                }
+                catch (Exception e)
+                {
+                    Flash(e.Message);
+
+                }
             }
-            catch (Exception e)
-            {
-                Flash(e.Message);
-
-            }
-
+            
             return RedirectToAction("Import");
         }
 

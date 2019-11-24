@@ -5,6 +5,10 @@
     var alerts = TempData.ContainsKey(ModernWorkplaceConcierge.Models.Alert.AlertKey) ?
         (List<ModernWorkplaceConcierge.Models.Alert>)TempData[ModernWorkplaceConcierge.Models.Alert.AlertKey] :
         new List<ModernWorkplaceConcierge.Models.Alert>();
+
+    var messages = TempData.ContainsKey(ModernWorkplaceConcierge.Models.Info.SessKey) ?
+        (List<ModernWorkplaceConcierge.Models.Info>)TempData[ModernWorkplaceConcierge.Models.Info.SessKey] :
+        new List<ModernWorkplaceConcierge.Models.Info>();
 }
 
 <!DOCTYPE html>
@@ -103,6 +107,9 @@
         </div>
     </nav>
     <main role="main" class="container">
+
+        @RenderBody()
+
         @foreach (var alert in alerts)
         {
 
@@ -118,7 +125,20 @@
             </div>
         }
 
-        @RenderBody()
+        @foreach (var message in messages)
+        {
+
+            <div class="alert alert-success alert-dismissible" role="alert">
+                <p class="mb-3">@message.Message</p>
+                @if (!string.IsNullOrEmpty(message.Debug))
+                {
+                    <pre class="alert-pre border bg-light p-2"><code>@message.Debug</code></pre>
+                }
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
     </main>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

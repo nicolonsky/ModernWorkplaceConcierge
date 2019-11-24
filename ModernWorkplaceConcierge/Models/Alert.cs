@@ -10,4 +10,11 @@ namespace ModernWorkplaceConcierge.Models
         public string Message { get; set; }
         public string Debug { get; set; }
     }
+
+    public class Info
+    {
+        public const string SessKey = "TempDataInfo";
+        public string Message { get; set; }
+        public string Debug { get; set; }
+    }
 }

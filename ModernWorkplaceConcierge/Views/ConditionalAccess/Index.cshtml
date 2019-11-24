@@ -5,11 +5,9 @@
 }
 
     <div class="jumbotron">
-        <h1>ConditionalAccessPolicies</h1>
-        <p>
-            Download individual Conditional Access policies or all at once. Helpful for testing, backup and documentation purposes. <br />
-            Please note that baseline policies and policies with the "Monitor" option enabled are not available from Microsoft Graph.
-        </p>
+        <h1>Conditional Access Policies</h1>
+        <p>Download individual Conditional Access policies or all at once. Helpful for testing, backup and documentation purposes.</p>
+
         @Html.ActionLink("Export Conditional Access configuration", "DownloadAll", "ConditionalAccess", new { area = "" }, new { @class = "btn btn-primary btn-large" })
     </div>
 
@@ -20,9 +18,6 @@
         </th>
         <th>
             @Html.DisplayNameFor(model => model.state)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.modifiedDateTime)
         </th>
         <th></th>
     </tr>
@@ -35,9 +30,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.state)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.modifiedDateTime)
             </td>
             <td>
                 @Html.ActionLink("Download", "Download", new { Id = item.id })
