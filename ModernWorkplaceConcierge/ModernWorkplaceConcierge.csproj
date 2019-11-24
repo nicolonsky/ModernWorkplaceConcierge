@@ -295,10 +295,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Properties\PublishProfiles\IntuneConcierge - Web Deploy.pubxml" />
     <Content Include="Views\Intune\DeviceManagementScripts.cshtml" />
     <Content Include="Views\Intune\Import.cshtml" />
     <Content Include="Views\ConditionalAccess\Import.cshtml" />

@@ -6,9 +6,6 @@
 #Config
 ModernWorkplaceConcierge/PrivateSettings.config
 
-#Scripts
-ModernWorkplaceConcierge/Scripts/*
-
 # User-specific files
 *.rsuser
 *.suo
