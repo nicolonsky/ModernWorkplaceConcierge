@@ -90,7 +90,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
             ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(ca);
 
-            byte[] capolicy = Encoding.GetEncoding(1250).GetBytes(JsonConvert.SerializeObject(conditionalAccessPolicy, Formatting.Indented).ToString());
+            byte[] capolicy = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(conditionalAccessPolicy, Formatting.Indented).ToString());
 
 
             return File(capolicy, "application/json", "CA-Policy" + Id + ".json");
@@ -109,7 +109,7 @@ namespace ModernWorkplaceConcierge.Controllers
                     {
                         foreach (ConditionalAccessPolicy item in conditionalAccessPolicies.Value)
                         {
-                            byte[] temp = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
+                            byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
                             var zipArchiveEntry = archive.CreateEntry(item.displayName + "_" + item.id + ".json", CompressionLevel.Fastest);
 

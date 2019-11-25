@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Microsoft.Graph;
 using System.Text;
 using static System.Net.WebRequestMethods;
+using Newtonsoft.Json.Linq;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -23,33 +24,56 @@ namespace ModernWorkplaceConcierge.Controllers
         }
 
         [HttpPost]
-        public ActionResult Upload(HttpPostedFileBase file)
+        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files)
         {
-            try
+            foreach (HttpPostedFileBase file in files)
             {
-                BinaryReader b = new BinaryReader(file.InputStream);
-                byte[] binData = b.ReadBytes(file.ContentLength);
+                try
+                {
+                    BinaryReader b = new BinaryReader(file.InputStream);
+                    byte[] binData = b.ReadBytes(file.ContentLength);
 
-                if (file.FileName.Contains(".zip")) {
+                    string result = Encoding.UTF8.GetString(binData);
 
-                    System.IO.Compression.ZipArchive zip = new ZipArchive(b.BaseStream);
+                    try {
 
-                    foreach (ZipArchiveEntry entry in zip.Entries)
-                    {
-                        var stream = entry.Open();
-                        //Do awesome stream stuff!!
+                        GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
 
-                        if (entry.FullName.Contains("DeviceConfigurations")) {
+                        if (json.type.Contains("CompliancePolicy"))
+                        {
+                            DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(result);
 
-                            //DeviceConfiguration deviceConfiguration = JsonConvert.DeserializeObject<DeviceConfiguration>(Encoding.ASCII.GetBytes(stream.Read));
-                        
+                            var response = await GraphHelper.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
+
+                            Message("Success", response.ToString());
+
+                        }else if (json.type.Contains("Configuration"))
+                        {
+                            DeviceConfiguration deviceConfiguration = JsonConvert.DeserializeObject<DeviceConfiguration>(result);
+
+                            // request fails when true :(
+                            deviceConfiguration.SupportsScopeTags = false;
+
+                            var response = await GraphHelper.AddDeviceConfigurationAsync(deviceConfiguration);
+
+                            Message("Success", response.ToString());
                         }
                     }
+                    catch (Exception e)
+                    {
+                        Flash(e.Message, result);
+
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Flash(e.Message);
+
                 }
             }
-            catch { }
 
-                return View();
+            return RedirectToAction("Import");
         }
 
         // GET: Export
@@ -105,7 +129,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 {
                     foreach (DeviceConfiguration item in DeviceConfigurations)
                     {
-                        byte[] temp = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
                         var zipArchiveEntry = archive.CreateEntry("DeviceConfigurations\\"+item.DisplayName+".json", CompressionLevel.Fastest);
 
@@ -114,7 +138,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     foreach (DeviceCompliancePolicy item in DeviceCompliancePolicies)
                     {
-                        byte[] temp = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
                         var zipArchiveEntry = archive.CreateEntry("DeviceCompliancePolicies\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
 
@@ -123,7 +147,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     foreach (ManagedAppPolicy item in ManagedAppProtection)
                     {
-                        byte[] temp = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
                         var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
 
@@ -132,7 +156,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     foreach (WindowsAutopilotDeploymentProfile item in WindowsAutopilotDeploymentProfiles)
                     {
-                        byte[] temp = System.Text.Encoding.Unicode.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
                         var zipArchiveEntry = archive.CreateEntry("WindowsAutopilotDeploymentProfiles\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
 
@@ -144,7 +168,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                         string fixedItem = await GraphHelper.GetDeviceManagementScriptRawAsync(item.Id);
 
-                        byte[] temp = Encoding.ASCII.GetBytes(fixedItem);
+                        byte[] temp = Encoding.UTF8.GetBytes(fixedItem);
 
                         var zipArchiveEntry = archive.CreateEntry("DeviceManagementScripts\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
 

@@ -19,6 +19,13 @@ using System.Text;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
+    public class GraphJson {
+
+        [JsonProperty("@odata.type")]
+        public string type { get; set; }
+
+    }
+
     public static class GraphHelper
     {
         // Load configuration settings from PrivateSettings.config
@@ -148,6 +155,15 @@ namespace ModernWorkplaceConcierge.Helpers
             return deviceConfigurations.CurrentPage;
         }
 
+        public static async Task<DeviceConfiguration> AddDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            var result = await graphClient.DeviceManagement.DeviceConfigurations.Request().AddAsync(deviceConfiguration);
+
+            return result;
+        }
+
         public static async Task<IEnumerable<DeviceCompliancePolicy>> GetDeviceCompliancePoliciesAsync()
         {
             var graphClient = GetAuthenticatedClient();
@@ -156,6 +172,16 @@ namespace ModernWorkplaceConcierge.Helpers
 
             return deviceCompliancePolicies.CurrentPage;
         }
+
+        public static async Task <DeviceCompliancePolicy> AddDeviceCompliancePolicyAsync(DeviceCompliancePolicy deviceCompliancePolicy)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            var result = await graphClient.DeviceManagement.DeviceCompliancePolicies.Request().AddAsync(deviceCompliancePolicy);
+
+            return result;
+        }
+
 
         public static async Task<IEnumerable<ManagedAppPolicy>> GetManagedAppProtectionAsync()
         {
