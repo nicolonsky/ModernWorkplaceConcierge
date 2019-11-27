@@ -16,13 +16,16 @@ using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
 using IntuneConcierge.Helpers;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
     public class GraphJson {
 
-        [JsonProperty("@odata.type")]
-        public string type { get; set; }
+        [JsonProperty("@odata.type", NullValueHandling = NullValueHandling.Ignore)]
+        public string OdataType { get; set; }
+        [JsonProperty("@odata.context", NullValueHandling = NullValueHandling.Ignore)]
+        public string OdataValue { get { return OdataType; } set { OdataType = value; } }
 
     }
 
@@ -77,6 +80,15 @@ namespace ModernWorkplaceConcierge.Helpers
 
             return result.CurrentPage;
 
+        }
+
+        public static async Task<DeviceManagementScript> AddDeviceManagementScriptsAsync(DeviceManagementScript deviceManagementScript)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            var response = await graphClient.DeviceManagement.DeviceManagementScripts.Request().AddAsync(deviceManagementScript);
+
+            return response;
         }
 
         public static async Task<DeviceManagementScript> GetDeviceManagementScriptsAsync(string Id)

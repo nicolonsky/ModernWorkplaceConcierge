@@ -30,12 +30,16 @@ namespace ModernWorkplaceConcierge.Controllers
                     ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(result);
 
                     conditionalAccessPolicy.id = null;
+                    conditionalAccessPolicy.state = "disabled";
+                    conditionalAccessPolicy.createdDateTime = null;
 
                     string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
                     {
                         NullValueHandling = NullValueHandling.Ignore,
                         Formatting = Formatting.Indented
                     }).ToString();
+
+                    Flash(requestContent);
 
                     var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
 

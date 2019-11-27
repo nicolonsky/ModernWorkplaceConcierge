@@ -11,6 +11,7 @@ using Microsoft.Graph;
 using System.Text;
 using static System.Net.WebRequestMethods;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -39,7 +40,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                         GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
 
-                        if (json.type.Contains("CompliancePolicy"))
+                        if (json.OdataValue.Contains("CompliancePolicy"))
                         {
                             DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(result);
 
@@ -47,7 +48,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                             Message("Success", response.ToString());
 
-                        }else if (json.type.Contains("Configuration"))
+                        }else if (json.OdataValue.Contains("Configuration"))
                         {
                             DeviceConfiguration deviceConfiguration = JsonConvert.DeserializeObject<DeviceConfiguration>(result);
 
@@ -56,12 +57,21 @@ namespace ModernWorkplaceConcierge.Controllers
 
                             var response = await GraphHelper.AddDeviceConfigurationAsync(deviceConfiguration);
 
+                            Message("Success", JsonConvert.SerializeObject(response));
+
+                        }else if (json.OdataValue.Contains("deviceManagementScripts"))
+                        {
+                            DeviceManagementScript deviceManagementScript = JsonConvert.DeserializeObject<DeviceManagementScript>(result);
+
+                            var response = await GraphHelper.AddDeviceManagementScriptsAsync(deviceManagementScript);
+
                             Message("Success", response.ToString());
+
                         }
                     }
                     catch (Exception e)
                     {
-                        Flash(e.Message, result);
+                        Flash(e.Message, e.StackTrace);
 
                     }
 
@@ -138,6 +148,9 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     foreach (DeviceCompliancePolicy item in DeviceCompliancePolicies)
                     {
+
+                        
+
                         byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
                         var zipArchiveEntry = archive.CreateEntry("DeviceCompliancePolicies\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
