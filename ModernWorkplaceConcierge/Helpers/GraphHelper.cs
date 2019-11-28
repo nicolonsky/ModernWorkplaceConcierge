@@ -198,10 +198,25 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<IEnumerable<ManagedAppPolicy>> GetManagedAppProtectionAsync()
         {
             var graphClient = GetAuthenticatedClient();
-            
-            var managedAppProtection = await graphClient.DeviceAppManagement.IosManagedAppProtections.Request().GetAsync();
+
+            var managedAppProtection = await graphClient.DeviceAppManagement.ManagedAppPolicies.Request().GetAsync();
 
             return managedAppProtection.CurrentPage;
+        }
+
+        public static async Task<string> GetManagedAppProtectionAssignmentAsync(string Id)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            var managedAppProtection = await graphClient.DeviceAppManagement.ManagedAppPolicies[Id].Request().GetAsync();
+
+            string result = JsonConvert.SerializeObject(managedAppProtection, Formatting.Indented);
+
+            result.Insert(0,"{\"apps\":");
+
+            result.Insert(result.Length - 1, "}");
+
+            return result;
         }
 
         public static async Task<ManagedAppPolicy> GetManagedAppProtectionAsync(string Id)
@@ -213,7 +228,7 @@ namespace ModernWorkplaceConcierge.Helpers
             return managedAppProtection;
         }
 
-        public static async Task <IEnumerable<Microsoft.Graph.WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
+        public static async Task <IEnumerable<WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
         {
             var graphClient = GetAuthenticatedClient();
 
@@ -222,13 +237,22 @@ namespace ModernWorkplaceConcierge.Helpers
             return windowsAutopilotDeploymentProfiles.CurrentPage;
         }
 
-        public static async Task<Microsoft.Graph.WindowsAutopilotDeploymentProfile> GetWindowsAutopilotDeploymentProfiles(string Id)
+        public static async Task<WindowsAutopilotDeploymentProfile> GetWindowsAutopilotDeploymentProfiles(string Id)
         {
             var graphClient = GetAuthenticatedClient();
 
-            Microsoft.Graph.WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[Id].Request().GetAsync();
+            WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[Id].Request().GetAsync();
 
             return windowsAutopilotDeploymentProfile;
+        }
+
+        public static async Task<WindowsAutopilotDeploymentProfile> AddWindowsAutopilotDeploymentProfile(WindowsAutopilotDeploymentProfile autopilotDeploymentProfile)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            var response = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().AddAsync(autopilotDeploymentProfile);
+
+            return response;
         }
 
         public static async Task<Organization> GetOrgDetailsAsync()
@@ -240,6 +264,24 @@ namespace ModernWorkplaceConcierge.Helpers
             Organization organization = org.CurrentPage.First();
 
             return organization;
+        }
+
+        public static async Task<string> GetDefaultDomain()
+        {
+            Organization organization = await GetOrgDetailsAsync();
+
+            string verifiedDomain = organization.VerifiedDomains.First().Name;
+
+            foreach (VerifiedDomain domain in organization.VerifiedDomains)
+            {
+                if ((bool)domain.IsDefault)
+                {
+                    verifiedDomain = domain.Name;
+                }
+
+            }
+
+            return verifiedDomain;
         }
 
         public static async Task<User> GetUserDetailsAsync(string accessToken)

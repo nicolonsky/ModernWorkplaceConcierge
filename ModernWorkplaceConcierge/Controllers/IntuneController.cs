@@ -1,17 +1,12 @@
 ﻿using ModernWorkplaceConcierge.Helpers;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
 using Microsoft.Graph;
 using System.Text;
-using static System.Net.WebRequestMethods;
-using Newtonsoft.Json.Linq;
-using System.Collections;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -44,6 +39,8 @@ namespace ModernWorkplaceConcierge.Controllers
                         {
                             DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(result);
 
+                            Flash("Not implemented");
+
                             var response = await GraphHelper.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
 
                             Message("Success", response.ToString());
@@ -64,6 +61,14 @@ namespace ModernWorkplaceConcierge.Controllers
                             DeviceManagementScript deviceManagementScript = JsonConvert.DeserializeObject<DeviceManagementScript>(result);
 
                             var response = await GraphHelper.AddDeviceManagementScriptsAsync(deviceManagementScript);
+
+                            Message("Success", response.ToString());
+
+                        }else if (json.OdataValue.Contains("azureADWindowsAutopilotDeploymentProfile"))
+                        {
+                            WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = JsonConvert.DeserializeObject<WindowsAutopilotDeploymentProfile>(result);
+
+                            var response = await GraphHelper.AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
 
                             Message("Success", response.ToString());
 
@@ -124,71 +129,73 @@ namespace ModernWorkplaceConcierge.Controllers
         public async System.Threading.Tasks.Task<FileResult> DownloadAsync()
         {
             var DeviceCompliancePolicies = await GraphHelper.GetDeviceCompliancePoliciesAsync();
-
             var DeviceConfigurations = await GraphHelper.GetDeviceConfigurationsAsync();
-
             var ManagedAppProtection = await GraphHelper.GetManagedAppProtectionAsync();
-
             var WindowsAutopilotDeploymentProfiles = await GraphHelper.GetWindowsAutopilotDeploymentProfiles();
-
             var DeviceManagementScripts = await GraphHelper.GetDeviceManagementScriptsAsync();
+            var DeviceEnrollmentConfig = await GraphHelper.GetDeviceEnrollmentConfigurationsAsync();
 
             using (MemoryStream ms = new MemoryStream())
             {
                 using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
                 {
+
+                    foreach (DeviceEnrollmentConfiguration item in DeviceEnrollmentConfig)
+                    {
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
+                        var zipArchiveEntry = archive.CreateEntry("DeviceEnrollmentConfiguration\\" + item.Id + ".json", CompressionLevel.Fastest);
+                        using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                    }
+                    
                     foreach (DeviceConfiguration item in DeviceConfigurations)
                     {
-                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
-
-                        var zipArchiveEntry = archive.CreateEntry("DeviceConfigurations\\"+item.DisplayName+".json", CompressionLevel.Fastest);
-
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
+                        var zipArchiveEntry = archive.CreateEntry("DeviceConfiguration\\" + item.DisplayName+".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
                     foreach (DeviceCompliancePolicy item in DeviceCompliancePolicies)
                     {
-
-                        
-
-                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
-
-                        var zipArchiveEntry = archive.CreateEntry("DeviceCompliancePolicies\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
-
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
+                        var zipArchiveEntry = archive.CreateEntry("DeviceCompliancePolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
                     foreach (ManagedAppPolicy item in ManagedAppProtection)
                     {
-                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
                         var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
-
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+
+                        //get assigned apps to policy
+                        /*
+                        string assignedApps = await GraphHelper.GetManagedAppProtectionAssignmentAsync(item.Id);
+                        temp = Encoding.UTF8.GetBytes(assignedApps);
+                        zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + "_assignedApps" + ".json", CompressionLevel.Fastest);
+                        using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                        */
                     }
 
                     foreach (WindowsAutopilotDeploymentProfile item in WindowsAutopilotDeploymentProfiles)
                     {
-                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
-
-                        var zipArchiveEntry = archive.CreateEntry("WindowsAutopilotDeploymentProfiles\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
-
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
+                        var zipArchiveEntry = archive.CreateEntry("WindowsAutopilotDeploymentProfile\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
                     foreach (DeviceManagementScript item in DeviceManagementScripts)
                     {
-
                         string fixedItem = await GraphHelper.GetDeviceManagementScriptRawAsync(item.Id);
-
                         byte[] temp = Encoding.UTF8.GetBytes(fixedItem);
-
-                        var zipArchiveEntry = archive.CreateEntry("DeviceManagementScripts\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
-
+                        var zipArchiveEntry = archive.CreateEntry("DeviceManagementScript\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
                 }
-                return File(ms.ToArray(), "application/zip", "Archive.zip");
+
+                string domainName = await GraphHelper.GetDefaultDomain();
+
+                return File(ms.ToArray(), "application/zip", "IntuneConfig_" + domainName + ".zip");
             }
         }
     }
