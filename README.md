@@ -15,7 +15,7 @@ The tool is built on ASP.NET and works with the Microsoft Graph Beta API (becaus
 
 To Authenticate with the Microsoft Graph API a multi tenant Azure AD application performs authentication and you will need to provide admin consent to the Azure AD application before you can use this tool.
 
-![Consent](https://github.com/nicolonsky/ModernWorkplaceConcierge/master/Doc/Consent.png)
+![Consent](https://github.com/nicolonsky/ModernWorkplaceConcierge/blob/master/Doc/Consent.png)
 
 As the tool performs only GET and POST requests to the Graph API no unitended or negative effects should occur. Additionally conditional access policies are imported as disabled to prevent a lockout.
 
