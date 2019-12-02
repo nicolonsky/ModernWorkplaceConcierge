@@ -28,6 +28,6 @@ The following Intune objects are included in exports:
 
 To Authenticate with the Microsoft Graph API a multi tenant Azure AD application performs authentication and you will need to provide admin consent to the Azure AD application before you can use this tool.
 
-![Consent](https://github.com/nicolonsky/ModernWorkplaceConcierge/blob/master/Doc/Consent.png)
+<img src="https://github.com/nicolonsky/ModernWorkplaceConcierge/blob/master/Doc/Consent.png" alt="Consent" width="25%">
 
 As the tool performs only GET and POST requests to the Graph API no unitended or negative effects should occur. Additionally conditional access policies are imported as disabled to prevent a lockout.
