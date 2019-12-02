@@ -17,6 +17,10 @@
             <li>App configuration policies</li>
             <li>Windows Autopilot deployment profiles</li>
         </ul>
-        @Html.ActionLink("Export Intune configuration", "DownloadAsync", "Intune", new { area = "" }, new { @class = "btn btn-primary btn-large" })
+
+        <a href="@Url.Action("DownloadAsync", "Intune")" class="btn btn-primary btn-large">
+            <i class="far fa-file-archive"></i>
+            <span>Export Intune configuration</span>
+        </a>
     </div>
 

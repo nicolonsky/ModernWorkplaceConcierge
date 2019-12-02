@@ -7,6 +7,8 @@ using System.Web.Mvc;
 using Newtonsoft.Json;
 using Microsoft.Graph;
 using System.Text;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -40,9 +42,15 @@ namespace ModernWorkplaceConcierge.Controllers
 
                             //https://github.com/microsoftgraph/powershell-intune-samples/blob/master/CompliancePolicy/CompliancePolicy_Import_FromJSON.ps1
 
-                            DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(result);
+                            JObject o = JObject.Parse(result);
 
-                            Flash("Not implemented");
+                            JObject o2 = JObject.Parse(@"{scheduledActionsForRule:[{ruleName:'PasswordRequired',scheduledActionConfigurations:[{actionType:'block',gracePeriodHours:'0',notificationTemplateId:'',notificationMessageCCList:[]}]}]}");
+
+                            o.Add("scheduledActionsForRule", o2.SelectToken("scheduledActionsForRule"));
+
+                            string jsonPolicy = JsonConvert.SerializeObject(o);
+
+                            DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(jsonPolicy);
 
                             var response = await GraphHelper.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
 

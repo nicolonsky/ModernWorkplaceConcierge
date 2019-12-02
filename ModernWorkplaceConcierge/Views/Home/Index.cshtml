@@ -5,16 +5,19 @@
     ViewBag.Current = "Home";
 }
 
-<div class="jumbotron">
-    <h1>Modern Workplace Concierge</h1>
-    <p class="lead">Your concierge of choice for managing a modern workplace based on Microsoft 365 services.</p>
-    @if (Request.IsAuthenticated)
-    {
-        <h4>Welcome @ViewBag.User.DisplayName!</h4>
-        <p>Use the navigation bar at the top of the page to get started.</p>
-    }
-    else
-    {
-        @Html.ActionLink("Sign In with Microsoft", "SignIn", "Account", new { area = "" }, new { @class = "btn btn-primary btn-large" })
-    }
-</div>
+    <div class="jumbotron">
+        <h1>Modern Workplace Concierge</h1>
+        <p class="lead">Your concierge of choice for managing a modern workplace based on Microsoft 365 services.</p>
+        @if (Request.IsAuthenticated)
+        {
+            <h4>Welcome @ViewBag.User.DisplayName!</h4>
+            <p>Use the navigation bar at the top of the page to get started.</p>
+        }
+        else
+        {
+            <a href="@Url.Action("SignIn", "Account")" class="btn btn-primary btn-large">
+                <i class="fab fa-microsoft"></i>
+                <span>Sign In with Microsoft</span>
+            </a>
+        }
+    </div>
