@@ -26,76 +26,76 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             foreach (HttpPostedFileBase file in files)
             {
-                try
+                if (file.FileName.Contains(".json"))
                 {
-                    BinaryReader b = new BinaryReader(file.InputStream);
-                    byte[] binData = b.ReadBytes(file.ContentLength);
+                    try
+                    {
+                        BinaryReader b = new BinaryReader(file.InputStream);
+                        byte[] binData = b.ReadBytes(file.ContentLength);
+                        string result = Encoding.UTF8.GetString(binData);
 
-                    string result = Encoding.UTF8.GetString(binData);
-
-                    try {
-
-                        GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
-
-                        if (json.OdataValue.Contains("CompliancePolicy"))
+                        try
                         {
+                            GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
 
-                            //https://github.com/microsoftgraph/powershell-intune-samples/blob/master/CompliancePolicy/CompliancePolicy_Import_FromJSON.ps1
+                            if (json.OdataValue.Contains("CompliancePolicy"))
+                            {
+                                JObject o = JObject.Parse(result);
 
-                            JObject o = JObject.Parse(result);
+                                JObject o2 = JObject.Parse(@"{scheduledActionsForRule:[{ruleName:'PasswordRequired',scheduledActionConfigurations:[{actionType:'block',gracePeriodHours:'0',notificationTemplateId:'',notificationMessageCCList:[]}]}]}");
 
-                            JObject o2 = JObject.Parse(@"{scheduledActionsForRule:[{ruleName:'PasswordRequired',scheduledActionConfigurations:[{actionType:'block',gracePeriodHours:'0',notificationTemplateId:'',notificationMessageCCList:[]}]}]}");
+                                o.Add("scheduledActionsForRule", o2.SelectToken("scheduledActionsForRule"));
 
-                            o.Add("scheduledActionsForRule", o2.SelectToken("scheduledActionsForRule"));
+                                string jsonPolicy = JsonConvert.SerializeObject(o);
 
-                            string jsonPolicy = JsonConvert.SerializeObject(o);
+                                DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(jsonPolicy);
 
-                            DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(jsonPolicy);
+                                var response = await GraphHelper.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
 
-                            var response = await GraphHelper.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
+                                Message("Success", response.ToString());
+                            }
+                            else if (json.OdataValue.Contains("Configuration"))
+                            {
+                                DeviceConfiguration deviceConfiguration = JsonConvert.DeserializeObject<DeviceConfiguration>(result);
 
-                            Message("Success", response.ToString());
+                                // request fails when true :(
+                                deviceConfiguration.SupportsScopeTags = false;
 
-                        }else if (json.OdataValue.Contains("Configuration"))
+                                var response = await GraphHelper.AddDeviceConfigurationAsync(deviceConfiguration);
+
+                                Message("Success", JsonConvert.SerializeObject(response));
+                            }
+                            else if (json.OdataValue.Contains("deviceManagementScripts"))
+                            {
+                                DeviceManagementScript deviceManagementScript = JsonConvert.DeserializeObject<DeviceManagementScript>(result);
+
+                                var response = await GraphHelper.AddDeviceManagementScriptsAsync(deviceManagementScript);
+
+                                Message("Success", response.ToString());
+                            }
+                            else if (json.OdataValue.Contains("azureADWindowsAutopilotDeploymentProfile"))
+                            {
+                                WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = JsonConvert.DeserializeObject<WindowsAutopilotDeploymentProfile>(result);
+
+                                var response = await GraphHelper.AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
+
+                                Message("Success", response.ToString());
+                            }
+                            else
+                            {
+                                throw new NotImplementedException();
+                            }
+                        }
+                        catch (Exception e)
                         {
-                            DeviceConfiguration deviceConfiguration = JsonConvert.DeserializeObject<DeviceConfiguration>(result);
-
-                            // request fails when true :(
-                            deviceConfiguration.SupportsScopeTags = false;
-
-                            var response = await GraphHelper.AddDeviceConfigurationAsync(deviceConfiguration);
-
-                            Message("Success", JsonConvert.SerializeObject(response));
-
-                        }else if (json.OdataValue.Contains("deviceManagementScripts"))
-                        {
-                            DeviceManagementScript deviceManagementScript = JsonConvert.DeserializeObject<DeviceManagementScript>(result);
-
-                            var response = await GraphHelper.AddDeviceManagementScriptsAsync(deviceManagementScript);
-
-                            Message("Success", response.ToString());
-
-                        }else if (json.OdataValue.Contains("azureADWindowsAutopilotDeploymentProfile"))
-                        {
-                            WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = JsonConvert.DeserializeObject<WindowsAutopilotDeploymentProfile>(result);
-
-                            var response = await GraphHelper.AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
-
-                            Message("Success", response.ToString());
+                            Flash(e.Message, e.StackTrace);
 
                         }
                     }
                     catch (Exception e)
                     {
-                        Flash(e.Message, e.StackTrace);
-
+                        Flash(e.Message);
                     }
-
-                }
-                catch (Exception e)
-                {
-                    Flash(e.Message);
-
                 }
             }
 
