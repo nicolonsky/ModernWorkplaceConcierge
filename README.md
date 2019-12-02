@@ -11,14 +11,6 @@ The [Modern Workplace Concierge](https://mwconcierge.azurewebsites.net/) is a he
 
 The tool is built on ASP.NET and works with the Microsoft Graph Beta API (because on the Beta endpoint are more entities available).
 
-## Consent and Permissions
-
-To Authenticate with the Microsoft Graph API a multi tenant Azure AD application performs authentication and you will need to provide admin consent to the Azure AD application before you can use this tool.
-
-![Consent](https://github.com/nicolonsky/ModernWorkplaceConcierge/master/Doc/Consent.png)
-
-As the tool performs only GET and POST requests to the Graph API no unitended or negative effects should occur. Additionally conditional access policies are imported as disabled to prevent a lockout.
-
 ### Supported Intune Configurations
 
 The following Intune objects are included in exports:
@@ -32,3 +24,10 @@ The following Intune objects are included in exports:
 * App protection policies
 * App configuration policies
 * Windows Autopilot deployment profiles
+## Consent and Permissions
+
+To Authenticate with the Microsoft Graph API a multi tenant Azure AD application performs authentication and you will need to provide admin consent to the Azure AD application before you can use this tool.
+
+![Consent](https://github.com/nicolonsky/ModernWorkplaceConcierge/blob/master/Doc/Consent.png)
+
+As the tool performs only GET and POST requests to the Graph API no unitended or negative effects should occur. Additionally conditional access policies are imported as disabled to prevent a lockout.
