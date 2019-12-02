@@ -37,28 +37,12 @@ namespace ModernWorkplaceConcierge
                 {
                     ClientId = appId,
                     Authority = "https://login.microsoftonline.com/common/v2.0",
-                    Scope = $"openid email profile offline_access {graphScopes}",
+                    Scope = $"openid profile {graphScopes}",
                     RedirectUri = redirectUri,
                     PostLogoutRedirectUri = redirectUri,
                     TokenValidationParameters = new TokenValidationParameters
                     {
-                        // For demo purposes only, see below
                         ValidateIssuer = false
-
-                        // In a real multi-tenant app, you would add logic to determine whether the
-                        // issuer was from an authorized tenant
-                        //ValidateIssuer = true,
-                        //IssuerValidator = (issuer, token, tvp) =>
-                        //{
-                        //  if (MyCustomTenantValidation(issuer))
-                        //  {
-                        //    return issuer;
-                        //  }
-                        //  else
-                        //  {
-                        //    throw new SecurityTokenInvalidIssuerException("Invalid issuer");
-                        //  }
-                        //}
                     },
                     Notifications = new OpenIdConnectAuthenticationNotifications
                     {

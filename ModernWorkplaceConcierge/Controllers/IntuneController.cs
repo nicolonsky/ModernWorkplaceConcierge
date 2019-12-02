@@ -37,6 +37,9 @@ namespace ModernWorkplaceConcierge.Controllers
 
                         if (json.OdataValue.Contains("CompliancePolicy"))
                         {
+
+                            //https://github.com/microsoftgraph/powershell-intune-samples/blob/master/CompliancePolicy/CompliancePolicy_Import_FromJSON.ps1
+
                             DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(result);
 
                             Flash("Not implemented");

@@ -37,20 +37,46 @@ namespace ModernWorkplaceConcierge.Controllers
                     {
                         NullValueHandling = NullValueHandling.Ignore,
                         Formatting = Formatting.Indented
-                    }).ToString();
+                    });
 
-                    Flash(requestContent);
+                    try
+                    {
+                        var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+                        Message("Success", success.ToString());
+                    }
+                    catch {
 
-                    var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+                        try
+                        {
+                            // remove Id's
+                            conditionalAccessPolicy.conditions.users.includeUsers = new string[] { "none" };
+                            conditionalAccessPolicy.conditions.users.excludeUsers = null;
+                            conditionalAccessPolicy.conditions.users.includeGroups = null;
+                            conditionalAccessPolicy.conditions.users.excludeGroups = null;
+                            conditionalAccessPolicy.conditions.users.includeRoles = null;
+                            conditionalAccessPolicy.conditions.users.excludeRoles = null;
 
-                    Message("Success", success.ToString());
+                            conditionalAccessPolicy.conditions.applications.includeApplications = new string[] { "none" };
+                            conditionalAccessPolicy.conditions.applications.excludeApplications = null;
 
+                            requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
+                            {
+                                NullValueHandling = NullValueHandling.Ignore,
+                                Formatting = Formatting.Indented
+                            });
+
+                            var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+
+                            Message("Success: Unknown tenant ID's removed!", success.ToString());
+                        }
+                        catch (Exception e)
+                        {
+
+                            Flash(e.Message, e.StackTrace);
+                        }
+                    }
                 }
-                catch (Exception e)
-                {
-                    Flash(e.Message);
-
-                }
+                 catch{}
             }
             
             return RedirectToAction("Import");
@@ -62,10 +88,6 @@ namespace ModernWorkplaceConcierge.Controllers
             return View();
 
         }
-
-        /*
-            CA policies: https://docs.microsoft.com/en-us/graph/api/conditionalaccessroot-list-policies?view=graph-rest-beta&tabs=http
-                */
 
         // GET: ConditionalAccess
         public async System.Threading.Tasks.Task<ViewResult> Index()
@@ -121,7 +143,9 @@ namespace ModernWorkplaceConcierge.Controllers
                         }
                     }
 
-                    return File(ms.ToArray(), "application/zip", "Archive.zip");
+                    string domainName = await GraphHelper.GetDefaultDomain();
+
+                    return File(ms.ToArray(), "application/zip", "ConditionalAccessConfig_" + domainName + ".zip");
                 }
             }
             catch (Exception e)
