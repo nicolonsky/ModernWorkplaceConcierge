@@ -71,7 +71,7 @@ namespace ModernWorkplaceConcierge.Helpers
                 CloudAssignedDeviceName = profile.DeviceNameTemplate;
             }
 
-            CloudAssignedOobeConfig = 8;
+            CloudAssignedOobeConfig = 8 + 256;
 
             if  (profile.OutOfBoxExperienceSettings.UserType.Equals("standard"))
             {
