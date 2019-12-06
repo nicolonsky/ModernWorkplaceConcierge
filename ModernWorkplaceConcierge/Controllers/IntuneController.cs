@@ -24,72 +24,74 @@ namespace ModernWorkplaceConcierge.Controllers
         [HttpPost]
         public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files)
         {
-            foreach (HttpPostedFileBase file in files)
+            try
             {
-                if (file.FileName.Contains(".json"))
+                if (files.Length > 0 && files[0].FileName.Contains(".json"))
                 {
-                    try
+                    foreach (HttpPostedFileBase file in files)
                     {
-                        BinaryReader b = new BinaryReader(file.InputStream);
-                        byte[] binData = b.ReadBytes(file.ContentLength);
-                        string result = Encoding.UTF8.GetString(binData);
 
                         try
                         {
-                            GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
+                            BinaryReader b = new BinaryReader(file.InputStream);
+                            byte[] binData = b.ReadBytes(file.ContentLength);
+                            string result = Encoding.UTF8.GetString(binData);
 
-                            if (json.OdataValue.Contains("CompliancePolicy"))
-                            {
-                                JObject o = JObject.Parse(result);
+                            string response = await GraphHelper.AddIntuneConfig(result);
 
-                                JObject o2 = JObject.Parse(@"{scheduledActionsForRule:[{ruleName:'PasswordRequired',scheduledActionConfigurations:[{actionType:'block',gracePeriodHours:'0',notificationTemplateId:'',notificationMessageCCList:[]}]}]}");
-
-                                o.Add("scheduledActionsForRule", o2.SelectToken("scheduledActionsForRule"));
-
-                                string jsonPolicy = JsonConvert.SerializeObject(o);
-
-                                DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(jsonPolicy);
-
-                                var response = await GraphHelper.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
-
-                                Message("Success", response.ToString());
-                            }
-                            else if (json.OdataValue.Contains("Configuration"))
-                            {
-                                DeviceConfiguration deviceConfiguration = JsonConvert.DeserializeObject<DeviceConfiguration>(result);
-
-                                // request fails when true :(
-                                deviceConfiguration.SupportsScopeTags = false;
-
-                                var response = await GraphHelper.AddDeviceConfigurationAsync(deviceConfiguration);
-
-                                Message("Success", JsonConvert.SerializeObject(response));
-                            }
-                            else if (json.OdataValue.Contains("deviceManagementScripts"))
-                            {
-                                DeviceManagementScript deviceManagementScript = JsonConvert.DeserializeObject<DeviceManagementScript>(result);
-
-                                var response = await GraphHelper.AddDeviceManagementScriptsAsync(deviceManagementScript);
-
-                                Message("Success", response.ToString());
-                            }
-                            else if (json.OdataValue.Contains("azureADWindowsAutopilotDeploymentProfile"))
-                            {
-                                WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = JsonConvert.DeserializeObject<WindowsAutopilotDeploymentProfile>(result);
-
-                                var response = await GraphHelper.AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
-
-                                Message("Success", response.ToString());
-                            }
-                            else
-                            {
-                                throw new NotImplementedException();
-                            }
+                            Message("Success", response);
                         }
                         catch (Exception e)
                         {
-                            Flash(e.Message, e.StackTrace);
+                            Flash(e.Message);
+                        }
+                    }
+                }
+                else if (files.Length > 0 && files[0].FileName.Contains(".zip"))
+                {
+                    try
+                    {
+                        MemoryStream target = new MemoryStream();
+                        files[0].InputStream.CopyTo(target);
+                        byte[] data = target.ToArray();
 
+                        using (var zippedStream = new MemoryStream(data))
+                        {
+                            using (var archive = new ZipArchive(zippedStream))
+                            {
+                                foreach (var entry in archive.Entries)
+                                {
+                                    try
+                                    {
+                                        if (entry != null)
+                                        {
+                                            if (entry.FullName.Contains("WindowsAutopilotDeploymentProfile") || entry.FullName.Contains("DeviceConfiguration") || entry.FullName.Contains("DeviceCompliancePolicy") || entry.FullName.Contains("DeviceManagementScript"))
+                                            {
+                                                using (var unzippedEntryStream = entry.Open())
+                                                {
+                                                    using (var ms = new MemoryStream())
+                                                    {
+                                                        unzippedEntryStream.CopyTo(ms);
+                                                        var unzippedArray = ms.ToArray();
+                                                        string result = Encoding.UTF8.GetString(unzippedArray);
+
+                                                        string response = await GraphHelper.AddIntuneConfig(result);
+
+                                                        if (!(String.IsNullOrEmpty(response)))
+                                                        {
+                                                            Message("Success", response);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Flash(e.ToString());
+                                    }
+                                }
+                            }
                         }
                     }
                     catch (Exception e)
@@ -97,6 +99,17 @@ namespace ModernWorkplaceConcierge.Controllers
                         Flash(e.Message);
                     }
                 }
+                else if (files.Length > 0)
+                {
+                    Flash("Unsupported file type", files[0].FileName);
+                }
+            }
+            catch (NullReferenceException)
+            {
+                Flash("Please select a file!");
+            }
+            catch (Exception e) {
+                Flash(e.Message);
             }
 
             return RedirectToAction("Import");

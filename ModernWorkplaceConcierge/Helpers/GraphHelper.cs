@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 using IntuneConcierge.Helpers;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
@@ -39,6 +40,62 @@ namespace ModernWorkplaceConcierge.Helpers
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
 
 
+        public static async Task<string> AddIntuneConfig(string result) {
+
+            GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
+
+            if (json.OdataValue.Contains("CompliancePolicy"))
+            {
+                JObject o = JObject.Parse(result);
+
+                JObject o2 = JObject.Parse(@"{scheduledActionsForRule:[{ruleName:'PasswordRequired',scheduledActionConfigurations:[{actionType:'block',gracePeriodHours:'0',notificationTemplateId:'',notificationMessageCCList:[]}]}]}");
+
+                o.Add("scheduledActionsForRule", o2.SelectToken("scheduledActionsForRule"));
+
+                string jsonPolicy = JsonConvert.SerializeObject(o);
+
+                DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(jsonPolicy);
+
+                var response = await GraphHelper.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
+
+                return response.ODataType + " | " +response.DisplayName;
+            }
+            else if (json.OdataValue.Contains("Configuration") && json.OdataValue.Contains("windows"))
+            {
+                DeviceConfiguration deviceConfiguration = JsonConvert.DeserializeObject<DeviceConfiguration>(result);
+
+                // request fails when true :(
+                deviceConfiguration.SupportsScopeTags = false;
+
+                var response = await AddDeviceConfigurationAsync(deviceConfiguration);
+
+                return response.ODataType + " | " + response.DisplayName;
+            }
+            else if (json.OdataValue.Contains("deviceManagementScripts"))
+            {
+                DeviceManagementScript deviceManagementScript = JsonConvert.DeserializeObject<DeviceManagementScript>(result);
+
+                // remove id - otherwise request fails
+                deviceManagementScript.Id = "";
+
+                var response = await AddDeviceManagementScriptsAsync(deviceManagementScript);
+
+                return "#microsoft.graph.deviceManagementScript" + " | " + response.DisplayName;
+            }
+            else if (json.OdataValue.Contains("WindowsAutopilotDeploymentProfile"))
+            {
+                WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = JsonConvert.DeserializeObject<WindowsAutopilotDeploymentProfile>(result);
+
+                var response = await AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
+
+                return response.ODataType + " | " + response.DisplayName;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public static async Task<string> AddConditionalAccessPolicyAsync(string ConditionalAccessPolicyJSON)
         {
             var graphClient = GetAuthenticatedClient();
@@ -59,8 +116,6 @@ namespace ModernWorkplaceConcierge.Helpers
 
             return await response.Content.ReadAsStringAsync();
         }
-
-
 
         // Get's ESP, Enrollment restrictions, WHFB settings etc...
         public static async Task<IEnumerable<DeviceEnrollmentConfiguration>> GetDeviceEnrollmentConfigurationsAsync()
