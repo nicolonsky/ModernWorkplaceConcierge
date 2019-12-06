@@ -18,67 +18,92 @@ namespace ModernWorkplaceConcierge.Controllers
         [HttpPost]
         public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files)
         {
-            foreach (HttpPostedFileBase file in files)
+            try
             {
-                try
+                if (files.Length > 0 && files[0].FileName.Contains(".json"))
                 {
-                    BinaryReader b = new BinaryReader(file.InputStream);
-                    byte[] binData = b.ReadBytes(file.ContentLength);
-
-                    string result = Encoding.UTF8.GetString(binData);
-
-                    ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(result);
-
-                    conditionalAccessPolicy.id = null;
-                    conditionalAccessPolicy.state = "disabled";
-                    conditionalAccessPolicy.createdDateTime = null;
-
-                    string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
+                    foreach (HttpPostedFileBase file in files)
                     {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        Formatting = Formatting.Indented
-                    });
-
-                    try
-                    {
-                        var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
-                        Message("Success", success.ToString());
-                    }
-                    catch {
 
                         try
                         {
-                            // remove Id's
-                            conditionalAccessPolicy.conditions.users.includeUsers = new string[] { "none" };
-                            conditionalAccessPolicy.conditions.users.excludeUsers = null;
-                            conditionalAccessPolicy.conditions.users.includeGroups = null;
-                            conditionalAccessPolicy.conditions.users.excludeGroups = null;
-                            conditionalAccessPolicy.conditions.users.includeRoles = null;
-                            conditionalAccessPolicy.conditions.users.excludeRoles = null;
+                            BinaryReader b = new BinaryReader(file.InputStream);
+                            byte[] binData = b.ReadBytes(file.ContentLength);
+                            string result = Encoding.UTF8.GetString(binData);
 
-                            conditionalAccessPolicy.conditions.applications.includeApplications = new string[] { "none" };
-                            conditionalAccessPolicy.conditions.applications.excludeApplications = null;
+                            string response = await GraphHelper.ImportCaConfig(result);
 
-                            requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
-                            {
-                                NullValueHandling = NullValueHandling.Ignore,
-                                Formatting = Formatting.Indented
-                            });
-
-                            var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
-
-                            Message("Success: Unknown tenant ID's removed!", success.ToString());
+                            Message("Success", response);
                         }
                         catch (Exception e)
                         {
-
-                            Flash(e.Message, e.StackTrace);
+                            Flash(e.Message);
                         }
                     }
                 }
-                 catch{}
+                else if (files.Length > 0 && files[0].FileName.Contains(".zip"))
+                {
+                    try
+                    {
+                        MemoryStream target = new MemoryStream();
+                        files[0].InputStream.CopyTo(target);
+                        byte[] data = target.ToArray();
+
+                        using (var zippedStream = new MemoryStream(data))
+                        {
+                            using (var archive = new ZipArchive(zippedStream))
+                            {
+                                foreach (var entry in archive.Entries)
+                                {
+                                    try
+                                    {
+                                        if (entry != null)
+                                        {
+                                            using (var unzippedEntryStream = entry.Open())
+                                            {
+                                                using (var ms = new MemoryStream())
+                                                {
+                                                    unzippedEntryStream.CopyTo(ms);
+                                                    var unzippedArray = ms.ToArray();
+                                                    string result = Encoding.UTF8.GetString(unzippedArray);
+
+                                                    string response = await GraphHelper.ImportCaConfig(result);
+
+                                                    if (!(String.IsNullOrEmpty(response)))
+                                                    {
+                                                        Message("Success", response);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Flash(e.ToString());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Flash(e.Message);
+                    }
+                }
+                else if (files.Length > 0)
+                {
+                    Flash("Unsupported file type", files[0].FileName);
+                }
             }
-            
+            catch (NullReferenceException)
+            {
+                Flash("Please select a file!");
+            }
+            catch (Exception e)
+            {
+                Flash(e.Message);
+            }
+
             return RedirectToAction("Import");
         }
 

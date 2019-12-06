@@ -39,6 +39,50 @@ namespace ModernWorkplaceConcierge.Helpers
         private static string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
         private static string graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
 
+        public static async Task<string> ImportCaConfig(string policy)
+        {
+            ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(policy);
+
+            conditionalAccessPolicy.id = null;
+            conditionalAccessPolicy.state = "disabled";
+            conditionalAccessPolicy.createdDateTime = null;
+
+            string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented
+            });
+
+            try
+            {
+                var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+
+                return success.ToString();
+            }
+            catch
+            {
+                // remove Id's
+                conditionalAccessPolicy.conditions.users.includeUsers = new string[] { "none" };
+                conditionalAccessPolicy.conditions.users.excludeUsers = null;
+                conditionalAccessPolicy.conditions.users.includeGroups = null;
+                conditionalAccessPolicy.conditions.users.excludeGroups = null;
+                conditionalAccessPolicy.conditions.users.includeRoles = null;
+                conditionalAccessPolicy.conditions.users.excludeRoles = null;
+
+                conditionalAccessPolicy.conditions.applications.includeApplications = new string[] { "none" };
+                conditionalAccessPolicy.conditions.applications.excludeApplications = null;
+
+                requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = Formatting.Indented
+                });
+
+                var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
+
+                return "Unknown tenant ID's removed! \r\n" + success.ToString();   
+            }
+        }
 
         public static async Task<string> AddIntuneConfig(string result) {
 

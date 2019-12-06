@@ -11,6 +11,7 @@
         @if (Request.IsAuthenticated)
         {
             <h4>Welcome @ViewBag.User.DisplayName!</h4>
+            <h6>Tenant @ViewBag.Tenant</h6>
             <p>Use the navigation bar at the top of the page to get started.</p>
 
             <a href="https://github.com/nicolonsky/ModernWorkplaceConcierge" target="_blank" class="btn btn-dark btn-large">
