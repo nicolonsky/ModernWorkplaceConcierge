@@ -75,11 +75,14 @@ namespace ModernWorkplaceConcierge.Controllers
                                                         var unzippedArray = ms.ToArray();
                                                         string result = Encoding.UTF8.GetString(unzippedArray);
 
-                                                        string response = await GraphHelper.AddIntuneConfig(result);
-
-                                                        if (!(String.IsNullOrEmpty(response)))
+                                                        if (!string.IsNullOrEmpty(result))
                                                         {
-                                                            Message("Success", response);
+                                                            string response = await GraphHelper.AddIntuneConfig(result);
+
+                                                            if (!(string.IsNullOrEmpty(response)))
+                                                            {
+                                                                Message("Success", response);
+                                                            }
                                                         }
                                                     }
                                                 }
