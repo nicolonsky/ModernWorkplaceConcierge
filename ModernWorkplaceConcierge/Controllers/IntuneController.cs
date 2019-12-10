@@ -75,11 +75,14 @@ namespace ModernWorkplaceConcierge.Controllers
                                                         var unzippedArray = ms.ToArray();
                                                         string result = Encoding.UTF8.GetString(unzippedArray);
 
-                                                        string response = await GraphHelper.AddIntuneConfig(result);
-
-                                                        if (!(String.IsNullOrEmpty(response)))
+                                                        if (!string.IsNullOrEmpty(result))
                                                         {
-                                                            Message("Success", response);
+                                                            string response = await GraphHelper.AddIntuneConfig(result);
+
+                                                            if (!(string.IsNullOrEmpty(response)))
+                                                            {
+                                                                Message("Success", response);
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -136,6 +139,25 @@ namespace ModernWorkplaceConcierge.Controllers
                 Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
 
                 return View();
+            }
+        }
+
+        public async System.Threading.Tasks.Task<PartialViewResult>PowerShellScriptContent(string Id)
+        {
+            try
+            {
+                var scripts = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
+
+                string powerShellCode = Encoding.UTF8.GetString(scripts.ScriptContent);
+
+                return PartialView("_PowerShellScriptContent", powerShellCode);
+
+            }
+            catch (Exception e)
+            {
+                Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
+
+                return PartialView();
             }
         }
 
