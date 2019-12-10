@@ -4,6 +4,7 @@
     ViewBag.Current = "IntuneDeviceManagementScripts";
 }
 
+
 <div class="jumbotron">
     <h1>DeviceManagementScripts</h1>
     <p>Download PowerShell scripts from your Intune tenant.</p>
@@ -36,9 +37,58 @@
                 @Html.DisplayFor(modelItem => item.LastModifiedDateTime)
             </td>
             <td>
+                <a href="javascript:void(0);" class="anchorDetail" data-id="@item.Id">Preview</a> |
                 @Html.ActionLink("Download", "DownloadDeviceManagementScript", new { Id = item.Id })
             </td>
         </tr>
     }
-
 </table>
+
+
+<link rel="stylesheet" href="~/Content/Highlight/vs.css">
+
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="myModal" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">PowerShell script content</h5>
+            </div>
+            <pre>
+                <code id="myModalContent" class="powershell"></code>
+            </pre>
+            <div class="modal-footer">
+                <button type="button" id="closbtn" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var URL = '/Intune/PowerShellScriptContent';
+    $(function () {
+        $(".anchorDetail").click(function () {
+            debugger;
+            var $buttonClicked = $(this);
+            var id = $buttonClicked.attr('data-id');
+
+            $.ajax({
+                type: "GET",
+                url: URL,
+                contentType: "text/plain; charset=utf-8",
+                data: { "Id": id },
+                datatype: "text/html",
+                success: function (data) {
+                    debugger;
+                    $('#myModalContent').html(data);
+                    $('#myModal').modal('show');
+                },
+                error: function () {
+                    alert("Dynamic content load failed.");
+                }
+            });
+        });
+    });  
+</script>
+
+
+

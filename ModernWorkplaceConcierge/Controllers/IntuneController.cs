@@ -142,6 +142,25 @@ namespace ModernWorkplaceConcierge.Controllers
             }
         }
 
+        public async System.Threading.Tasks.Task<PartialViewResult>PowerShellScriptContent(string Id)
+        {
+            try
+            {
+                var scripts = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
+
+                string powerShellCode = Encoding.UTF8.GetString(scripts.ScriptContent);
+
+                return PartialView("_PowerShellScriptContent", powerShellCode);
+
+            }
+            catch (Exception e)
+            {
+                Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
+
+                return PartialView();
+            }
+        }
+
         public async System.Threading.Tasks.Task<FileResult> DownloadDeviceManagementScript(String Id)
         {
             DeviceManagementScript script = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
