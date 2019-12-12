@@ -65,7 +65,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                     {
                                         if (entry != null)
                                         {
-                                            if (entry.FullName.Contains("WindowsAutopilotDeploymentProfile") || entry.FullName.Contains("DeviceConfiguration") || entry.FullName.Contains("DeviceCompliancePolicy") || entry.FullName.Contains("DeviceManagementScript"))
+                                            if (entry.FullName.Contains("WindowsAutopilotDeploymentProfile") || entry.FullName.Contains("DeviceConfiguration") || entry.FullName.Contains("DeviceCompliancePolicy") || entry.FullName.Contains("DeviceManagementScript") || entry.FullName.Contains("ManagedAppPolicy"))
                                             {
                                                 using (var unzippedEntryStream = entry.Open())
                                                 {
@@ -213,14 +213,24 @@ namespace ModernWorkplaceConcierge.Controllers
                         byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
                         var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                        
+                        if (item.ODataType.Equals("#microsoft.graph.iosManagedAppProtection"))
+                        {
+                            // get assigned apps for current MAM policy
+                            string assignedApps = await GraphHelper.GetManagedAppProtectionAssignmentAsync(item.Id, "iosManagedAppProtections");
+                            temp = Encoding.UTF8.GetBytes(assignedApps);
+                            zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + "_assignedApps" + ".json", CompressionLevel.Fastest);
+                            using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
 
-                        //get assigned apps to policy
-                        /*
-                        string assignedApps = await GraphHelper.GetManagedAppProtectionAssignmentAsync(item.Id);
-                        temp = Encoding.UTF8.GetBytes(assignedApps);
-                        zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + "_assignedApps" + ".json", CompressionLevel.Fastest);
-                        using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
-                        */
+                        }else if (item.ODataType.Equals("#microsoft.graph.androidManagedAppProtection"))
+                        {
+                            // get assigned apps for current MAM policy
+                            string assignedApps = await GraphHelper.GetManagedAppProtectionAssignmentAsync(item.Id, "androidManagedAppProtections");
+                            temp = Encoding.UTF8.GetBytes(assignedApps);
+                            zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + "_assignedApps" + ".json", CompressionLevel.Fastest);
+                            using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+
+                        }
                     }
 
                     foreach (WindowsAutopilotDeploymentProfile item in WindowsAutopilotDeploymentProfiles)

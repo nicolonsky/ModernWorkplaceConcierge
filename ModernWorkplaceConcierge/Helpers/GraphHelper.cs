@@ -133,6 +133,14 @@ namespace ModernWorkplaceConcierge.Helpers
                 var response = await AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
 
                 return response.ODataType + " | " + response.DisplayName;
+
+            }else if (json.OdataValue.Contains("#microsoft.graph.iosManagedAppProtection"))
+            {
+                IosManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<IosManagedAppProtection>(result);
+
+                var response = await AddIosManagedAppProtectionAsync(managedAppProtection);
+
+                return "#microsoft.graph.iosManagedAppProtection | " + response.DisplayName;
             }
             else
             {
@@ -179,6 +187,24 @@ namespace ModernWorkplaceConcierge.Helpers
 
             return result.CurrentPage;
 
+        }
+
+        public static async Task<IosManagedAppProtection> AddIosManagedAppProtectionAsync(IosManagedAppProtection managedAppProtection)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            var response = await graphClient.DeviceAppManagement.IosManagedAppProtections.Request().AddAsync(managedAppProtection);
+
+            /*
+            TargetedManagedAppConfiguration targetedManagedAppConfiguration;
+
+             var assignApps = await graphClient.DeviceAppManagement.IosManagedAppProtections[response.Id]
+                .Assign(targetedManagedAppConfiguration)
+                .Request()
+                .PostAsync();
+            */
+
+            return response;
         }
 
         public static async Task<DeviceManagementScript> AddDeviceManagementScriptsAsync(DeviceManagementScript deviceManagementScript)
@@ -303,19 +329,25 @@ namespace ModernWorkplaceConcierge.Helpers
             return managedAppProtection.CurrentPage;
         }
 
-        public static async Task<string> GetManagedAppProtectionAssignmentAsync(string Id)
+        public static async Task<string> GetManagedAppProtectionAssignmentAsync(string Id, string Type)
         {
             var graphClient = GetAuthenticatedClient();
 
-            var managedAppProtection = await graphClient.DeviceAppManagement.ManagedAppPolicies[Id].Request().GetAsync();
+            string requestUrl = graphClient.BaseUrl + "/deviceAppManagement/" +  Type + "/" + Id + "/apps";
 
-            string result = JsonConvert.SerializeObject(managedAppProtection, Formatting.Indented);
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
 
-            result.Insert(0,"{\"apps\":");
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
 
-            result.Insert(result.Length - 1, "}");
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
-            return result;
+            string result = await response.Content.ReadAsStringAsync();
+
+            JObject o = JObject.Parse(result);
+
+            return JsonConvert.SerializeObject(o, Formatting.Indented);
         }
 
         public static async Task<ManagedAppPolicy> GetManagedAppProtectionAsync(string Id)
