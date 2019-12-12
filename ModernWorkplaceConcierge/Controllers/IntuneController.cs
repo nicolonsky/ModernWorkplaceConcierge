@@ -209,26 +209,38 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     foreach (ManagedAppPolicy item in ManagedAppProtection)
                     {
-
-                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
-                        var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
-                        using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
-                        
                         if (item.ODataType.Equals("#microsoft.graph.iosManagedAppProtection"))
                         {
-                            // get assigned apps for current MAM policy
                             string assignedApps = await GraphHelper.GetManagedAppProtectionAssignmentAsync(item.Id, "iosManagedAppProtections");
-                            temp = Encoding.UTF8.GetBytes(assignedApps);
-                            zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + "_assignedApps" + ".json", CompressionLevel.Fastest);
+
+                            // Create json object from mam policy
+                            JObject appProtectionPolicy = JObject.FromObject(item);
+
+                            JObject appPortectionPolicyAssignedApps = JObject.Parse(assignedApps);
+
+                            // Add assigned apps to export
+                            appProtectionPolicy.Add("assignedApps", appPortectionPolicyAssignedApps.SelectToken("value"));
+
+                            byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(appProtectionPolicy, Formatting.Indented));
+                            var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                            using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                        }
+                        else if (item.ODataType.Equals("#microsoft.graph.androidManagedAppProtection"))
+                        {
+                            string assignedApps = await GraphHelper.GetManagedAppProtectionAssignmentAsync(item.Id, "androidManagedAppProtections");
+
+                            // Create json object from mam policy
+                            JObject appProtectionPolicy = JObject.FromObject(item);
+
+                            JObject appPortectionPolicyAssignedApps = JObject.Parse(assignedApps);
+
+                            // Add assigned apps to export
+                            appProtectionPolicy.Add("assignedApps", appPortectionPolicyAssignedApps.SelectToken("value"));
+
+                            byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(appProtectionPolicy, Formatting.Indented));
+                            var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
 
-                        }else if (item.ODataType.Equals("#microsoft.graph.androidManagedAppProtection"))
-                        {
-                            // get assigned apps for current MAM policy
-                            string assignedApps = await GraphHelper.GetManagedAppProtectionAssignmentAsync(item.Id, "androidManagedAppProtections");
-                            temp = Encoding.UTF8.GetBytes(assignedApps);
-                            zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + "_assignedApps" + ".json", CompressionLevel.Fastest);
-                            using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
 
                         }
                     }

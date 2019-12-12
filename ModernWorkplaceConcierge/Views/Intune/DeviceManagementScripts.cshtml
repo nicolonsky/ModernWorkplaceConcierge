@@ -4,6 +4,8 @@
     ViewBag.Current = "IntuneDeviceManagementScripts";
 }
 
+<script src="~/Content/Prismjs/prism.js"></script>
+<link rel="stylesheet" href="~/Content/Prismjs/prism.css">
 
 <div class="jumbotron">
     <h1>DeviceManagementScripts</h1>
@@ -47,16 +49,16 @@
 <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="myModal" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="border:none">
                 <h5 class="modal-title">PowerShell Preview</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <pre>
-                <code id="myModalContent" class="powershell" style="color: mediumblue"></code>
+            <pre class="line-numbers">
+                <code id="myModalContent" class="language-powershell"></code>
             </pre>
-            <div class="modal-footer">
+            <div class="modal-footer" style="border:none">
                 <button type="button" id="closbtn" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -81,6 +83,7 @@
                     debugger;
                     $('#myModalContent').html(data);
                     $('#myModal').modal('show');
+                    Prism.highlightAll();
                 },
                 error: function () {
                     alert("Dynamic content load failed.");

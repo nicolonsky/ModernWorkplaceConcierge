@@ -140,9 +140,41 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 var response = await AddIosManagedAppProtectionAsync(managedAppProtection);
 
-                return "#microsoft.graph.iosManagedAppProtection | " + response.DisplayName;
+                // Get assigned apps
+                JObject config = JObject.Parse(result);
+
+                var graphClient = GetAuthenticatedClient();
+
+                foreach (var app in config.SelectToken("assignedApps").Children())
+                {
+                    ManagedMobileApp mobileApp = app.ToObject<ManagedMobileApp>();
+
+                    await graphClient.DeviceAppManagement.IosManagedAppProtections[response.Id].Apps.Request().AddAsync(mobileApp);
+                }
+
+                return "#microsoft.graph.iosManagedAppProtection | " + JsonConvert.SerializeObject(response);
             }
-            else
+            else if (json.OdataValue.EndsWith("/apps") && json.OdataValue.Contains("iosManagedAppProtections"))
+            {
+
+                string appProtectionId = json.OdataValue.Split('(')[1].Split(')')[0].Trim(new char[] { (char)39 });
+
+                JObject o = JObject.Parse(result);
+
+                IEnumerable<ManagedMobileApp> targetedManagedAppConfigurations = o
+                    .SelectToken("value")
+                    .ToObject<IEnumerable<ManagedMobileApp>>();
+
+                var graphClient = GetAuthenticatedClient();
+
+                foreach (ManagedMobileApp app in targetedManagedAppConfigurations)
+                {
+                    var assignApps = await graphClient.DeviceAppManagement.IosManagedAppProtections[appProtectionId]
+                    .Apps
+                    .Request()
+                    .AddAsync(app);
+                }   
+            }
             {
                 return null;
             }
