@@ -251,7 +251,6 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="PrivateSettings.config" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -390,6 +389,7 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Intune\_PowerShellScriptContent.cshtml" />
+    <Content Include="secrets.secrets" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
