@@ -21,10 +21,11 @@ namespace ModernWorkplaceConcierge
     public partial class Startup
     {
         // Load configuration settings from PrivateSettings.config
-        private static string appId = ConfigurationManager.AppSettings["ida:AppId"];
-        private static string appSecret = ConfigurationManager.AppSettings["ida:AppSecret"];
-        private static string redirectUri = ConfigurationManager.AppSettings["ida:RedirectUri"];
-        private static string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
+        private static readonly string tokenEndpoint = ConfigurationManager.AppSettings["ida:TokenEndpoint"];
+        private static readonly string appId = ConfigurationManager.AppSettings["ida:AppId"];
+        private static readonly string appSecret = ConfigurationManager.AppSettings["ida:AppSecret"];
+        private static readonly string redirectUri = ConfigurationManager.AppSettings["ida:RedirectUri"];
+        private static readonly string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
 
         public void ConfigureAuth(IAppBuilder app)
         {
@@ -36,7 +37,7 @@ namespace ModernWorkplaceConcierge
                 new OpenIdConnectAuthenticationOptions
                 {
                     ClientId = appId,
-                    Authority = "https://login.microsoftonline.com/common/v2.0",
+                    Authority = tokenEndpoint,
                     Scope = $"openid profile {graphScopes}",
                     RedirectUri = redirectUri,
                     PostLogoutRedirectUri = redirectUri,

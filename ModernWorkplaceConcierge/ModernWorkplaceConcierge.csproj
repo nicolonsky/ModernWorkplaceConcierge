@@ -223,6 +223,7 @@
     <Compile Include="Controllers\AutoPilotConfigurationController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ConditionalAccessController.cs" />
+    <Compile Include="Controllers\IntuneConfigExportController.cs" />
     <Compile Include="Controllers\IntuneController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -250,7 +251,6 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Helpers\Reference.txt" />
     <Content Include="PrivateSettings.config" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
