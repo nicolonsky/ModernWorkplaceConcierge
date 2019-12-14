@@ -29,10 +29,12 @@
       "defaultValue": "F1"
     },
     "repoUrl": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "https://github.com/nicolonsky/ModernWorkplaceConcierge/tree/master"
     },
     "branch": {
-      "type": "string"
+      "type": "string",
+        "defaultValue":  "master"
     },
     "isManualIntegration": {
       "type": "bool",
