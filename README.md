@@ -35,7 +35,7 @@ As the tool performs only GET and POST requests to the Graph API no unitended or
 ### Host your own instance
 
 If you cannot use the public instance of the ModernWorkplaceConcierge (because of legal and/or compliance reasons) you can deploy an instance in your Azure tenant.
-[Documentation for Self-hosting a custom instance](https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki/Self-hosting-a-custom-instance)
+[Wiki documentation for Self-hosting a custom instance](https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki/Self-hosting-a-custom-instance).
 
 [![Deploy to Azure](https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png)](https://azuredeploy.net/?repository=https://github.com/nicolonsky/ModernWorkplaceConcierge/tree/master)
 
