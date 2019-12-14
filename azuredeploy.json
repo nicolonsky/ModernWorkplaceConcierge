@@ -46,7 +46,7 @@
   "resources": [
     {
       "apiVersion": "2015-08-01",
-      "name": "[parameters('appServicePlanName')]",
+      "name": "[parameters('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[parameters('siteLocation')]",
       "sku": {
