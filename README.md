@@ -36,7 +36,7 @@ As the tool performs only GET and POST requests to the Graph API no unitended or
 
 If you cannot use the tool from the pulbic instance (like legal and compliance reasons) you can deploy your own instance:
 
-[![Deploy to Azure](https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png)](https://azuredeploy.net/)
+[![Deploy to Azure](https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png)](https://azuredeploy.net/?repository=https://github.com/nicolonsky/ModernWorkplaceConcierge/tree/master)
 
 <a href="http://armviz.io/#/?load=https://raw.githubusercontent.com/nicolonsky/ModernWorkplaceConcierge/dev/azuredeploy.json" target="_blank">
   <img src="http://armviz.io/visualizebutton.png"/>
