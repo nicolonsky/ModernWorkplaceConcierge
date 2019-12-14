@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7FD6B3BD-1C5F-4ACF-BFC0-20AFCAC0CD3A}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		azuredeploy.json = azuredeploy.json
 		README.md = README.md
 	EndProjectSection
 EndProject

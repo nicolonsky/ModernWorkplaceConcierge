@@ -31,3 +31,13 @@ To Authenticate with the Microsoft Graph API a multi tenant Azure AD application
 <img src="https://github.com/nicolonsky/ModernWorkplaceConcierge/blob/master/Doc/Consent.png" alt="Consent" width="25%">
 
 As the tool performs only GET and POST requests to the Graph API no unitended or negative effects should occur. Additionally conditional access policies are imported as disabled to prevent a lockout.
+
+### Host your own instance
+
+If you cannot use the tool from the pulbic instance (like legal and compliance reasons) you can deploy your own instance:
+
+[![Deploy to Azure](https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png)](https://azuredeploy.net/)
+
+<a href="http://armviz.io/#/?load=https://raw.githubusercontent.com/nicolonsky/ModernWorkplaceConcierge/dev/azuredeploy.json" target="_blank">
+  <img src="http://armviz.io/visualizebutton.png"/>
+</a>
