@@ -32,11 +32,11 @@ namespace ModernWorkplaceConcierge.Helpers
     public static class GraphHelper
     {
         // Load configuration settings from PrivateSettings.config
-        private static readonly string appId = ConfigurationManager.AppSettings["ida:AppId"];
-        private static readonly string appSecret = ConfigurationManager.AppSettings["ida:AppSecret"];
-        private static readonly string redirectUri = ConfigurationManager.AppSettings["ida:RedirectUri"];
-        private static readonly string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
-        private static readonly string  graphEndpoint = ConfigurationManager.AppSettings["ida:GraphEndpoint"];
+        private static readonly string appId = ConfigurationManager.AppSettings["AppId"];
+        private static readonly string appSecret = ConfigurationManager.AppSettings["AppSecret"];
+        private static readonly string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
+        private static readonly string graphScopes = ConfigurationManager.AppSettings["AppScopes"];
+        private static readonly string  graphEndpoint = ConfigurationManager.AppSettings["GraphEndpoint"];
 
         public static async Task<string> ImportCaConfig(string policy)
         {

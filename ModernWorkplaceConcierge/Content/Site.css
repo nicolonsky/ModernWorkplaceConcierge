@@ -12,3 +12,20 @@ body {
     word-break: break-all;
     white-space: pre-wrap;
 }
+
+.footer {
+    background-color: #f5f5f5;
+    color: gray
+}
+
+.mt-auto, .my-auto {
+    margin-top: auto !important;
+}
+
+.pb-3, .py-3 {
+    padding-bottom: 1rem !important;
+}
+
+.pt-3, .py-3 {
+    padding-top: 1rem !important;
+}
