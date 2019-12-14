@@ -73,15 +73,15 @@
         "siteConfig": {
           "appSettings": [
             {
-              "name": "ida:AppID",
+              "name": "AppID",
               "value": "{AAD-AppID}"
             },
             {
-              "name": "ida:AppSecret",
+              "name": "AppSecret",
               "value": "{AAD-AppSecret}"
             },
             {
-              "name": "ida:RedirectUri",
+              "name": "RedirectUri",
               "value": "{WebsiteURL}"
             }
           ]

@@ -21,11 +21,11 @@ namespace ModernWorkplaceConcierge
     public partial class Startup
     {
         // Load configuration settings from PrivateSettings.config
-        private static readonly string tokenEndpoint = ConfigurationManager.AppSettings["ida:TokenEndpoint"];
-        private static readonly string appId = ConfigurationManager.AppSettings["ida:AppId"];
-        private static readonly string appSecret = ConfigurationManager.AppSettings["ida:AppSecret"];
-        private static readonly string redirectUri = ConfigurationManager.AppSettings["ida:RedirectUri"];
-        private static readonly string graphScopes = ConfigurationManager.AppSettings["ida:AppScopes"];
+        private static readonly string tokenEndpoint = ConfigurationManager.AppSettings["TokenEndpoint"];
+        private static readonly string appId = ConfigurationManager.AppSettings["AppId"];
+        private static readonly string appSecret = ConfigurationManager.AppSettings["AppSecret"];
+        private static readonly string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
+        private static readonly string graphScopes = ConfigurationManager.AppSettings["AppScopes"];
 
         public void ConfigureAuth(IAppBuilder app)
         {
