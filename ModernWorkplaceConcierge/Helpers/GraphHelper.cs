@@ -20,11 +20,6 @@ using System.Collections;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
-    public class RoleDefinitionHelper : Microsoft.Graph.RoleDefinition
-    {
-       
-    }
-
     public class GraphJson {
 
         [JsonProperty("@odata.type", NullValueHandling = NullValueHandling.Ignore)]
@@ -318,6 +313,7 @@ namespace ModernWorkplaceConcierge.Helpers
 
             roleDefinition.IsBuiltIn = false;
             roleDefinition.DisplayName += "- Copy";
+            roleDefinition.Id = null;
 
             RoleDefinition roleDefinitionCopy = await graphClient.DeviceManagement.RoleDefinitions.Request().AddAsync(roleDefinition);
 

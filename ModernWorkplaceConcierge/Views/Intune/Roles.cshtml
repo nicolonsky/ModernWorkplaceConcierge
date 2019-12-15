@@ -1,8 +1,13 @@
-﻿@model IEnumerable<ModernWorkplaceConcierge.Helpers.RoleDefinitionHelper>
+﻿@model IEnumerable<Microsoft.Graph.RoleDefinition>
 
 @{
     ViewBag.Current = "IntuneRoles";
 }
+
+    <div class="jumbotron">
+        <h1>Intune roles</h1>
+        <p>Copy built-in or existing roles for <a href="https://docs.microsoft.com/en-us/intune/fundamentals/role-based-access-control" target="_blank">Role-based access control (RBAC) with Microsoft Intune.</a></p>
+    </div>
 
 @if (Model != null)
 {
@@ -15,7 +20,7 @@
                 @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsBuiltInRoleDefinition)
+                Built-in
             </th>
             <th></th>
         </tr>
@@ -33,7 +38,7 @@
                     @Html.DisplayFor(modelItem => item.IsBuiltInRoleDefinition)
                 </td>
                 <td>
-                    @Html.ActionLink("Copy", "Copy", new { id = item.Id }) |
+                    @Html.ActionLink("Copy", "Copy", new { Id = item.Id })
                 </td>
             </tr>
         }
