@@ -23,6 +23,7 @@ namespace ModernWorkplaceConcierge.Controllers
             var WindowsAutopilotDeploymentProfiles = await GraphHelper.GetWindowsAutopilotDeploymentProfiles();
             var DeviceManagementScripts = await GraphHelper.GetDeviceManagementScriptsAsync();
             var DeviceEnrollmentConfig = await GraphHelper.GetDeviceEnrollmentConfigurationsAsync();
+            var ScopeTags = await GraphHelper.GetRoleScopeTags();
 
             using (MemoryStream ms = new MemoryStream())
             {
@@ -103,6 +104,13 @@ namespace ModernWorkplaceConcierge.Controllers
                         string fixedItem = await GraphHelper.GetDeviceManagementScriptRawAsync(item.Id);
                         byte[] temp = Encoding.UTF8.GetBytes(fixedItem);
                         var zipArchiveEntry = archive.CreateEntry("DeviceManagementScript\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                        using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                    }
+
+                    foreach (RoleScopeTag item in ScopeTags)
+                    {
+                        byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
+                        var zipArchiveEntry = archive.CreateEntry("RoleScopeTags\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
                 }
