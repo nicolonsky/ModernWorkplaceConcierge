@@ -282,6 +282,20 @@ namespace ModernWorkplaceConcierge.Helpers
             return deviceManagementScripts.CurrentPage;
         }
 
+        public static async Task<IEnumerable<DeviceAndAppManagementRoleAssignment>> GetRoleAssignments()
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.DeviceManagement.RoleAssignments.Request().GetAsync();
+            return response;
+        }
+
+        public static async Task<DeviceAndAppManagementRoleAssignment> AddRoleAssignment(DeviceAndAppManagementRoleAssignment roleAssignment)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.DeviceManagement.RoleAssignments.Request().AddAsync(roleAssignment);
+            return response;
+        }
+
         public static async Task<IEnumerable<RoleScopeTag>> GetRoleScopeTags()
         {
             var graphClient = GetAuthenticatedClient();
