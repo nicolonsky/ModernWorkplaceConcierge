@@ -125,6 +125,20 @@ namespace ModernWorkplaceConcierge.Controllers
             return View();
         }
 
+        // GET: Export
+        public async System.Threading.Tasks.Task<ViewResult> Roles()
+        {
+            try
+            {
+                return View(await GraphHelper.GetRoleDefinitions());
+            }
+            catch (Exception e)
+            {
+                Flash(e.Message, e.StackTrace.ToString());
+                return View();
+            } 
+        }
+
         public async System.Threading.Tasks.Task<ViewResult> DeviceManagementScripts()
         {
             try

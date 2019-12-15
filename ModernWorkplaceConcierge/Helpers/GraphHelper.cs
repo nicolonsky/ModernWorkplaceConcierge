@@ -14,13 +14,17 @@ using System.Web;
 using System.Net.Http;
 using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
-using IntuneConcierge.Helpers;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
+    public class RoleDefinitionHelper : Microsoft.Graph.RoleDefinition
+    {
+       
+    }
+
     public class GraphJson {
 
         [JsonProperty("@odata.type", NullValueHandling = NullValueHandling.Ignore)]
@@ -298,6 +302,29 @@ namespace ModernWorkplaceConcierge.Helpers
 
         }
 
+        public static async Task<IEnumerable<RoleDefinition>> GetRoleDefinitions()
+        {
+            var graphClient = GetAuthenticatedClient();
+            var result = await graphClient.DeviceManagement.RoleDefinitions.Request().GetAsync();
+            
+            return result.CurrentPage;
+
+        }
+
+        public static async Task<RoleDefinition> CopyRoleDefinition(string Id)
+        {
+            var graphClient = GetAuthenticatedClient();
+            RoleDefinition roleDefinition = await graphClient.DeviceManagement.RoleDefinitions[Id].Request().GetAsync();
+
+            roleDefinition.IsBuiltIn = false;
+            roleDefinition.DisplayName += "- Copy";
+
+            RoleDefinition roleDefinitionCopy = await graphClient.DeviceManagement.RoleDefinitions.Request().AddAsync(roleDefinition);
+
+            return roleDefinitionCopy;
+
+        }
+
         public static async Task<IosManagedAppProtection> AddIosManagedAppProtectionAsync(IosManagedAppProtection managedAppProtection)
         {
             var graphClient = GetAuthenticatedClient();
@@ -492,7 +519,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<User> GetUserDetailsAsync(string accessToken)
         {
             var graphClient = new GraphServiceClient(
-                new DelegateAuthenticationProvider(
+                new Microsoft.Graph.DelegateAuthenticationProvider(
                     async (requestMessage) =>
                     {
                         requestMessage.Headers.Authorization =

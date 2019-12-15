@@ -67,6 +67,9 @@
 
                                 @Html.ActionLink("AutoPilotConfiguration", "Index", "AutoPilotConfiguration", new { area = "" },
                                new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
+
+                                @Html.ActionLink("Custom Roles", "Roles", "Intune", new { area = "" },
+                               new { @class = ViewBag.Current == "IntuneRole" ? "dropdown-item active" : "dropdown-item" })
                             </div>
                         </li>
 
@@ -155,7 +158,7 @@
     <footer class="footer mt-auto fixed-bottom py-2">
         <div class="container">
             <span class="">Instance: <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span></span>
-            <span class="float-right">Presented by Nicola Suter</span>
+            <span class="float-md-right">Presented by Nicola Suter</span>
         </div>
     </footer>
 
