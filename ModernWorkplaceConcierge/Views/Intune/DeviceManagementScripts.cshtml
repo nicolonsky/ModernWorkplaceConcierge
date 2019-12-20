@@ -28,21 +28,28 @@
 
     @foreach (var item in Model)
     {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DisplayName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FileName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastModifiedDateTime)
-            </td>
-            <td>
-                <a href="javascript:void(0);" class="anchorDetail" data-id="@item.Id">Preview</a> |
-                @Html.ActionLink("Download", "DownloadDeviceManagementScript", new { Id = item.Id })
-            </td>
-        </tr>
+        if (item.DisplayName != null)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DisplayName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastModifiedDateTime)
+                </td>
+                <td>
+                    <a href="javascript:void(0);" class="anchorDetail" data-id="@item.Id">Preview</a> |
+                    @Html.ActionLink("Download", "DownloadDeviceManagementScript", new { Id = item.Id })
+                </td>
+            </tr>
+        }
+        else
+        {
+            <caption> Could not fetch DeviceManagementScript.</caption>
+        }
     }
 </table>
 

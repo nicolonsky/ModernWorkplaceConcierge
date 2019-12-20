@@ -4,15 +4,15 @@
     ViewBag.Current = "ConditionalAccessExport";
 }
 
-    <div class="jumbotron">
-        <h1>Conditional Access Policies</h1>
-        <p>Download single Conditional Access policies or all at once. Helpful for testing, backup and documentation.</p>
+<div class="jumbotron">
+    <h1>Conditional Access Policies</h1>
+    <p>Download single Conditional Access policies or all at once. Helpful for testing, backup and documentation.</p>
 
-        <a href="@Url.Action("DownloadAll", "ConditionalAccess")" class="btn btn-primary btn-large">
-            <i class="far fa-file-archive"></i>
-            <span>Export Conditional Access configuration</span>
-        </a>
-    </div>
+    <a href="@Url.Action("DownloadAll", "ConditionalAccess")" class="btn btn-primary btn-large">
+        <i class="far fa-file-archive"></i>
+        <span>Export Conditional Access configuration</span>
+    </a>
+</div>
 
 <table class="table">
     <tr>
@@ -27,16 +27,27 @@
 
     @foreach (var item in Model)
     {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.displayName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.state)
-            </td>
-            <td>
-                @Html.ActionLink("Download", "Download", new { Id = item.id })
-            </td>
-        </tr>
+        if(item.displayName != null)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.displayName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.state)
+                </td>
+                <td>
+                    @Html.ActionLink("Download", "Download", new { Id = item.id })
+                </td>
+            </tr>
+
+        }
+        else
+        {
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Error</h4>
+                Could not fetch ConditionalAccessPolicy
+            </div>
+        }
     }
 </table>
