@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Microsoft.Graph.PlannerPlan>
+
+@{
+    ViewBag.Current = "PlannerImport";
+}
+
+<div class="jumbotron">
+    <h1>Import Trello Tasks to Microsoft Planner</h1>
+    <p>Migrate a trello board to Micorosoft planner</p>
+</div>
+
+@using (Html.BeginForm("Import", "Planner", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <b>Target Office 365 Planner Plan:</b>
+    @Html.DropDownList("PlannerPlan", new SelectList(Model, "Id", "Title"), new {@class = "form-control"});
+
+    <br />
+
+    <div class="form-group">
+        <b>Exported Trello Tasks JSON:</b>
+        <div class="custom-file">
+            <input type="file" name="file" class="custom-file-input" id="file" accept=".json">
+            <label class="custom-file-label" for="file">Choose file</label>
+        </div>
+        <script>
+            // Add the following code if you want the name of the file appear on select
+            $(".custom-file-input").on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+                $("#upload").removeAttr("disabled");
+            });
+        </script>
+        <br />
+        <br />
+        <button class="btn btn-primary" type="submit" id="upload" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none" id="loady"></span>
+            Import
+        </button>
+    </div>
+}
+
+<script>
+    (function () {
+        $('#upload').click(function () {
+            $('#loady').show();
+        })
+    })();
+</script>
+
+
+
+
