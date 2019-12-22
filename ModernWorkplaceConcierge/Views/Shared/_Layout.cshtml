@@ -84,6 +84,14 @@
                             </div>
                         </li>
 
+                        <li class="nav-item dropdown">
+                            <a class="dropdown-toggle @((ViewBag.Current.StartsWith("Planner")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Office 365</a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                @Html.ActionLink("Import Planner Tasks", "Index", "Planner", new { area = "" },
+                                new { @class = ViewBag.Current == "PlannerImport" ? "dropdown-item active" : "dropdown-item" })
+
+                            </div>
+                        </li>
                     }
                 </ul>
                 <ul class="navbar-nav justify-content-end">

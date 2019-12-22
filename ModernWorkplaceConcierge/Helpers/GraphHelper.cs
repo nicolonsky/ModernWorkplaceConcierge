@@ -282,6 +282,35 @@ namespace ModernWorkplaceConcierge.Helpers
             return deviceManagementScripts.CurrentPage;
         }
 
+
+        public static async Task<IEnumerable<PlannerPlan>> GetplannerPlans()
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.Me.Planner.Plans.Request().GetAsync();
+            return response.CurrentPage;
+        }
+
+        public static async Task<User> GetUser(string displayName)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.Users.Request().Filter("displayName eq" + displayName).GetAsync();
+            return response.CurrentPage.First();
+        }
+
+        public static async Task<PlannerTask> AddPlannerTask(PlannerTask plannerTask)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.Planner.Tasks.Request().AddAsync(plannerTask);
+            return response;
+        }
+
+        public static async Task<PlannerTaskDetails> AddPlannerTaskDetails(PlannerTaskDetails plannerTaskDetails, string id )
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.Planner.Tasks[id].Details.Request().CreateAsync(plannerTaskDetails);
+            return response;
+        }
+
         public static async Task<IEnumerable<DeviceAndAppManagementRoleAssignment>> GetRoleAssignments()
         {
             var graphClient = GetAuthenticatedClient();
