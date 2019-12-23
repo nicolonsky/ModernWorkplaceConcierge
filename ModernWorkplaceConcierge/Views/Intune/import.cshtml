@@ -38,13 +38,14 @@
             $(".custom-file-input").on("change", function () {
                 var fileName = $(this).val().split("\\").pop();
                 $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+                $("#upload").removeAttr("disabled");
             });
         </script>
         <br />
         <br />
         <!--<input type="submit" class="btn btn-primary" value="Upload" id="upload" />-->
 
-        <button class="btn btn-primary" type="submit" id="upload">
+        <button class="btn btn-primary" type="submit" id="upload" disabled>
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none" id="loady"></span>
             Import
         </button>

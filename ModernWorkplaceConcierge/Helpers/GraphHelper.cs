@@ -293,7 +293,12 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<User> GetUser(string displayName)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient.Users.Request().Filter("displayName eq" + displayName).GetAsync();
+            var response = await graphClient
+                .Users
+                .Request()
+                .Filter($"startsWith(displayName,'{displayName}')")
+                .GetAsync();
+
             return response.CurrentPage.First();
         }
 
@@ -304,10 +309,64 @@ namespace ModernWorkplaceConcierge.Helpers
             return response;
         }
 
-        public static async Task<PlannerTaskDetails> AddPlannerTaskDetails(PlannerTaskDetails plannerTaskDetails, string id )
+        public static async Task<PlannerTaskDetails> GetPlannerTaskDetails(string taskId)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient.Planner.Tasks[id].Details.Request().CreateAsync(plannerTaskDetails);
+            var response = await graphClient
+                .Planner
+                .Tasks[taskId]
+                .Details
+                .Request()
+                .GetAsync();
+
+            return response;
+        }
+
+        public static async Task<IEnumerable<PlannerBucket>> GetPlannerBuckets(string planId)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient
+                .Planner
+                .Plans[planId]
+                .Buckets
+                .Request()
+                .GetAsync();
+
+            return response.CurrentPage;
+        }
+
+        public static async Task<PlannerBucket> AddPlannerBucket(PlannerBucket plannerBucket)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient
+                .Planner
+                .Buckets
+                .Request()
+                .AddAsync(plannerBucket);
+
+            return response;
+        }
+
+        public static async Task<PlannerTaskDetails> AddPlannerTaskDetails(PlannerTaskDetails plannerTaskDetails, string taskId)
+        {
+
+            var graphClient = GetAuthenticatedClient();
+
+            var originalTaskDescription = await graphClient
+                .Planner
+                .Tasks[taskId]
+                .Details
+                .Request()
+                .GetAsync();
+
+            var response = await graphClient
+                .Planner
+                .Tasks[taskId]
+                .Details
+                .Request()
+                .Header("If-Match", originalTaskDescription.GetEtag())
+                .UpdateAsync(plannerTaskDetails);
+
             return response;
         }
 

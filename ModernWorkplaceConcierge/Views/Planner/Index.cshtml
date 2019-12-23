@@ -6,9 +6,8 @@
 
 <div class="jumbotron">
     <h1>Import Trello Tasks to Microsoft Planner</h1>
-
+    <p>Import Trello JSON file to an existing planner plan</p>
 </div>
-
 
 @using (Html.BeginForm("Import", "Planner", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
@@ -28,13 +27,14 @@
             $(".custom-file-input").on("change", function () {
                 var fileName = $(this).val().split("\\").pop();
                 $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+                $("#upload").removeAttr("disabled");
             });
         </script>
         <br />
         <br />
         <!--<input type="submit" class="btn btn-primary" value="Upload" id="upload" />-->
 
-        <button class="btn btn-primary" type="submit" id="upload">
+        <button class="btn btn-primary" type="submit" id="upload" disabled>
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none" id="loady"></span>
             Import
         </button>
