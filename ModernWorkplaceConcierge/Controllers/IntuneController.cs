@@ -9,6 +9,7 @@ using Microsoft.Graph;
 using System.Text;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -123,6 +124,39 @@ namespace ModernWorkplaceConcierge.Controllers
         {
 
             return View();
+        }
+
+        // GET: Export
+        public async System.Threading.Tasks.Task<ViewResult> Roles()
+        {
+            try
+            {
+                var roleDefinitions = await GraphHelper.GetRoleDefinitions();
+
+                return View(roleDefinitions);
+            }
+            catch (Exception e)
+            {
+                Flash(e.Message, e.StackTrace.ToString());
+                return View();
+            } 
+        }
+
+        public async System.Threading.Tasks.Task<ActionResult> Copy(string Id)
+        {
+            try
+            {
+                var role = await GraphHelper.CopyRoleDefinition(Id);
+
+                return RedirectToAction("Roles");
+
+            }
+            catch (Exception e)
+            {
+                Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
+
+                return RedirectToAction("Roles");
+            }
         }
 
         public async System.Threading.Tasks.Task<ViewResult> DeviceManagementScripts()

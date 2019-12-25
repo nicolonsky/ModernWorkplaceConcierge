@@ -14,7 +14,6 @@ using System.Web;
 using System.Net.Http;
 using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
-using IntuneConcierge.Helpers;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Collections;
@@ -283,6 +282,122 @@ namespace ModernWorkplaceConcierge.Helpers
             return deviceManagementScripts.CurrentPage;
         }
 
+
+        public static async Task<IEnumerable<PlannerPlan>> GetplannerPlans()
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.Me.Planner.Plans.Request().GetAsync();
+            return response.CurrentPage;
+        }
+
+        public static async Task<User> GetUser(string displayName)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient
+                .Users
+                .Request()
+                .Filter($"startsWith(displayName,'{displayName}')")
+                .GetAsync();
+
+            return response.CurrentPage.First();
+        }
+
+        public static async Task<PlannerTask> AddPlannerTask(PlannerTask plannerTask)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.Planner.Tasks.Request().AddAsync(plannerTask);
+            return response;
+        }
+
+        public static async Task<PlannerTaskDetails> GetPlannerTaskDetails(string taskId)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient
+                .Planner
+                .Tasks[taskId]
+                .Details
+                .Request()
+                .GetAsync();
+
+            return response;
+        }
+
+        public static async Task<IEnumerable<PlannerBucket>> GetPlannerBuckets(string planId)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient
+                .Planner
+                .Plans[planId]
+                .Buckets
+                .Request()
+                .GetAsync();
+
+            return response.CurrentPage;
+        }
+
+        public static async Task<PlannerBucket> AddPlannerBucket(PlannerBucket plannerBucket)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient
+                .Planner
+                .Buckets
+                .Request()
+                .AddAsync(plannerBucket);
+
+            return response;
+        }
+
+        public static async Task<PlannerTaskDetails> AddPlannerTaskDetails(PlannerTaskDetails plannerTaskDetails, string taskId)
+        {
+
+            var graphClient = GetAuthenticatedClient();
+
+            var originalTaskDescription = await graphClient
+                .Planner
+                .Tasks[taskId]
+                .Details
+                .Request()
+                .GetAsync();
+
+            var response = await graphClient
+                .Planner
+                .Tasks[taskId]
+                .Details
+                .Request()
+                .Header("If-Match", originalTaskDescription.GetEtag())
+                .UpdateAsync(plannerTaskDetails);
+
+            return response;
+        }
+
+        public static async Task<IEnumerable<DeviceAndAppManagementRoleAssignment>> GetRoleAssignments()
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.DeviceManagement.RoleAssignments.Request().GetAsync();
+            return response;
+        }
+
+        public static async Task<DeviceAndAppManagementRoleAssignment> AddRoleAssignment(DeviceAndAppManagementRoleAssignment roleAssignment)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.DeviceManagement.RoleAssignments.Request().AddAsync(roleAssignment);
+            return response;
+        }
+
+        public static async Task<IEnumerable<RoleScopeTag>> GetRoleScopeTags()
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.DeviceManagement.RoleScopeTags.Request().GetAsync();
+            return response;
+        }
+
+        public static async Task<RoleScopeTag> AddRoleScopeTag(RoleScopeTag roleScopeTag)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.DeviceManagement.RoleScopeTags.Request().AddAsync(roleScopeTag);
+            return response;
+        }
+
         public static async Task<TargetedManagedAppConfiguration> AddManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration)
         {
             var graphClient = GetAuthenticatedClient();
@@ -295,6 +410,30 @@ namespace ModernWorkplaceConcierge.Helpers
             var graphClient = GetAuthenticatedClient();
             var result = await graphClient.DeviceManagement.DeviceManagementScripts.Request().GetAsync();
             return result.CurrentPage;
+
+        }
+
+        public static async Task<IEnumerable<RoleDefinition>> GetRoleDefinitions()
+        {
+            var graphClient = GetAuthenticatedClient();
+            var result = await graphClient.DeviceManagement.RoleDefinitions.Request().GetAsync();
+            
+            return result.CurrentPage;
+
+        }
+
+        public static async Task<RoleDefinition> CopyRoleDefinition(string Id)
+        {
+            var graphClient = GetAuthenticatedClient();
+            RoleDefinition roleDefinition = await graphClient.DeviceManagement.RoleDefinitions[Id].Request().GetAsync();
+
+            roleDefinition.IsBuiltIn = false;
+            roleDefinition.DisplayName += "- Copy";
+            roleDefinition.Id = null;
+
+            RoleDefinition roleDefinitionCopy = await graphClient.DeviceManagement.RoleDefinitions.Request().AddAsync(roleDefinition);
+
+            return roleDefinitionCopy;
 
         }
 
@@ -492,7 +631,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<User> GetUserDetailsAsync(string accessToken)
         {
             var graphClient = new GraphServiceClient(
-                new DelegateAuthenticationProvider(
+                new Microsoft.Graph.DelegateAuthenticationProvider(
                     async (requestMessage) =>
                     {
                         requestMessage.Headers.Authorization =

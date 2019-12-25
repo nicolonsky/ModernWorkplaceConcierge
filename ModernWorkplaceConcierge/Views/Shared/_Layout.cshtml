@@ -67,6 +67,9 @@
 
                                 @Html.ActionLink("AutoPilotConfiguration", "Index", "AutoPilotConfiguration", new { area = "" },
                                new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
+
+                                @Html.ActionLink("Custom Roles", "Roles", "Intune", new { area = "" },
+                               new { @class = ViewBag.Current == "IntuneRoles" ? "dropdown-item active" : "dropdown-item" })
                             </div>
                         </li>
 
@@ -81,6 +84,14 @@
                             </div>
                         </li>
 
+                        <li class="nav-item dropdown">
+                            <a class="dropdown-toggle @((ViewBag.Current.StartsWith("Planner")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Office 365</a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                @Html.ActionLink("Import Planner Tasks", "Index", "Planner", new { area = "" },
+                                new { @class = ViewBag.Current == "PlannerImport" ? "dropdown-item active" : "dropdown-item" })
+
+                            </div>
+                        </li>
                     }
                 </ul>
                 <ul class="navbar-nav justify-content-end">
@@ -155,7 +166,7 @@
     <footer class="footer mt-auto fixed-bottom py-2">
         <div class="container">
             <span class="">Instance: <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span></span>
-            <span class="float-right">Presented by Nicola Suter</span>
+            <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
         </div>
     </footer>
 
