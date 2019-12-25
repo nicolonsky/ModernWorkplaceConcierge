@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 namespace ModernWorkplaceConcierge.Controllers
 {
     [Authorize]
+    [HandleError]
     public class AutoPilotConfigurationController : BaseController
     {
         // GET: AutoPilotConfigurationJSON

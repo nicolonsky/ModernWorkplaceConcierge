@@ -6,20 +6,20 @@
 
 <div class="jumbotron">
     <h1>Import Trello Tasks to Microsoft Planner</h1>
-    <p>Import Trello JSON file to an existing planner plan</p>
+    <p>Migrate a trello board to Micorosoft planner</p>
 </div>
 
 @using (Html.BeginForm("Import", "Planner", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <b>Target Office 365 Planner Plan:</b>
-    @Html.DropDownList("PlannerPlan", new SelectList(Model, "Id", "Title"),  new { @class = "form-control"});
+    @Html.DropDownList("PlannerPlan", new SelectList(Model, "Id", "Title"), new {@class = "form-control"});
 
     <br />
 
     <div class="form-group">
         <b>Exported Trello Tasks JSON:</b>
         <div class="custom-file">
-            <input type="file" name="file" class="custom-file-input" id="file" accept=".json,.zip" multiple>
+            <input type="file" name="file" class="custom-file-input" id="file" accept=".json">
             <label class="custom-file-label" for="file">Choose file</label>
         </div>
         <script>
@@ -32,8 +32,6 @@
         </script>
         <br />
         <br />
-        <!--<input type="submit" class="btn btn-primary" value="Upload" id="upload" />-->
-
         <button class="btn btn-primary" type="submit" id="upload" disabled>
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none" id="loady"></span>
             Import

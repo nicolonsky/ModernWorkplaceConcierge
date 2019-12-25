@@ -290,6 +290,13 @@ namespace ModernWorkplaceConcierge.Helpers
             return response.CurrentPage;
         }
 
+        public static async Task<PlannerPlan> GetplannerPlan(string id)
+        {
+            var graphClient = GetAuthenticatedClient();
+            var response = await graphClient.Planner.Plans[id].Request().GetAsync();
+            return response;
+        }
+
         public static async Task<User> GetUser(string displayName)
         {
             var graphClient = GetAuthenticatedClient();
