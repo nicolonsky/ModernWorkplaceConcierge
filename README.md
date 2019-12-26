@@ -7,11 +7,12 @@ The [Modern Workplace Concierge](https://mwconcierge.azurewebsites.net/) is a he
 * Import and export Intune configuration and settings
 * Import and export Conditional Access policies
 * Download OSD ready offline Autopilot profiles
-* Download stored PowerShell scripts in Intune (as PowerShell)
+* Re-Download stored PowerShell scripts in Intune (as PowerShell)
+* Import trello boards to Microsoft Planner
 
 The tool is built on ASP.NET and works with the Microsoft Graph Beta API (because on the Beta endpoint are more entities available).
 
-### Supported Intune Configurations
+## Supported Intune Configurations
 
 The following Intune objects are included in exports:
 
@@ -23,7 +24,10 @@ The following Intune objects are included in exports:
 * Windows enrollment settings
 * App protection policies
 * App configuration policies
-* Windows Autopilot deployment profiles
+* Windows autopilot deployment profiles
+* Scope tags
+* RBAC Roles
+
 ## Consent and Permissions
 
 To Authenticate with the Microsoft Graph API a multi tenant Azure AD application performs authentication and you will need to provide admin consent to the Azure AD application before you can use this tool.
@@ -31,6 +35,10 @@ To Authenticate with the Microsoft Graph API a multi tenant Azure AD application
 <img src="https://github.com/nicolonsky/ModernWorkplaceConcierge/blob/master/Doc/Consent.png" alt="Consent" width="25%">
 
 As the tool performs only GET and POST requests to the Graph API no unitended or negative effects should occur. Additionally conditional access policies are imported as disabled to prevent a lockout.
+
+## Privacy
+
+All up- and downloaded data is processed in memory and not stored persistent. No usage data with Azure AD tenant ID's or Azure AD user information is collected. The app uses Azure application insights and traces the performance markers [what-does-application-insights-monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview#what-does-application-insights-monitor).
 
 ### Host your own instance
 
