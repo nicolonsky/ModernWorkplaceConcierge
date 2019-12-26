@@ -5,19 +5,19 @@
 }
 
 <div class="jumbotron">
-    <h1>Import Trello Tasks to Microsoft Planner</h1>
-    <p>Migrate a trello board to Micorosoft planner</p>
+    <h1>Import trello boards to Microsoft Planner</h1>
+    <p>Migrate exported trello boards to Micorosoft planner. Documentation is available on the <a href="https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki/Migrate-trello-tasks-to-Microsoft-Planner" target="_blank">GitHub wiki</a>.</p>
 </div>
 
 @using (Html.BeginForm("Import", "Planner", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <b>Target Office 365 Planner Plan:</b>
+    <b>Target Office 365 Planner:</b>
     @Html.DropDownList("PlannerPlan", new SelectList(Model, "Id", "Title"), new {@class = "form-control"});
 
     <br />
 
     <div class="form-group">
-        <b>Exported Trello Tasks JSON:</b>
+        <b>Exported trello board json:</b>
         <div class="custom-file">
             <input type="file" name="file" class="custom-file-input" id="file" accept=".json">
             <label class="custom-file-label" for="file">Choose file</label>
