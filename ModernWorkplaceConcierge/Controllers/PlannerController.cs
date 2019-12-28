@@ -198,6 +198,31 @@ namespace ModernWorkplaceConcierge.Controllers
                                 }
                             }
 
+                            try
+                            {
+
+                                plannerTaskDetails.Checklist = new PlannerChecklistItems();
+
+                                JToken[] checklists = task.SelectTokens("idChecklists[*]").ToArray();
+
+                                foreach (JToken checklist in checklists)
+                                {
+                                    JToken[] checklistItems = trelloBoard.SelectTokens($"$.checklists[?(@.id == '{(string)checklist}')].checkItems[*].name").ToArray();
+
+                                    foreach (JToken checklistItem in checklistItems)
+                                    {
+                                        string checklistItemName = (string)checklistItem;
+
+                                        plannerTaskDetails.Checklist.AddChecklistItem(checklistItemName);
+
+                                    }
+                                }
+                            }
+                            catch
+                            {
+
+                            }
+
                             var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id);
                         }
                     }
