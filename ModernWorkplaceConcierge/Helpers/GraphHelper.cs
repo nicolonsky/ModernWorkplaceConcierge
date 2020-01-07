@@ -266,6 +266,8 @@ namespace ModernWorkplaceConcierge.Helpers
             // Authenticate (add access token) our HttpRequestMessage
             await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
 
+            MwHub.SendMessage(hrm.Method + " " + hrm.RequestUri.AbsoluteUri);
+
             // Send the request and get the response.
             HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
@@ -286,6 +288,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<IEnumerable<PlannerPlan>> GetplannerPlans()
         {
             var graphClient = GetAuthenticatedClient();
+            MwHub.SendMessage(graphClient.Me.Planner.Plans.Request().RequestUrl);
             var response = await graphClient.Me.Planner.Plans.Request().GetAsync();
             return response.CurrentPage;
         }
@@ -533,6 +536,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<IEnumerable<DeviceConfiguration>> GetDeviceConfigurationsAsync()
         {
             var graphClient = GetAuthenticatedClient();
+            MwHub.SendMessage(graphClient.DeviceManagement.DeviceConfigurations.Request().RequestUrl);
             var deviceConfigurations = await graphClient.DeviceManagement.DeviceConfigurations.Request().GetAsync();
             return deviceConfigurations.CurrentPage;
         }
@@ -547,6 +551,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<IEnumerable<DeviceCompliancePolicy>> GetDeviceCompliancePoliciesAsync()
         {
             var graphClient = GetAuthenticatedClient();
+            MwHub.SendMessage(graphClient.DeviceManagement.DeviceCompliancePolicies.Request().RequestUrl);
             var deviceCompliancePolicies = await graphClient.DeviceManagement.DeviceCompliancePolicies.Request().GetAsync();
             return deviceCompliancePolicies.CurrentPage;
         }
@@ -561,6 +566,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<IEnumerable<ManagedAppPolicy>> GetManagedAppProtectionAsync()
         {
             var graphClient = GetAuthenticatedClient();
+            MwHub.SendMessage(graphClient.DeviceAppManagement.ManagedAppPolicies.Request().RequestUrl);
             var managedAppProtection = await graphClient.DeviceAppManagement.ManagedAppPolicies.Request().GetAsync();
             return managedAppProtection.CurrentPage;
         }
@@ -582,6 +588,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<ManagedAppPolicy> GetManagedAppProtectionAsync(string Id)
         {
             var graphClient = GetAuthenticatedClient();
+            MwHub.SendMessage(graphClient.DeviceAppManagement.IosManagedAppProtections[Id].Request().RequestUrl);
             var managedAppProtection = await graphClient.DeviceAppManagement.IosManagedAppProtections[Id].Request().GetAsync();
             return managedAppProtection;
         }
@@ -589,6 +596,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task <IEnumerable<WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
         {
             var graphClient = GetAuthenticatedClient();
+            MwHub.SendMessage(graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().RequestUrl);
             var windowsAutopilotDeploymentProfiles = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().GetAsync();
             return windowsAutopilotDeploymentProfiles.CurrentPage;
         }
@@ -596,6 +604,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<WindowsAutopilotDeploymentProfile> GetWindowsAutopilotDeploymentProfiles(string Id)
         {
             var graphClient = GetAuthenticatedClient();
+            MwHub.SendMessage(graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[Id].Request().RequestUrl);
             WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[Id].Request().GetAsync();
             return windowsAutopilotDeploymentProfile;
         }

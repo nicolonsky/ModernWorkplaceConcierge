@@ -122,7 +122,7 @@ namespace ModernWorkplaceConcierge.Controllers
         // GET: Export
         public ActionResult Index()
         {
-
+            MwHub.SendMessage("Index action invoked.");
             return View();
         }
 

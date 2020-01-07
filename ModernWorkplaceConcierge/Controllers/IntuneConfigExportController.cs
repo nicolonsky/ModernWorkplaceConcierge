@@ -17,6 +17,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public async System.Threading.Tasks.Task<FileResult> DownloadAsync()
         {
+            
             var DeviceCompliancePolicies = await GraphHelper.GetDeviceCompliancePoliciesAsync();
             var DeviceConfigurations = await GraphHelper.GetDeviceConfigurationsAsync();
             var ManagedAppProtection = await GraphHelper.GetManagedAppProtectionAsync();
