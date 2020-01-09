@@ -5,20 +5,8 @@
 <div class="jumbotron">
     <h1>Export Intune configuration and settings</h1>
 
-    <p>Items available in export (will be included in JSON format within a ZIP file):</p>
-    <ul>
-        <li>Compliance policies</li>
-        <li>Configuration profiles</li>
-        <li>PowerShell scripts</li>
-        <li>Windows 10 update rings</li>
-        <li>Enrollment restrictions</li>
-        <li>Windows enrollment settings</li>
-        <li>App protection policies</li>
-        <li>App configuration policies</li>
-        <li>Windows Autopilot deployment profiles</li>
-        <li>Scope tags</li>
-    </ul>
-
+    <p>Items in export will be included in JSON format within a ZIP file.</p>
+   
     <a href="@Url.Action("DownloadAsync", "IntuneConfigExport")" class="btn btn-primary btn-large">
         <i class="far fa-file-archive"></i>
         <span>Export Intune configuration</span>
@@ -34,11 +22,15 @@
         $(function () {
             //Proxy created on the fly
             var chat = $.connection.mwHub;
+
             $.connection.hub.logging = true;
 
-            $.connection.hub.start();
+             $.connection.hub.start().done(function () {
 
-            chat.client.BroadCast = function (message) {
+                chat.server.sendMessage("SignalR connection established");
+             });
+
+            chat.client.AddMessage = function (message) {
 
                 $("#messages").prepend("<li class=\"list-group-item\"><small>" + message + "</small></li>");
             };

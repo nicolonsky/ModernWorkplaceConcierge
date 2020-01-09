@@ -12,11 +12,10 @@ using Microsoft.AspNet.SignalR;
 namespace ModernWorkplaceConcierge.Helpers
 {
     public class MwHub : Hub
-    { 
-        internal static void SendMessage(string message)
+    {
+        public void SendMessage(string message)
         {
-            IHubContext context = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-            context.Clients.All.broadcast(DateTime.Now.ToString("o") + " " + message);
+                Clients.Caller.addMessage(DateTime.Now.ToString("o") + " " + message);  // Message sent       
         }
     }
 }

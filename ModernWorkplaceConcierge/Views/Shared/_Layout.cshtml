@@ -128,7 +128,7 @@
             </div>
         </div>
     </nav>
-    <main role="main" class="container">
+    <main role="main" class="container overflow-auto">
 
         @RenderBody()
 
@@ -161,22 +161,25 @@
                 </button>
             </div>
         }
-    </main>
-    
-    <div class="container fixed-bottom py-lg-5" style="height: 20%">
-        <ul class="list-group" id="messages">
-        </ul>
-    </div>
-        <br />
-        <footer class="footer mt-auto fixed-bottom py-2">
-            <div class="container">
-                <span class="">Instance: <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span></span>
-                <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
-            </div>
-        </footer>
 
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
-        @RenderSection("scripts", required: false)
+        <div class="container">
+            <ul class="list-group" id="messages">
+            </ul>
+        </div>
+    </main>
+
+
+    <br />
+    <br />
+    <footer class="footer mt-auto fixed-bottom py-2">
+        <div class="container">
+            <span class="">Instance: <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span></span>
+            <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
+        </div>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -10,10 +10,11 @@ using System.Text;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using Microsoft.AspNet.SignalR;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
-    [Authorize]
+    [System.Web.Mvc.Authorize]
     public class IntuneController : BaseController
     {
         public ActionResult Import()
@@ -122,7 +123,6 @@ namespace ModernWorkplaceConcierge.Controllers
         // GET: Export
         public ActionResult Index()
         {
-            MwHub.SendMessage("Index action invoked.");
             return View();
         }
 
