@@ -10,10 +10,11 @@ using System.Text;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using Microsoft.AspNet.SignalR;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
-    [Authorize]
+    [System.Web.Mvc.Authorize]
     public class IntuneController : BaseController
     {
         public ActionResult Import()
@@ -122,7 +123,6 @@ namespace ModernWorkplaceConcierge.Controllers
         // GET: Export
         public ActionResult Index()
         {
-
             return View();
         }
 
@@ -180,7 +180,7 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             try
             {
-                var scripts = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
+                var scripts = await GraphHelper.GetDeviceManagementScriptAsync(Id);
 
                 string powerShellCode = Encoding.UTF8.GetString(scripts.ScriptContent);
 
@@ -197,7 +197,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public async System.Threading.Tasks.Task<FileResult> DownloadDeviceManagementScript(String Id)
         {
-            DeviceManagementScript script = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
+            DeviceManagementScript script = await GraphHelper.GetDeviceManagementScriptAsync(Id);
 
             return File(script.ScriptContent, "text/plain", script.FileName);
 

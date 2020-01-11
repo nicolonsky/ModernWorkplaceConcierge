@@ -128,7 +128,7 @@
             </div>
         </div>
     </nav>
-    <main role="main" class="container">
+    <main role="main" class="container overflow-auto">
 
         @RenderBody()
 
@@ -161,7 +161,15 @@
                 </button>
             </div>
         }
+
+        <div class="container">
+            <ul class="list-group" id="messages">
+            </ul>
+        </div>
     </main>
+
+
+    <br />
     <br />
     <footer class="footer mt-auto fixed-bottom py-2">
         <div class="container">
@@ -169,7 +177,6 @@
             <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
         </div>
     </footer>
-
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
