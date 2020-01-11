@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Http;
 using System.Web.Mvc;
 using Microsoft.AspNet.SignalR;
 
@@ -15,7 +14,7 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         public void SendMessage(string message)
         {
-                Clients.Caller.addMessage(DateTime.Now.ToString("o") + " " + message);  // Message sent       
+                Clients.Caller.addMessage(message);  // Message sent  
         }
     }
 }

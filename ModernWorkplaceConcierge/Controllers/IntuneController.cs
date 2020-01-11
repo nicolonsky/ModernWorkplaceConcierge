@@ -180,7 +180,7 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             try
             {
-                var scripts = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
+                var scripts = await GraphHelper.GetDeviceManagementScriptAsync(Id);
 
                 string powerShellCode = Encoding.UTF8.GetString(scripts.ScriptContent);
 
@@ -197,7 +197,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public async System.Threading.Tasks.Task<FileResult> DownloadDeviceManagementScript(String Id)
         {
-            DeviceManagementScript script = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
+            DeviceManagementScript script = await GraphHelper.GetDeviceManagementScriptAsync(Id);
 
             return File(script.ScriptContent, "text/plain", script.FileName);
 

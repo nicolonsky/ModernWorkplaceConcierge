@@ -24,14 +24,14 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public async System.Threading.Tasks.Task<ActionResult> Detail(String Id)
         {
-            var AutopilotProfile = await GraphHelper.GetWindowsAutopilotDeploymentProfiles(Id);
+            var AutopilotProfile = await GraphHelper.GetWindowsAutopilotDeploymentProfile(Id);
 
             return View(AutopilotProfile);
         }
 
         public async System.Threading.Tasks.Task<FileResult> DownloadAutopilotConfigurationJSON(string Id)
         {
-            var profile =  await GraphHelper.GetWindowsAutopilotDeploymentProfiles(Id);
+            var profile =  await GraphHelper.GetWindowsAutopilotDeploymentProfile(Id);
             var org = await GraphHelper.GetOrgDetailsAsync();
 
             AutopilotConfiguration windowsAutopilotDeploymentProfile = new AutopilotConfiguration(profile, org);
