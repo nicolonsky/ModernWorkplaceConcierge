@@ -104,15 +104,23 @@ namespace ModernWorkplaceConcierge.Controllers
                         string trelloId = (string)task["idList"];
                         string name = (string)trelloBoard.SelectToken($"$.lists[?(@.id == '{trelloId}')]")["name"];
 
-                        // Get bucketId to store tasks
-                        string bucketId = plannerBuckets.Where(p => p.Name.Equals(name)).First().Id;
+                      
 
                         PlannerTask plannerTask = new PlannerTask
                         {
                             PlanId = PlannerPlan,
                             Title = (string)task["name"],
-                            BucketId = bucketId
                         };
+
+                        try
+                        {
+                            // Get bucketId to store tasks
+                            string bucketId = plannerBuckets.Where(p => p.Name.Equals(name)).First().Id;
+                            plannerTask.BucketId = bucketId;
+                        }
+                        catch
+                        {
+                        }
 
                         // Get completed
                         bool isClosed = bool.Parse((string)task["closed"]);
@@ -131,17 +139,26 @@ namespace ModernWorkplaceConcierge.Controllers
                         }
 
                         // Get assigned user
-                        string assignedToId = (string)task.SelectToken("idMembers[*]");
-
-                        if (!string.IsNullOrEmpty(assignedToId))
+                        try
                         {
-                            string assignedToname = (string)trelloBoard.SelectToken($"$.members[?(@.id == '{assignedToId}')]")["fullName"];
-
-                            User user = await GraphHelper.GetUser(assignedToname);
+                            JToken[] assignedToId = task.SelectTokens("idMembers[*]").ToArray();
 
                             plannerTask.Assignments = new PlannerAssignments();
-                            plannerTask.Assignments.AddAssignee(user.Id);
 
+                            foreach (JToken currentUser in assignedToId)
+                            {
+                                if (!string.IsNullOrEmpty((string)currentUser))
+                                {
+                                    string assignedToname = (string)trelloBoard.SelectToken($"$.members[?(@.id == '{(string)currentUser}')]")["fullName"];
+
+                                    User user = await GraphHelper.GetUser(assignedToname);
+
+                                    plannerTask.Assignments.AddAssignee(user.Id);
+
+                                }
+                            }
+                        }catch
+                        {
                         }
 
                         // Add the task
@@ -150,11 +167,10 @@ namespace ModernWorkplaceConcierge.Controllers
 
                         // Add task details like description and attachments
 
-                        string attachmentName = (string)task.SelectToken("attachments[*].name");
-                        string attachmentUrl = (string)task.SelectToken("attachments[*].url");
+                        JToken[] attachments = task.SelectTokens("attachments[*]").ToArray();
                         string taskDescription = (string)task["desc"];
 
-                        if (!string.IsNullOrEmpty(taskDescription) || !string.IsNullOrEmpty(attachmentUrl))
+                        if (!string.IsNullOrEmpty(taskDescription) || attachments.Count() > 0)
                         {
                             PlannerTaskDetails plannerTaskDetails = new PlannerTaskDetails();
 
@@ -164,11 +180,47 @@ namespace ModernWorkplaceConcierge.Controllers
                                 plannerTaskDetails.Description = taskDescription;
                             }
 
-                            if (!string.IsNullOrEmpty(attachmentUrl) && !string.IsNullOrEmpty(attachmentName))
-                            {
-                                plannerTaskDetails.References = new PlannerExternalReferences();
+                            plannerTaskDetails.References = new PlannerExternalReferences();
 
-                                plannerTaskDetails.References.AddReference(attachmentUrl, attachmentName);
+                            foreach (JToken attachment in attachments)
+                            {
+                                string attachmentUrl = attachment.Value<string>("url");
+                                string attachmentName = attachment.Value<string>("name");
+
+                                if (!string.IsNullOrEmpty(attachmentUrl))
+                                {
+                                    try {
+                                        plannerTaskDetails.References.AddReference(attachmentUrl, attachmentName);
+                                    }
+                                    catch
+                                    {
+                                    } 
+                                }
+                            }
+
+                            try
+                            {
+
+                                plannerTaskDetails.Checklist = new PlannerChecklistItems();
+
+                                JToken[] checklists = task.SelectTokens("idChecklists[*]").ToArray();
+
+                                foreach (JToken checklist in checklists)
+                                {
+                                    JToken[] checklistItems = trelloBoard.SelectTokens($"$.checklists[?(@.id == '{(string)checklist}')].checkItems[*].name").ToArray();
+
+                                    foreach (JToken checklistItem in checklistItems)
+                                    {
+                                        string checklistItemName = (string)checklistItem;
+
+                                        plannerTaskDetails.Checklist.AddChecklistItem(checklistItemName);
+
+                                    }
+                                }
+                            }
+                            catch
+                            {
+
                             }
 
                             var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id);
