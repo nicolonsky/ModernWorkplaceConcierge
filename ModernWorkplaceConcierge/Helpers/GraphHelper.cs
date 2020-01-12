@@ -21,13 +21,28 @@ using Microsoft.AspNet.SignalR;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
-    public class GraphJson
-    {
+    public class GraphJson {
+
         [JsonProperty("@odata.type", NullValueHandling = NullValueHandling.Ignore)]
         public string OdataType { get; set; }
         [JsonProperty("@odata.context", NullValueHandling = NullValueHandling.Ignore)]
         public string OdataValue { get { return OdataType; } set { OdataType = value; } }
     }
+    
+    public class SignalRMessage
+    {
+        public string clientId { get; set; }
+
+        public void sendMessage(string message)
+        {
+            if ((!string.IsNullOrEmpty(message)))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(this.clientId).addMessage(message);
+            }
+        }
+    }
+
 }
     public static class GraphHelper
     {
@@ -36,8 +51,7 @@ namespace ModernWorkplaceConcierge.Helpers
         private static readonly string appSecret = ConfigurationManager.AppSettings["AppSecret"];
         private static readonly string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
         private static readonly string graphScopes = ConfigurationManager.AppSettings["AppScopes"];
-        private static readonly string graphEndpoint = ConfigurationManager.AppSettings["GraphEndpoint"];
-
+        private static readonly string  graphEndpoint = ConfigurationManager.AppSettings["GraphEndpoint"];
 
     public static async Task<string> ImportCaConfig(string policy)
         {
@@ -80,12 +94,11 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent);
 
-                return "Unknown tenant ID's removed! \r\n" + success.ToString();
+                return "Unknown tenant ID's removed! \r\n" + success.ToString();   
             }
         }
 
-        public static async Task<string> AddIntuneConfig(string result)
-        {
+        public static async Task<string> AddIntuneConfig(string result, string clientId = null) {
 
             GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
 
@@ -101,9 +114,9 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(jsonPolicy);
 
-                var response = await AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
+                var response = await AddDeviceCompliancePolicyAsync(deviceCompliancePolicy, clientId);
 
-                return response.ODataType + " | " + response.DisplayName;
+                return response.ODataType + " | " +response.DisplayName;
             }
             else if (json.OdataValue.Contains("Configuration") && json.OdataValue.Contains("windows"))
             {
@@ -112,7 +125,7 @@ namespace ModernWorkplaceConcierge.Helpers
                 // request fails when true :(
                 deviceConfiguration.SupportsScopeTags = false;
 
-                var response = await AddDeviceConfigurationAsync(deviceConfiguration);
+                var response = await AddDeviceConfigurationAsync(deviceConfiguration, clientId);
 
                 return response.ODataType + " | " + response.DisplayName;
             }
@@ -123,7 +136,7 @@ namespace ModernWorkplaceConcierge.Helpers
                 // remove id - otherwise request fails
                 deviceManagementScript.Id = "";
 
-                var response = await AddDeviceManagementScriptsAsync(deviceManagementScript);
+                var response = await AddDeviceManagementScriptsAsync(deviceManagementScript, clientId);
 
                 return "#microsoft.graph.deviceManagementScript" + " | " + response.DisplayName;
             }
@@ -131,7 +144,7 @@ namespace ModernWorkplaceConcierge.Helpers
             {
                 WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = JsonConvert.DeserializeObject<WindowsAutopilotDeploymentProfile>(result);
 
-                var response = await AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
+                var response = await AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile, clientId);
 
                 return response.ODataType + " | " + response.DisplayName;
 
@@ -142,7 +155,7 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 var response = await AddIosManagedAppProtectionAsync(managedAppProtection);
 
-                string requestUrl = graphEndpoint + "/deviceAppManagement/iosManagedAppProtections/" + response.Id + "/targetApps";
+                string requestUrl = graphEndpoint  + "/deviceAppManagement/iosManagedAppProtections/" + response.Id + "/targetApps";
 
                 // Try adding assigned apps fro MAM policy
                 try
@@ -167,8 +180,7 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 return "#microsoft.graph.iosManagedAppProtection | " + response.DisplayName;
 
-            }
-            else if (json.OdataValue.Contains("#microsoft.graph.androidManagedAppProtection"))
+            }else if (json.OdataValue.Contains("#microsoft.graph.androidManagedAppProtection"))
             {
                 AndroidManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<AndroidManagedAppProtection>(result);
 
@@ -264,7 +276,7 @@ namespace ModernWorkplaceConcierge.Helpers
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {
                 Content = new StringContent(ConditionalAccessPolicyJSON, Encoding.UTF8, "application/json")
-
+                            
             };
 
             // Authenticate (add access token) our HttpRequestMessage
@@ -326,12 +338,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<PlannerTask> AddPlannerTask(PlannerTask plannerTask)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient
-                .Planner
-                .Tasks
-                .Request()
-                .AddAsync(plannerTask);
-
+            var response = await graphClient.Planner.Tasks.Request().AddAsync(plannerTask);
             return response;
         }
 
@@ -406,19 +413,13 @@ namespace ModernWorkplaceConcierge.Helpers
                 hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.DeviceManagement.RoleAssignments.Request().RequestUrl);
             }
             var response = await graphClient.DeviceManagement.RoleAssignments.Request().GetAsync();
-
             return response;
         }
 
         public static async Task<DeviceAndAppManagementRoleAssignment> AddRoleAssignment(DeviceAndAppManagementRoleAssignment roleAssignment)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient
-                .DeviceManagement
-                .RoleAssignments
-                .Request()
-                .AddAsync(roleAssignment);
-
+            var response = await graphClient.DeviceManagement.RoleAssignments.Request().AddAsync(roleAssignment);
             return response;
         }
 
@@ -432,31 +433,20 @@ namespace ModernWorkplaceConcierge.Helpers
                 hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.DeviceManagement.RoleScopeTags.Request().RequestUrl);
             }
             var response = await graphClient.DeviceManagement.RoleScopeTags.Request().GetAsync();
-
             return response;
         }
 
         public static async Task<RoleScopeTag> AddRoleScopeTag(RoleScopeTag roleScopeTag)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient
-                .DeviceManagement
-                .RoleScopeTags
-                .Request()
-                .AddAsync(roleScopeTag);
-
+            var response = await graphClient.DeviceManagement.RoleScopeTags.Request().AddAsync(roleScopeTag);
             return response;
         }
 
         public static async Task<TargetedManagedAppConfiguration> AddManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient
-                .DeviceAppManagement
-                .TargetedManagedAppConfigurations
-                .Request()
-                .AddAsync(managedAppConfiguration);
-
+            var response = await graphClient.DeviceAppManagement.TargetedManagedAppConfigurations.Request().AddAsync(managedAppConfiguration);
             return response;
         }
 
@@ -466,7 +456,7 @@ namespace ModernWorkplaceConcierge.Helpers
             //SendMessage("GET: " +graphClient.DeviceManagement.DeviceManagementScripts.Request().RequestUrl);
             var result = await graphClient.DeviceManagement.DeviceManagementScripts.Request().GetAsync();
             return result.CurrentPage;
-            return result.CurrentPage;
+
         }
 
         public static async Task<IEnumerable<RoleDefinition>> GetRoleDefinitions()
@@ -482,11 +472,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public static async Task<RoleDefinition> CopyRoleDefinition(string Id)
         {
             var graphClient = GetAuthenticatedClient();
-            RoleDefinition roleDefinition = await graphClient
-                .DeviceManagement
-                .RoleDefinitions[Id]
-                .Request()
-                .GetAsync();
+            RoleDefinition roleDefinition = await graphClient.DeviceManagement.RoleDefinitions[Id].Request().GetAsync();
 
             roleDefinition.IsBuiltIn = false;
             roleDefinition.DisplayName += "- Copy";
@@ -495,41 +481,32 @@ namespace ModernWorkplaceConcierge.Helpers
             RoleDefinition roleDefinitionCopy = await graphClient.DeviceManagement.RoleDefinitions.Request().AddAsync(roleDefinition);
 
             return roleDefinitionCopy;
+
         }
 
         public static async Task<IosManagedAppProtection> AddIosManagedAppProtectionAsync(IosManagedAppProtection managedAppProtection)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient
-                .DeviceAppManagement
-                .IosManagedAppProtections
-                .Request()
-                .AddAsync(managedAppProtection);
-
+            var response = await graphClient.DeviceAppManagement.IosManagedAppProtections.Request().AddAsync(managedAppProtection);
             return response;
         }
 
         public static async Task<AndroidManagedAppProtection> AddAndroidManagedAppProtectionAsync(AndroidManagedAppProtection managedAppProtection)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient
-                .DeviceAppManagement
-                .AndroidManagedAppProtections
-                .Request()
-                .AddAsync(managedAppProtection);
-
+            var response = await graphClient.DeviceAppManagement.AndroidManagedAppProtections.Request().AddAsync(managedAppProtection);
             return response;
         }
 
-        public static async Task<DeviceManagementScript> AddDeviceManagementScriptsAsync(DeviceManagementScript deviceManagementScript)
+        public static async Task<DeviceManagementScript> AddDeviceManagementScriptsAsync(DeviceManagementScript deviceManagementScript, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient
-                .DeviceManagement
-                .DeviceManagementScripts
-                .Request()
-                .AddAsync(deviceManagementScript);
-
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceManagement.DeviceManagementScripts.Request().RequestUrl);
+            }
+        var response = await graphClient.DeviceManagement.DeviceManagementScripts.Request().AddAsync(deviceManagementScript);
             return response;
         }
 
@@ -547,14 +524,11 @@ namespace ModernWorkplaceConcierge.Helpers
             return deviceManagementScripts;
         }
 
+
         public static async Task<DeviceManagementScript> GetDeviceManagementScriptAsync(string Id)
         {
             var graphClient = GetAuthenticatedClient();
-            DeviceManagementScript deviceManagementScript = await graphClient
-                .DeviceManagement.DeviceManagementScripts[Id]
-                .Request()
-                .GetAsync();
-
+            DeviceManagementScript deviceManagementScript = await graphClient.DeviceManagement.DeviceManagementScripts[Id].Request().GetAsync();
             return deviceManagementScript;
         }
 
@@ -562,8 +536,8 @@ namespace ModernWorkplaceConcierge.Helpers
         {
             var graphClient = GetAuthenticatedClient();
 
-            string requestUrl = graphEndpoint + "/deviceManagement/deviceManagementScripts/" + Id;
-
+            string requestUrl = graphEndpoint + "/deviceManagement/deviceManagementScripts/"+Id;
+            
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
             //SendMessage(hrm.Method + ": " + hrm.RequestUri.AbsoluteUri);
 
@@ -591,7 +565,7 @@ namespace ModernWorkplaceConcierge.Helpers
             string requestUrl = graphEndpoint + "/conditionalAccess/policies";
 
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-
+            
             // Authenticate (add access token) our HttpRequestMessage
             await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
 
@@ -618,7 +592,7 @@ namespace ModernWorkplaceConcierge.Helpers
             // Send the request and get the response.
             HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
-            string result = await response.Content.ReadAsStringAsync();
+            string result = await response.Content.ReadAsStringAsync(); 
 
             return result;
         }
@@ -634,19 +608,20 @@ namespace ModernWorkplaceConcierge.Helpers
             }
 
             var deviceConfigurations = await graphClient.DeviceManagement.DeviceConfigurations.Request().GetAsync();
-
             return deviceConfigurations.CurrentPage;
         }
 
-        public static async Task<DeviceConfiguration> AddDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration)
+        public static async Task<DeviceConfiguration> AddDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration, string clientId)
         {
             var graphClient = GetAuthenticatedClient();
-            var result = await graphClient
-                .DeviceManagement
-                .DeviceConfigurations
-                .Request()
-                .AddAsync(deviceConfiguration);
 
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceManagement.DeviceConfigurations.Request().RequestUrl);
+            }
+
+            var result = await graphClient.DeviceManagement.DeviceConfigurations.Request().AddAsync(deviceConfiguration);
             return result;
         }
 
@@ -661,19 +636,20 @@ namespace ModernWorkplaceConcierge.Helpers
             }
 
             var deviceCompliancePolicies = await graphClient.DeviceManagement.DeviceCompliancePolicies.Request().GetAsync();
-
             return deviceCompliancePolicies.CurrentPage;
         }
 
-        public static async Task<DeviceCompliancePolicy> AddDeviceCompliancePolicyAsync(DeviceCompliancePolicy deviceCompliancePolicy)
+        public static async Task <DeviceCompliancePolicy> AddDeviceCompliancePolicyAsync(DeviceCompliancePolicy deviceCompliancePolicy, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
-            var result = await graphClient
-                .DeviceManagement
-                .DeviceCompliancePolicies
-                .Request()
-                .AddAsync(deviceCompliancePolicy);
 
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+            hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceManagement.DeviceCompliancePolicies.Request().RequestUrl);
+        }
+
+        var result = await graphClient.DeviceManagement.DeviceCompliancePolicies.Request().AddAsync(deviceCompliancePolicy);
             return result;
         }
 
@@ -682,7 +658,6 @@ namespace ModernWorkplaceConcierge.Helpers
             var graphClient = GetAuthenticatedClient();
             //SendMessage("GET: " +graphClient.DeviceAppManagement.ManagedAppPolicies.Request().RequestUrl);
             var managedAppProtection = await graphClient.DeviceAppManagement.ManagedAppPolicies.Request().GetAsync();
-
             return managedAppProtection.CurrentPage;
         }
 
@@ -696,13 +671,13 @@ namespace ModernWorkplaceConcierge.Helpers
                 .Apps
                 .Request()
                 .GetAsync();
-
             return response.CurrentPage;
         }
 
         public static async Task<IEnumerable<ManagedMobileApp>> GetTargetedManagedAppConfigurationsAssignedAppsAsync(string Id, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
+
         if (!string.IsNullOrEmpty(clientId))
         {
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
@@ -736,31 +711,25 @@ namespace ModernWorkplaceConcierge.Helpers
                 hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().RequestUrl);
             }
             var windowsAutopilotDeploymentProfiles = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().GetAsync();
-
             return windowsAutopilotDeploymentProfiles.CurrentPage;
         }
 
         public static async Task<WindowsAutopilotDeploymentProfile> GetWindowsAutopilotDeploymentProfile(string Id)
         {
             var graphClient = GetAuthenticatedClient();
-            WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = await graphClient
-                .DeviceManagement
-                .WindowsAutopilotDeploymentProfiles[Id]
-                .Request()
-                .GetAsync();
-
+            WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[Id].Request().GetAsync();
             return windowsAutopilotDeploymentProfile;
         }
 
-        public static async Task<WindowsAutopilotDeploymentProfile> AddWindowsAutopilotDeploymentProfile(WindowsAutopilotDeploymentProfile autopilotDeploymentProfile)
+        public static async Task<WindowsAutopilotDeploymentProfile> AddWindowsAutopilotDeploymentProfile(WindowsAutopilotDeploymentProfile autopilotDeploymentProfile, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient
-                .DeviceManagement
-                .WindowsAutopilotDeploymentProfiles
-                .Request()
-                .AddAsync(autopilotDeploymentProfile);
-
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().RequestUrl);
+            }
+        var response = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().AddAsync(autopilotDeploymentProfile);
             return response;
         }
 
@@ -774,7 +743,14 @@ namespace ModernWorkplaceConcierge.Helpers
             }
 
             var org =  await graphClient.Organization.Request().GetAsync();
+          
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Organization.Request().RequestUrl);
+            }
 
+            var org =  await graphClient.Organization.Request().GetAsync();
 
             Organization organization = org.CurrentPage.First();
 
@@ -808,7 +784,6 @@ namespace ModernWorkplaceConcierge.Helpers
                     }));
             
              return await graphClient.Me.Request().GetAsync();
-
         }
 
         private static GraphServiceClient GetAuthenticatedClient()
@@ -822,14 +797,14 @@ namespace ModernWorkplaceConcierge.Helpers
                             .WithClientSecret(appSecret)
                             .Build();
 
-                        var tokenStore = new SessionTokenStore(idClient.UserTokenCache,
+                        var tokenStore = new SessionTokenStore(idClient.UserTokenCache, 
                             HttpContext.Current, ClaimsPrincipal.Current);
 
                         var accounts = await idClient.GetAccountsAsync();
 
-                        // By calling this here, the token can be refreshed
-                        // if it's expired right before the Graph call is made
-                        var scopes = graphScopes.Split(' ');
+                    // By calling this here, the token can be refreshed
+                    // if it's expired right before the Graph call is made
+                    var scopes = graphScopes.Split(' ');
                         var result = await idClient.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
                             .ExecuteAsync();
 
