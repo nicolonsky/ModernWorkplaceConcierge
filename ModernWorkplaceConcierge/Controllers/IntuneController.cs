@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace ModernWorkplaceConcierge.Controllers
 {
     [System.Web.Mvc.Authorize]
