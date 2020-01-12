@@ -741,8 +741,6 @@ namespace ModernWorkplaceConcierge.Helpers
                 var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
                 hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Organization.Request().RequestUrl);
             }
-
-            var org =  await graphClient.Organization.Request().GetAsync();
           
             if (!string.IsNullOrEmpty(clientId))
             {
@@ -751,7 +749,7 @@ namespace ModernWorkplaceConcierge.Helpers
             }
 
             var org =  await graphClient.Organization.Request().GetAsync();
-
+          
             Organization organization = org.CurrentPage.First();
 
             return organization;
