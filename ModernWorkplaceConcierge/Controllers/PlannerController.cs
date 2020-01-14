@@ -64,8 +64,10 @@ namespace ModernWorkplaceConcierge.Controllers
                 foreach (JToken list in trelloBoard.SelectToken("lists"))
                 {
                     string bucketName = (string)list["name"];
+                    // check if list was archived
+                    bool isOpen = !(bool)list["closed"];
 
-                    if (!bucketsToCreate.Contains(bucketName))
+                    if (!bucketsToCreate.Contains(bucketName) && isOpen)
                     {
                         bucketsToCreate.Add(bucketName);
                     }
@@ -106,6 +108,8 @@ namespace ModernWorkplaceConcierge.Controllers
                         // Get name of the trello list which will become a planner bucket
                         string trelloId = (string)task["idList"];
                         string name = (string)trelloBoard.SelectToken($"$.lists[?(@.id == '{trelloId}')]")["name"];
+                        // Check if task is in an archived list --> won't be imported
+                        bool isInArchivedList = (bool)trelloBoard.SelectToken($"$.lists[?(@.id == '{trelloId}')]")["closed"];
 
                         PlannerTask plannerTask = new PlannerTask
                         {
@@ -113,133 +117,142 @@ namespace ModernWorkplaceConcierge.Controllers
                             Title = (string)task["name"],
                         };
 
-                        try
+                        if (isInArchivedList)
                         {
-                            // Get bucketId to store tasks
-                            string bucketId = plannerBuckets.Where(p => p.Name.Equals(name)).First().Id;
-                            plannerTask.BucketId = bucketId;
+                            signalR.sendMessage("Discarding task because stored in an archived list: '" + plannerTask.Title+"'");
                         }
-                        catch
+                        else
                         {
-                        }
-
-                        // Get completed
-                        bool isClosed = bool.Parse((string)task["closed"]);
-
-                        if (isClosed)
-                        {
-                            plannerTask.PercentComplete = 100;
-                        }
-
-                        // Get due
-                        string dueDateTime = (string)task["due"];
-
-                        if (!string.IsNullOrEmpty(dueDateTime))
-                        {
-                            plannerTask.DueDateTime = DateTimeOffset.Parse(dueDateTime);
-                        }
-
-                        // Get assigned user
-                        try
-                        {
-                            JToken[] assignedToId = task.SelectTokens("idMembers[*]").ToArray();
-
-                            plannerTask.Assignments = new PlannerAssignments();
-
-                            foreach (JToken currentUser in assignedToId)
-                            {
-                                if (!string.IsNullOrEmpty((string)currentUser))
-                                {
-                                    string assignedToname = (string)trelloBoard.SelectToken($"$.members[?(@.id == '{(string)currentUser}')]")["fullName"];
-
-                                    User user = await GraphHelper.GetUser(assignedToname);
-
-                                    plannerTask.Assignments.AddAssignee(user.Id);
-
-                                }
-                            }
-                        }catch
-                        {
-                        }
-
-                        // Add the task
-                        var request = await GraphHelper.AddPlannerTask(plannerTask,clientId);
-
-                        signalR.sendMessage("Success | imported task: '" + request.Title + "'");
-
-                        importedTasksCounter++;
-
-                        // Add task details like description and attachments
-
-                        JToken[] attachments = task.SelectTokens("attachments[*]").ToArray();
-                        string taskDescription = (string)task["desc"];
-
-                        if (!string.IsNullOrEmpty(taskDescription) || attachments.Count() > 0)
-                        {
-                            PlannerTaskDetails plannerTaskDetails = new PlannerTaskDetails();
-
-                            if (!string.IsNullOrEmpty(taskDescription))
-                            {
-
-                                plannerTaskDetails.Description = taskDescription;
-                            }
-
-                            plannerTaskDetails.References = new PlannerExternalReferences();
-
-                            foreach (JToken attachment in attachments)
-                            {
-                                string attachmentUrl = attachment.Value<string>("url");
-                                string attachmentName = attachment.Value<string>("name");
-
-                                if (!string.IsNullOrEmpty(attachmentUrl))
-                                {
-                                    try {
-                                        plannerTaskDetails.References.AddReference(attachmentUrl, attachmentName);
-                                    }
-                                    catch
-                                    {
-                                    } 
-                                }
-                            }
-
                             try
                             {
+                                // Get bucketId to store tasks
+                                string bucketId = plannerBuckets.Where(p => p.Name.Equals(name)).First().Id;
+                                plannerTask.BucketId = bucketId;
+                            }
+                            catch
+                            {
+                            }
 
-                                plannerTaskDetails.Checklist = new PlannerChecklistItems();
+                            // Get completed
+                            bool isClosed = bool.Parse((string)task["closed"]);
 
-                                JToken[] checklists = task.SelectTokens("idChecklists[*]").ToArray();
+                            if (isClosed)
+                            {
+                                plannerTask.PercentComplete = 100;
+                            }
 
-                                foreach (JToken checklist in checklists)
+                            // Get due
+                            string dueDateTime = (string)task["due"];
+
+                            if (!string.IsNullOrEmpty(dueDateTime))
+                            {
+                                plannerTask.DueDateTime = DateTimeOffset.Parse(dueDateTime);
+                            }
+
+                            // Get assigned user
+                            try
+                            {
+                                JToken[] assignedToId = task.SelectTokens("idMembers[*]").ToArray();
+
+                                plannerTask.Assignments = new PlannerAssignments();
+
+                                foreach (JToken currentUser in assignedToId)
                                 {
-                                    JToken[] checklistItems = trelloBoard.SelectTokens($"$.checklists[?(@.id == '{(string)checklist}')].checkItems[*].name").ToArray();
-
-                                    foreach (JToken checklistItem in checklistItems)
+                                    if (!string.IsNullOrEmpty((string)currentUser))
                                     {
-                                        string checklistItemName = (string)checklistItem;
+                                        string assignedToname = (string)trelloBoard.SelectToken($"$.members[?(@.id == '{(string)currentUser}')]")["fullName"];
 
-                                        // truncate string because checklist items are limited to 100 characters
-                                        if (checklistItemName.Length >= 100)
-                                        {
-                                            checklistItemName = checklistItemName.Substring(0, 100);
-                                        }
+                                        User user = await GraphHelper.GetUser(assignedToname);
 
-                                        plannerTaskDetails.Checklist.AddChecklistItem(checklistItemName);
+                                        plannerTask.Assignments.AddAssignee(user.Id);
 
                                     }
                                 }
                             }
                             catch
                             {
-
                             }
 
-                            var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id, clientId);
+                            // Add the task
+                            var request = await GraphHelper.AddPlannerTask(plannerTask, clientId);
+
+                            signalR.sendMessage("Success | imported task: '" + request.Title + "'");
+
+                            importedTasksCounter++;
+
+                            // Add task details like description and attachments
+
+                            JToken[] attachments = task.SelectTokens("attachments[*]").ToArray();
+                            string taskDescription = (string)task["desc"];
+
+                            if (!string.IsNullOrEmpty(taskDescription) || attachments.Count() > 0)
+                            {
+                                PlannerTaskDetails plannerTaskDetails = new PlannerTaskDetails();
+
+                                if (!string.IsNullOrEmpty(taskDescription))
+                                {
+
+                                    plannerTaskDetails.Description = taskDescription;
+                                }
+
+                                plannerTaskDetails.References = new PlannerExternalReferences();
+
+                                foreach (JToken attachment in attachments)
+                                {
+                                    string attachmentUrl = attachment.Value<string>("url");
+                                    string attachmentName = attachment.Value<string>("name");
+
+                                    if (!string.IsNullOrEmpty(attachmentUrl))
+                                    {
+                                        try
+                                        {
+                                            plannerTaskDetails.References.AddReference(attachmentUrl, attachmentName);
+                                        }
+                                        catch
+                                        {
+                                        }
+                                    }
+                                }
+
+                                try
+                                {
+                                    plannerTaskDetails.Checklist = new PlannerChecklistItems();
+
+                                    JToken[] checklists = task.SelectTokens("idChecklists[*]").ToArray();
+
+                                    foreach (JToken checklist in checklists)
+                                    {
+                                        JToken[] checklistItems = trelloBoard.SelectTokens($"$.checklists[?(@.id == '{(string)checklist}')].checkItems[*].name").ToArray();
+
+                                        foreach (JToken checklistItem in checklistItems)
+                                        {
+                                            string checklistItemName = (string)checklistItem;
+
+                                            // truncate string because checklist items are limited to 100 characters
+                                            if (checklistItemName.Length >= 100)
+                                            {
+                                                checklistItemName = checklistItemName.Substring(0, 100);
+                                            }
+
+                                            plannerTaskDetails.Checklist.AddChecklistItem(checklistItemName);
+                                        }
+
+                                    }
+                                }
+                                catch
+                                {
+
+                                }
+
+                                var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id, clientId);
+                            }
 
                         }
+                    
                     }
                     catch (Exception e)
                     {
-                        signalR.sendMessage("Error: "+ e.Message);
+                        signalR.sendMessage("Error: " + e.Message);
                     }
                 }
 
