@@ -236,6 +236,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                             plannerTaskDetails.Checklist.AddChecklistItem(checklistItemName);
                                         }
+
                                     }
                                 }
                                 catch
@@ -245,6 +246,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                 var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id, clientId);
                             }
+
                         }
                     
                     }
