@@ -34,8 +34,11 @@ namespace ModernWorkplaceConcierge.Controllers
         }
 
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> Import(HttpPostedFileBase file, string PlannerPlan)
+        public async System.Threading.Tasks.Task<ActionResult> Import(HttpPostedFileBase file, string PlannerPlan, string clientId)
         {
+            SignalRMessage signalR = new SignalRMessage();
+            signalR.clientId = clientId;
+
             try {
 
                 // Get current planner object
@@ -69,7 +72,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 }
 
                 // Get existing planner buckets
-                IEnumerable<PlannerBucket> plannerBuckets = await GraphHelper.GetPlannerBuckets(PlannerPlan);
+                IEnumerable<PlannerBucket> plannerBuckets = await GraphHelper.GetPlannerBuckets(PlannerPlan, clientId);
 
                 // Create planner bucket if not exists
                 foreach (string bucket in bucketsToCreate)
@@ -84,7 +87,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                 PlanId = PlannerPlan
                             };
 
-                            var reponse = await GraphHelper.AddPlannerBucket(plannerBucket);
+                            var reponse = await GraphHelper.AddPlannerBucket(plannerBucket, clientId);
                         }
                     }
                     catch
@@ -93,7 +96,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 }
 
                 // Get available planner buckets
-                plannerBuckets = await GraphHelper.GetPlannerBuckets(PlannerPlan);
+                plannerBuckets = await GraphHelper.GetPlannerBuckets(PlannerPlan, clientId);
 
                 // create tasks
                 foreach (JToken task in trelloBoard.SelectToken("cards"))
@@ -103,8 +106,6 @@ namespace ModernWorkplaceConcierge.Controllers
                         // Get name of the trello list which will become a planner bucket
                         string trelloId = (string)task["idList"];
                         string name = (string)trelloBoard.SelectToken($"$.lists[?(@.id == '{trelloId}')]")["name"];
-
-                      
 
                         PlannerTask plannerTask = new PlannerTask
                         {
@@ -162,7 +163,10 @@ namespace ModernWorkplaceConcierge.Controllers
                         }
 
                         // Add the task
-                        var request = await GraphHelper.AddPlannerTask(plannerTask);
+                        var request = await GraphHelper.AddPlannerTask(plannerTask,clientId);
+
+                        signalR.sendMessage("Success | imported task: '" + request.Title + "'");
+
                         importedTasksCounter++;
 
                         // Add task details like description and attachments
@@ -213,8 +217,13 @@ namespace ModernWorkplaceConcierge.Controllers
                                     {
                                         string checklistItemName = (string)checklistItem;
 
-                                        plannerTaskDetails.Checklist.AddChecklistItem(checklistItemName);
+                                        // truncate string because checklist items are limited to 100 characters
+                                        if (checklistItemName.Length >= 100)
+                                        {
+                                            checklistItemName = checklistItemName.Substring(0, 100);
+                                        }
 
+                                        plannerTaskDetails.Checklist.AddChecklistItem(checklistItemName);
                                     }
                                 }
                             }
@@ -223,22 +232,24 @@ namespace ModernWorkplaceConcierge.Controllers
 
                             }
 
-                            var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id);
+                            var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id, clientId);
                         }
                     }
                     catch (Exception e)
                     {
-                        Flash(e.Message, e.StackTrace);
+                        signalR.sendMessage("Error: "+ e.Message);
                     }
                 }
 
-                Message("Imported: " + importedTasksCounter + " tasks to planner: " + planner.Title);
+                signalR.sendMessage("Success imported: " + importedTasksCounter + " tasks to planner: " + planner.Title);
             }
             catch (Exception e)
             {
-                Flash(e.Message);
+                signalR.sendMessage("Error: " + e.Message);
             }
-            return RedirectToAction("Index");
+
+            signalR.sendMessage("Done#!");
+            return new HttpStatusCodeResult(204);
         }
     }
 }

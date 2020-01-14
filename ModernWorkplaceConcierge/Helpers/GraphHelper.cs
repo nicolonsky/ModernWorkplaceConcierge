@@ -153,7 +153,7 @@ namespace ModernWorkplaceConcierge.Helpers
             {
                 IosManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<IosManagedAppProtection>(result);
 
-                var response = await AddIosManagedAppProtectionAsync(managedAppProtection);
+                var response = await AddIosManagedAppProtectionAsync(managedAppProtection, clientId);
 
                 string requestUrl = graphEndpoint  + "/deviceAppManagement/iosManagedAppProtections/" + response.Id + "/targetApps";
 
@@ -173,6 +173,12 @@ namespace ModernWorkplaceConcierge.Helpers
                     // Authenticate (add access token) our HttpRequestMessage
                     await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
 
+                    if (!string.IsNullOrEmpty(clientId))
+                    {
+                        var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                        hubContext.Clients.Client(clientId).addMessage("POST: " + hrm.RequestUri.AbsoluteUri);
+                    }
+
                     // Send the request and get the response.
                     await graphClient.HttpProvider.SendAsync(hrm);
                 }
@@ -184,7 +190,7 @@ namespace ModernWorkplaceConcierge.Helpers
             {
                 AndroidManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<AndroidManagedAppProtection>(result);
 
-                var response = await AddAndroidManagedAppProtectionAsync(managedAppProtection);
+                var response = await AddAndroidManagedAppProtectionAsync(managedAppProtection, clientId);
 
                 string requestUrl = graphEndpoint + "/deviceAppManagement/androidManagedAppProtections/" + response.Id + "/targetApps";
 
@@ -200,6 +206,12 @@ namespace ModernWorkplaceConcierge.Helpers
                     };
 
                     var graphClient = GetAuthenticatedClient();
+
+                    if (!string.IsNullOrEmpty(clientId))
+                    {
+                        var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                        hubContext.Clients.Client(clientId).addMessage("POST: " + hrm.RequestUri.AbsoluteUri);
+                    }
 
                     // Authenticate (add access token) our HttpRequestMessage
                     await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
@@ -234,6 +246,12 @@ namespace ModernWorkplaceConcierge.Helpers
 
                     // Authenticate (add access token) our HttpRequestMessage
                     await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+
+                    if (!string.IsNullOrEmpty(clientId))
+                    {
+                        var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                        hubContext.Clients.Client(clientId).addMessage("POST: " + hrm.RequestUri.AbsoluteUri);
+                    }
 
                     // Send the request and get the response.
                     await graphClient.HttpProvider.SendAsync(hrm);
@@ -316,28 +334,45 @@ namespace ModernWorkplaceConcierge.Helpers
             return response.CurrentPage;
         }
 
-        public static async Task<PlannerPlan> GetplannerPlan(string id)
+        public static async Task<PlannerPlan> GetplannerPlan(string id, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient.Planner.Plans[id].Request().GetAsync();
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Planner.Plans[id].Request().RequestUrl);
+            }
+        var response = await graphClient.Planner.Plans[id].Request().GetAsync();
             return response;
         }
 
-        public static async Task<User> GetUser(string displayName)
+        public static async Task<User> GetUser(string displayName, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
+
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Users.Request().Filter($"startsWith(displayName,'{displayName}')").RequestUrl);
+            }
+
             var response = await graphClient
-                .Users
-                .Request()
-                .Filter($"startsWith(displayName,'{displayName}')")
-                .GetAsync();
+                    .Users
+                    .Request()
+                    .Filter($"startsWith(displayName,'{displayName}')")
+                    .GetAsync();
 
             return response.CurrentPage.First();
         }
 
-        public static async Task<PlannerTask> AddPlannerTask(PlannerTask plannerTask)
+        public static async Task<PlannerTask> AddPlannerTask(PlannerTask plannerTask, string clientId)
         {
             var graphClient = GetAuthenticatedClient();
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.Planner.Tasks.Request().RequestUrl);
+            }
             var response = await graphClient.Planner.Tasks.Request().AddAsync(plannerTask);
             return response;
         }
@@ -355,10 +390,15 @@ namespace ModernWorkplaceConcierge.Helpers
             return response;
         }
 
-        public static async Task<IEnumerable<PlannerBucket>> GetPlannerBuckets(string planId)
+        public static async Task<IEnumerable<PlannerBucket>> GetPlannerBuckets(string planId, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
-            var response = await graphClient
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+            hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Planner.Plans[planId].Buckets.Request().RequestUrl);
+        }
+        var response = await graphClient
                 .Planner
                 .Plans[planId]
                 .Buckets
@@ -368,37 +408,55 @@ namespace ModernWorkplaceConcierge.Helpers
             return response.CurrentPage;
         }
 
-        public static async Task<PlannerBucket> AddPlannerBucket(PlannerBucket plannerBucket)
+        public static async Task<PlannerBucket> AddPlannerBucket(PlannerBucket plannerBucket, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
+
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.Planner.Buckets.Request().RequestUrl);
+            }
             var response = await graphClient
-                .Planner
-                .Buckets
-                .Request()
-                .AddAsync(plannerBucket);
+                    .Planner
+                    .Buckets
+                    .Request()
+                    .AddAsync(plannerBucket);
 
             return response;
         }
 
-        public static async Task<PlannerTaskDetails> AddPlannerTaskDetails(PlannerTaskDetails plannerTaskDetails, string taskId)
+        public static async Task<PlannerTaskDetails> AddPlannerTaskDetails(PlannerTaskDetails plannerTaskDetails, string taskId, string clientId = null)
         {
 
             var graphClient = GetAuthenticatedClient();
 
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Planner.Tasks[taskId].Details.Request().RequestUrl);
+            }
+
             var originalTaskDescription = await graphClient
-                .Planner
-                .Tasks[taskId]
-                .Details
-                .Request()
-                .GetAsync();
+                    .Planner
+                    .Tasks[taskId]
+                    .Details
+                    .Request()
+                    .GetAsync();
+
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("PATCH: " + graphClient.Planner.Tasks[taskId].Details.Request().RequestUrl);
+            }
 
             var response = await graphClient
-                .Planner
-                .Tasks[taskId]
-                .Details
-                .Request()
-                .Header("If-Match", originalTaskDescription.GetEtag())
-                .UpdateAsync(plannerTaskDetails);
+                    .Planner
+                    .Tasks[taskId]
+                    .Details
+                    .Request()
+                    .Header("If-Match", originalTaskDescription.GetEtag())
+                    .UpdateAsync(plannerTaskDetails);
 
             return response;
         }
@@ -484,16 +542,26 @@ namespace ModernWorkplaceConcierge.Helpers
 
         }
 
-        public static async Task<IosManagedAppProtection> AddIosManagedAppProtectionAsync(IosManagedAppProtection managedAppProtection)
+        public static async Task<IosManagedAppProtection> AddIosManagedAppProtectionAsync(IosManagedAppProtection managedAppProtection, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceAppManagement.IosManagedAppProtections.Request().RequestUrl);
+            }
             var response = await graphClient.DeviceAppManagement.IosManagedAppProtections.Request().AddAsync(managedAppProtection);
             return response;
         }
 
-        public static async Task<AndroidManagedAppProtection> AddAndroidManagedAppProtectionAsync(AndroidManagedAppProtection managedAppProtection)
+        public static async Task<AndroidManagedAppProtection> AddAndroidManagedAppProtectionAsync(AndroidManagedAppProtection managedAppProtection, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceAppManagement.AndroidManagedAppProtections.Request().RequestUrl);
+            }
             var response = await graphClient.DeviceAppManagement.AndroidManagedAppProtections.Request().AddAsync(managedAppProtection);
             return response;
         }
@@ -729,18 +797,14 @@ namespace ModernWorkplaceConcierge.Helpers
                 var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
                 hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().RequestUrl);
             }
-        var response = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().AddAsync(autopilotDeploymentProfile);
+
+            var response = await graphClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request().AddAsync(autopilotDeploymentProfile);
             return response;
         }
 
         public static async Task<Organization> GetOrgDetailsAsync(string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
-            if (!string.IsNullOrEmpty(clientId))
-            {
-                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-                hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Organization.Request().RequestUrl);
-            }
           
             if (!string.IsNullOrEmpty(clientId))
             {

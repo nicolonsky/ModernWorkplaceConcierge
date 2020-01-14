@@ -22,6 +22,9 @@
             <input type="file" name="file" class="custom-file-input" id="file" accept=".json">
             <label class="custom-file-label" for="file">Choose file</label>
         </div>
+
+        <input type="text" name="clientId" class="d-none" id="clientId">
+
         <script>
             // Add the following code if you want the name of the file appear on select
             $(".custom-file-input").on("change", function () {
@@ -51,19 +54,5 @@
     <script src="~/Scripts/jquery.signalR-2.4.1.min.js"></script>
     <script src="~/signalr/hubs"></script>
     <!--SignalR script to update the chat page and send messages.-->
-
-    <script type="text/javascript">
-        $(function () {
-            //Proxy created on the fly
-            var chat = $.connection.mwHub;
-            $.connection.hub.logging = true;
-
-            $.connection.hub.start();
-
-            chat.client.BroadCast = function (message) {
-
-                $("#messages").append("<li class=\"list-group-item\">" + message + "</li>");
-            };
-        });
-    </script>
+    <script src="~/Content/MwConciergeSignalR.js"></script>
 }
