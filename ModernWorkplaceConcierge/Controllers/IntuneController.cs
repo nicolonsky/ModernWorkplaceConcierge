@@ -45,13 +45,13 @@ namespace ModernWorkplaceConcierge.Controllers
                             byte[] binData = b.ReadBytes(file.ContentLength);
                             string result = Encoding.UTF8.GetString(binData);
 
-                            string response = await GraphHelper.AddIntuneConfig(result);
-                            signalR.sendMessage("Success" + response);
+                            string response = await GraphHelper.AddIntuneConfig(result, clientId);
+                            signalR.sendMessage("Success " + response);
 
                         }
                         catch (Exception e)
                         {
-                            signalR.sendMessage(e.Message);
+                            signalR.sendMessage("Error: " + e.Message);
                         }
                     }
                 }
@@ -99,7 +99,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                     }
                                     catch (Exception e)
                                     {
-                                        signalR.sendMessage(e.ToString());
+                                        signalR.sendMessage("Error: " + e.Message);
                                     }
                                 }
                             }
@@ -107,16 +107,16 @@ namespace ModernWorkplaceConcierge.Controllers
                     }
                     catch (Exception e)
                     {
-                        signalR.sendMessage(e.Message);
+                        signalR.sendMessage("Error: " + e.Message);
                     }
                 }
                 else if (files.Length > 0)
                 {
-                    signalR.sendMessage("Unsupported file: " + files[0].FileName);
+                    signalR.sendMessage("Error unsupported file: " + files[0].FileName);
                 }
             }
             catch (Exception e) {
-                signalR.sendMessage(e.Message);
+                signalR.sendMessage("Error: " + e.Message);
             }
 
             signalR.sendMessage("Done#!");
