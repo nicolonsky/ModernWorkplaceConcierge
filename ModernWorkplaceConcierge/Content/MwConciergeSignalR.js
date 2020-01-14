@@ -24,8 +24,13 @@
         } else if (message.includes("Success")) {
 
             $("#messages").prepend("<li class=\"list-group-item list-group-item-success\"><small>" + (new Date().toLocaleTimeString()) + " " + message + "</small></li>");
-        }
-        else {
+
+        } else if (message.match("Discarding")) {
+
+            $("#messages").prepend("<li class=\"list-group-item list-group-item-warning\"><small>" + (new Date().toLocaleTimeString()) + " " + message + "</small></li>");
+
+        } else {
+
             $("#messages").prepend("<li class=\"list-group-item\"><small>" + (new Date().toLocaleTimeString()) + " " + message + "</small></li>");
         }
     };
