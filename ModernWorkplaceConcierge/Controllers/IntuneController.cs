@@ -10,10 +10,13 @@ using System.Text;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace ModernWorkplaceConcierge.Controllers
 {
-    [Authorize]
+    [System.Web.Mvc.Authorize]
     public class IntuneController : BaseController
     {
         public ActionResult Import()
@@ -23,10 +26,14 @@ namespace ModernWorkplaceConcierge.Controllers
         }
 
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files)
+        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files, string clientId)
         {
+            SignalRMessage signalR = new SignalRMessage();
+            signalR.clientId = clientId;
+
             try
             {
+
                 if (files.Length > 0 && files[0].FileName.Contains(".json"))
                 {
                     foreach (HttpPostedFileBase file in files)
@@ -38,13 +45,13 @@ namespace ModernWorkplaceConcierge.Controllers
                             byte[] binData = b.ReadBytes(file.ContentLength);
                             string result = Encoding.UTF8.GetString(binData);
 
-                            string response = await GraphHelper.AddIntuneConfig(result);
+                            string response = await GraphHelper.AddIntuneConfig(result, clientId);
+                            signalR.sendMessage("Success " + response);
 
-                            Message("Success", response);
                         }
                         catch (Exception e)
                         {
-                            Flash(e.Message);
+                            signalR.sendMessage("Error: " + e.Message);
                         }
                     }
                 }
@@ -78,11 +85,11 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                                         if (!string.IsNullOrEmpty(result))
                                                         {
-                                                            string response = await GraphHelper.AddIntuneConfig(result);
+                                                            string response = await GraphHelper.AddIntuneConfig(result, clientId);
 
                                                             if (!(string.IsNullOrEmpty(response)))
                                                             {
-                                                                Message("Success", response);
+                                                                signalR.sendMessage("Success " +  response);
                                                             }
                                                         }
                                                     }
@@ -92,7 +99,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                     }
                                     catch (Exception e)
                                     {
-                                        Flash(e.ToString());
+                                        signalR.sendMessage("Error: " + e.Message);
                                     }
                                 }
                             }
@@ -100,29 +107,25 @@ namespace ModernWorkplaceConcierge.Controllers
                     }
                     catch (Exception e)
                     {
-                        Flash(e.Message);
+                        signalR.sendMessage("Error: " + e.Message);
                     }
                 }
                 else if (files.Length > 0)
                 {
-                    Flash("Unsupported file type", files[0].FileName);
+                    signalR.sendMessage("Error unsupported file: " + files[0].FileName);
                 }
             }
-            catch (NullReferenceException)
-            {
-                Flash("Please select a file!");
-            }
             catch (Exception e) {
-                Flash(e.Message);
+                signalR.sendMessage("Error: " + e.Message);
             }
 
-            return RedirectToAction("Import");
+            signalR.sendMessage("Done#!");
+            return new HttpStatusCodeResult(204);
         }
 
         // GET: Export
         public ActionResult Index()
         {
-
             return View();
         }
 
@@ -180,7 +183,7 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             try
             {
-                var scripts = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
+                var scripts = await GraphHelper.GetDeviceManagementScriptAsync(Id);
 
                 string powerShellCode = Encoding.UTF8.GetString(scripts.ScriptContent);
 
@@ -197,7 +200,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public async System.Threading.Tasks.Task<FileResult> DownloadDeviceManagementScript(String Id)
         {
-            DeviceManagementScript script = await GraphHelper.GetDeviceManagementScriptsAsync(Id);
+            DeviceManagementScript script = await GraphHelper.GetDeviceManagementScriptAsync(Id);
 
             return File(script.ScriptContent, "text/plain", script.FileName);
 

@@ -95,9 +95,14 @@
                     }
                 </ul>
                 <ul class="navbar-nav justify-content-end">
+                    <li class="nav-item">
+                        <a href="https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki" target="_blank" class="nav-link">
+                            <i class="fas fa-book"></i>
+                            <span>Documentation</span>
+                        </a>
+                    </li>
                     @if (Request.IsAuthenticated)
                     {
-
                         <li class="nav-item dropdown">
                             <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                                 @if (!string.IsNullOrEmpty(ViewBag.User.Avatar))
@@ -128,7 +133,7 @@
             </div>
         </div>
     </nav>
-    <main role="main" class="container">
+    <main role="main" class="container overflow-auto">
 
         @RenderBody()
 
@@ -161,7 +166,15 @@
                 </button>
             </div>
         }
+
+        <div class="container">
+            <ul class="list-group" id="messages">
+            </ul>
+        </div>
     </main>
+
+
+    <br />
     <br />
     <footer class="footer mt-auto fixed-bottom py-2">
         <div class="container">
@@ -169,7 +182,6 @@
             <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
         </div>
     </footer>
-
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

@@ -10,21 +10,22 @@ using Newtonsoft.Json.Linq;
 namespace ModernWorkplaceConcierge.Controllers
 {
     [Authorize]
+
     public class IntuneConfigExportController : BaseController
     {
         //https://medium.com/@xavierpenya/how-to-download-zip-files-in-asp-net-core-f31b5c371998
         //https://www.ryadel.com/en/create-zip-file-archive-programmatically-actionresult-asp-net-core-mvc-c-sharp/
-
-        public async System.Threading.Tasks.Task<FileResult> DownloadAsync()
+        [HttpPost]
+        public async System.Threading.Tasks.Task<FileResult> DownloadAsync(string clientId)
         {
-            var DeviceCompliancePolicies = await GraphHelper.GetDeviceCompliancePoliciesAsync();
-            var DeviceConfigurations = await GraphHelper.GetDeviceConfigurationsAsync();
+            var DeviceCompliancePolicies = await GraphHelper.GetDeviceCompliancePoliciesAsync(clientId);
+            var DeviceConfigurations = await GraphHelper.GetDeviceConfigurationsAsync(clientId);
             var ManagedAppProtection = await GraphHelper.GetManagedAppProtectionAsync();
-            var WindowsAutopilotDeploymentProfiles = await GraphHelper.GetWindowsAutopilotDeploymentProfiles();
-            var DeviceManagementScripts = await GraphHelper.GetDeviceManagementScriptsAsync();
-            var DeviceEnrollmentConfig = await GraphHelper.GetDeviceEnrollmentConfigurationsAsync();
-            var ScopeTags = await GraphHelper.GetRoleScopeTags();
-            var RoleAssignments = await GraphHelper.GetRoleAssignments();
+            var WindowsAutopilotDeploymentProfiles = await GraphHelper.GetWindowsAutopilotDeploymentProfiles(clientId);
+            var DeviceManagementScripts = await GraphHelper.GetDeviceManagementScriptsAsync(clientId);
+            var DeviceEnrollmentConfig = await GraphHelper.GetDeviceEnrollmentConfigurationsAsync(clientId);
+            var ScopeTags = await GraphHelper.GetRoleScopeTags(clientId);
+            var RoleAssignments = await GraphHelper.GetRoleAssignments(clientId);
 
             using (MemoryStream ms = new MemoryStream())
             {
@@ -71,7 +72,7 @@ namespace ModernWorkplaceConcierge.Controllers
                         }
                         else if (item.ODataType.Equals("#microsoft.graph.targetedManagedAppConfiguration"))
                         {
-                            var assignedApps = await GraphHelper.GetTargetedManagedAppConfigurationsAssignedAppsAsync(item.Id);
+                            var assignedApps = await GraphHelper.GetTargetedManagedAppConfigurationsAssignedAppsAsync(item.Id, clientId);
 
                             // Create json object from mam policy
                             JObject appProtectionPolicy = JObject.FromObject(item);
@@ -102,7 +103,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     foreach (DeviceManagementScript item in DeviceManagementScripts)
                     {
-                        string fixedItem = await GraphHelper.GetDeviceManagementScriptRawAsync(item.Id);
+                        string fixedItem = await GraphHelper.GetDeviceManagementScriptRawAsync(item.Id, clientId);
                         byte[] temp = Encoding.UTF8.GetBytes(fixedItem);
                         var zipArchiveEntry = archive.CreateEntry("DeviceManagementScript\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
@@ -123,7 +124,7 @@ namespace ModernWorkplaceConcierge.Controllers
                     }
                 }
 
-                string domainName = await GraphHelper.GetDefaultDomain();
+                string domainName = await GraphHelper.GetDefaultDomain(clientId);
 
                 return File(ms.ToArray(), "application/zip", "IntuneConfig_" + domainName + ".zip");
             }
