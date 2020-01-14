@@ -95,9 +95,14 @@
                     }
                 </ul>
                 <ul class="navbar-nav justify-content-end">
+                    <li class="nav-item">
+                        <a href="https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki" target="_blank" class="nav-link">
+                            <i class="fas fa-book"></i>
+                            <span>Documentation</span>
+                        </a>
+                    </li>
                     @if (Request.IsAuthenticated)
                     {
-
                         <li class="nav-item dropdown">
                             <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                                 @if (!string.IsNullOrEmpty(ViewBag.User.Avatar))

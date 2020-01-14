@@ -12,21 +12,9 @@ The [Modern Workplace Concierge](https://mwconcierge.azurewebsites.net/) is a he
 
 The tool is built on ASP.NET and works with the Microsoft Graph Beta API (because on the Beta endpoint are more entities available).
 
-## Supported Intune Configurations
+## Supported entities
 
-The following Intune objects are included in exports:
-
-* Compliance policies
-* Configuration profiles
-* PowerShell scripts
-* Windows 10 update rings
-* Enrollment restrictions
-* Windows enrollment settings
-* App protection policies
-* App configuration policies
-* Windows autopilot deployment profiles
-* Scope tags
-* RBAC Roles
+Supported configuration in imports and exports are documented on this project's [wiki](https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki/Entities-supported-in-exports-and-imports).
 
 ## Consent and Permissions
 
