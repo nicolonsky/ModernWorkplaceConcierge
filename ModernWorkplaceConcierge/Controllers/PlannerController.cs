@@ -224,24 +224,36 @@ namespace ModernWorkplaceConcierge.Controllers
                                     {
                                         JToken[] checklistItems = trelloBoard.SelectTokens($"$.checklists[?(@.id == '{(string)checklist}')].checkItems[*].name").ToArray();
 
+                                        int checklistCount = 0;
+
                                         foreach (JToken checklistItem in checklistItems)
                                         {
+
                                             string checklistItemName = (string)checklistItem;
 
                                             // truncate string because checklist items are limited to 100 characters
                                             if (checklistItemName.Length >= 100)
                                             {
+                                                signalR.sendMessage("Truncating checklist item: '" + checklistItemName + "' on task: '" + plannerTask.Title + "'. The maximum length in Planner is 100 characters!");
                                                 checklistItemName = checklistItemName.Substring(0, 100);
                                             }
 
-                                            plannerTaskDetails.Checklist.AddChecklistItem(checklistItemName);
-                                        }
+                                            if (!(checklistCount >= 20))
+                                            {
+                                                plannerTaskDetails.Checklist.AddChecklistItem(checklistItemName);
+                                            }
+                                            else
+                                            {
+                                                signalR.sendMessage("Discarding checklist item: '" + checklistItemName + "' on task: '" + plannerTask.Title + "' because Planner limit's each card to 20 checklist items!");
+                                            }
 
+                                            checklistCount++;
+                                        }
                                     }
                                 }
-                                catch
+                                catch (Exception e)
                                 {
-
+                                    signalR.sendMessage("Error: " + e.Message);
                                 }
 
                                 var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id, clientId);
