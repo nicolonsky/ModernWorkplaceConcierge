@@ -53,44 +53,54 @@ namespace ModernWorkplaceConcierge.Helpers
         private static readonly string graphScopes = ConfigurationManager.AppSettings["AppScopes"];
         private static readonly string graphEndpoint = ConfigurationManager.AppSettings["GraphEndpoint"];
 
-    public static async Task<string> ImportCaConfig(string policy, string clientId = null)
+        public static async Task<bool> ImportCaConfig(string policy, string clientId = null)
         {
-            ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(policy);
+            SignalRMessage signalR = new SignalRMessage();
+            signalR.clientId = clientId;
 
-            conditionalAccessPolicy.Id = "";
-            conditionalAccessPolicy.State = ConditionalAccessPolicyState.Disabled;
-            conditionalAccessPolicy.CreatedDateTime = null;
+            ModernWorkplaceConcierge.Helpers.ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ModernWorkplaceConcierge.Helpers.ConditionalAccessPolicy>(policy);
 
-            JObject jObject = JObject.FromObject(conditionalAccessPolicy);
-
-            
+            conditionalAccessPolicy.id = null;
+            conditionalAccessPolicy.state = "disabled";
+            conditionalAccessPolicy.createdDateTime = null;
 
             try
             {
-                var success = await AddConditionalAccessPolicyAsync(conditionalAccessPolicy, clientId);
-                return success.DisplayName;
+                string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = Formatting.Indented
+                });
 
+                var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent, clientId);
+                signalR.sendMessage("Success: " + success.displayName);
+                return true;
             }
             catch
             {
+                signalR.sendMessage("Discarding tenant specific information: " + conditionalAccessPolicy.displayName);
                 // remove Id's
-                conditionalAccessPolicy.Conditions.Users.IncludeUsers = new string[] { "none" };
-                conditionalAccessPolicy.Conditions.Users.ExcludeUsers = null;
-                conditionalAccessPolicy.Conditions.Users.IncludeGroups = null;
-                conditionalAccessPolicy.Conditions.Users.ExcludeGroups = null;
-                conditionalAccessPolicy.Conditions.Users.IncludeRoles = null;
-                conditionalAccessPolicy.Conditions.Users.ExcludeRoles = null;
+                conditionalAccessPolicy.conditions.users.includeUsers = new string[] { "none" };
+                conditionalAccessPolicy.conditions.users.excludeUsers = null;
+                conditionalAccessPolicy.conditions.users.includeGroups = null;
+                conditionalAccessPolicy.conditions.users.excludeGroups = null;
+                conditionalAccessPolicy.conditions.users.includeRoles = null;
+                conditionalAccessPolicy.conditions.users.excludeRoles = null;
 
-                conditionalAccessPolicy.Conditions.Applications.IncludeApplications = new string[] { "none" };
-                conditionalAccessPolicy.Conditions.Applications.ExcludeApplications = null;
+                conditionalAccessPolicy.conditions.applications.includeApplications = new string[] { "none" };
+                conditionalAccessPolicy.conditions.applications.excludeApplications = null;
 
-                var success = await AddConditionalAccessPolicyAsync(conditionalAccessPolicy ,clientId);
-
-                return "Unknown tenant ID's removed! \r\n" + success.DisplayName;
+                string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = Formatting.Indented
+                });
+                
+                await GraphHelper.AddConditionalAccessPolicyAsync(requestContent, clientId);
+                return true;
             }
-        }
-
-        public static async Task<string> AddIntuneConfig(string result, string clientId = null) {
+    }
+    public static async Task<string> AddIntuneConfig(string result, string clientId = null) {
 
             GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
 
@@ -278,25 +288,37 @@ namespace ModernWorkplaceConcierge.Helpers
             return requestBody;
         }
 
-        public static async Task<ConditionalAccessPolicy> AddConditionalAccessPolicyAsync(ConditionalAccessPolicy conditionalAccessPolicy, string clientId = null)
+        public static async Task<ModernWorkplaceConcierge.Helpers.ConditionalAccessPolicy> AddConditionalAccessPolicyAsync(string conditionalAccessPolicy, string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
+
+            string requestUrl = graphEndpoint + "/conditionalAccess/policies";
+
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+            {
+                Content = new StringContent(conditionalAccessPolicy, Encoding.UTF8, "application/json")
+
+            };
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
 
             if (!string.IsNullOrEmpty(clientId))
             {
                 var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.ConditionalAccess.Policies.Request().RequestUrl);
-                hubContext.Clients.Client(clientId).addMessage(JsonConvert.SerializeObject(conditionalAccessPolicy));
+                hubContext.Clients.Client(clientId).addMessage("POST: " + requestUrl);
             }
 
             // Send the request and get the response.
-            var response = await graphClient.ConditionalAccess.Policies.Request().AddAsync(conditionalAccessPolicy);
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
-            return response;
+            ModernWorkplaceConcierge.Helpers.ConditionalAccessPolicy conditionalAccessPolicyResult = JsonConvert.DeserializeObject<ModernWorkplaceConcierge.Helpers.ConditionalAccessPolicy>(await response.Content.ReadAsStringAsync());
+
+            return conditionalAccessPolicyResult;
         }
 
-        // Get's ESP, Enrollment restrictions, WHFB settings etc...
-        public static async Task<IEnumerable<DeviceEnrollmentConfiguration>> GetDeviceEnrollmentConfigurationsAsync(string clientId = null)
+    // Get's ESP, Enrollment restrictions, WHFB settings etc...
+    public static async Task<IEnumerable<DeviceEnrollmentConfiguration>> GetDeviceEnrollmentConfigurationsAsync(string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
 
@@ -635,40 +657,35 @@ namespace ModernWorkplaceConcierge.Helpers
                 hubContext.Clients.Client(clientId).addMessage(hrm.Method + " " + hrm.RequestUri.AbsoluteUri);
             }
 
-        // Send the request and get the response.
-        HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
             string result = await response.Content.ReadAsStringAsync(); //right!
 
             return result;
         }
 
-        public static async Task<IEnumerable<ConditionalAccessPolicy>> GetConditionalAccessPoliciesAsync (string clientId = null)
+        public static async Task<string> GetConditionalAccessPoliciesAsync(string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
+
+            string requestUrl = graphEndpoint + "/conditionalAccess/policies";
+
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
 
             if (!string.IsNullOrEmpty(clientId))
             {
                 var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-                hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.ConditionalAccess.Policies.Request().RequestUrl);
+                hubContext.Clients.Client(clientId).addMessage("GET: " + requestUrl);
             }
 
-            var result = await graphClient.ConditionalAccess.Policies.Request().GetAsync();
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
 
-            return result.CurrentPage;
-        }
-
-        public static async Task<ConditionalAccessPolicy> GetConditionalAccessPolicyAsync(string Id, string clientId = null)
-        {
-            var graphClient = GetAuthenticatedClient();
-
-            if (!string.IsNullOrEmpty(clientId))
-            {
-                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-                hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.ConditionalAccess.Policies[Id].Request().RequestUrl);
-            }
-
-            var result = await graphClient.ConditionalAccess.Policies[Id].Request().GetAsync();
+            string result = await response.Content.ReadAsStringAsync(); //right!
 
             return result;
         }
