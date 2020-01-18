@@ -38,7 +38,6 @@ namespace ModernWorkplaceConcierge.Controllers
                 {
                     foreach (HttpPostedFileBase file in files)
                     {
-
                         try
                         {
                             BinaryReader b = new BinaryReader(file.InputStream);

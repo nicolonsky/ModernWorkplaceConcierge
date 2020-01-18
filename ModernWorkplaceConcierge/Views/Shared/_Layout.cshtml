@@ -5,10 +5,6 @@
     var alerts = TempData.ContainsKey(ModernWorkplaceConcierge.Models.Alert.AlertKey) ?
         (List<ModernWorkplaceConcierge.Models.Alert>)TempData[ModernWorkplaceConcierge.Models.Alert.AlertKey] :
         new List<ModernWorkplaceConcierge.Models.Alert>();
-
-    var messages = TempData.ContainsKey(ModernWorkplaceConcierge.Models.Info.SessKey) ?
-        (List<ModernWorkplaceConcierge.Models.Info>)TempData[ModernWorkplaceConcierge.Models.Info.SessKey] :
-        new List<ModernWorkplaceConcierge.Models.Info>();
 }
 
 <!DOCTYPE html>
@@ -139,7 +135,6 @@
 
         @foreach (var alert in alerts)
         {
-
             <div class="alert alert-danger alert-dismissible" role="alert">
                 <p class="mb-3">@alert.Message</p>
                 @if (!string.IsNullOrEmpty(alert.Debug))
@@ -152,37 +147,33 @@
             </div>
         }
 
-        @foreach (var message in messages)
-        {
-
-            <div class="alert alert-success alert-dismissible" role="alert">
-                <p class="mb-3">@message.Message</p>
-                @if (!string.IsNullOrEmpty(message.Debug))
-                {
-                    <pre class="alert-pre border bg-light p-2"><code>@message.Debug</code></pre>
-                }
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+        <div id="signalRLiveMessages" aria-hidden="true" style="display: none">
+            <div class="card mb-lg-5">
+                <div class="card-header bg-white" id="headingOne">
+                    <h5 class="mb-0">
+                        <button class="btn collapsed" data-toggle="collapse" data-target="#liveMessages" aria-expanded="false" aria-controls="collapseOne">
+                            Notifications <span class="badge badge-success" id="notificationCount">1</span>
+                        </button>
+                    </h5>
+                </div>
+                <div id="liveMessages" class="collapse hide" aria-labelledby="headingOne" data-parent="#signalRLiveMessages">
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush" id="messages"> </ul>
+                    </div>
+                </div>
             </div>
-        }
-
-        <div class="container">
-            <ul class="list-group" id="messages">
-            </ul>
         </div>
     </main>
-
-
+    <br />
     <br />
     <br />
     <footer class="footer mt-auto fixed-bottom py-2">
+        
         <div class="container">
             <span class="">Instance: <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span></span>
             <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
         </div>
     </footer>
-
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)

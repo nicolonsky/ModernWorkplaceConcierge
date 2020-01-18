@@ -16,8 +16,10 @@ namespace ModernWorkplaceConcierge.Controllers
     public class ConditionalAccessController : BaseController
     {
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files)
+        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files, string clientId)
         {
+            SignalRMessage signalR = new SignalRMessage();
+            signalR.clientId = clientId;
             try
             {
                 if (files.Length > 0 && files[0].FileName.Contains(".json"))
@@ -31,13 +33,11 @@ namespace ModernWorkplaceConcierge.Controllers
                             byte[] binData = b.ReadBytes(file.ContentLength);
                             string result = Encoding.UTF8.GetString(binData);
 
-                            string response = await GraphHelper.ImportCaConfig(result);
-
-                            Message("Success", response);
+                            var success = await GraphHelper.ImportCaConfig(result, clientId);
                         }
                         catch (Exception e)
                         {
-                            Flash(e.Message);
+                            signalR.sendMessage("Error: " + e.Message);
                         }
                     }
                 }
@@ -67,19 +67,14 @@ namespace ModernWorkplaceConcierge.Controllers
                                                     var unzippedArray = ms.ToArray();
                                                     string result = Encoding.UTF8.GetString(unzippedArray);
 
-                                                    string response = await GraphHelper.ImportCaConfig(result);
-
-                                                    if (!(String.IsNullOrEmpty(response)))
-                                                    {
-                                                        Message("Success", response);
-                                                    }
+                                                    var success = await GraphHelper.ImportCaConfig(result, clientId);
                                                 }
                                             }
                                         }
                                     }
                                     catch (Exception e)
                                     {
-                                        Flash(e.ToString());
+                                        signalR.sendMessage("Error: " + e.Message);
                                     }
                                 }
                             }
@@ -87,24 +82,21 @@ namespace ModernWorkplaceConcierge.Controllers
                     }
                     catch (Exception e)
                     {
-                        Flash(e.Message);
+                        signalR.sendMessage("Error: " + e.Message);
                     }
                 }
                 else if (files.Length > 0)
                 {
-                    Flash("Unsupported file type", files[0].FileName);
+                    signalR.sendMessage("Error: unsupported file type" + files[0].FileName);
                 }
-            }
-            catch (NullReferenceException)
-            {
-                Flash("Please select a file!");
             }
             catch (Exception e)
             {
-                Flash(e.Message);
+                signalR.sendMessage("Error: " + e.Message);
             }
 
-            return RedirectToAction("Import");
+            signalR.sendMessage("Done#!");
+            return new HttpStatusCodeResult(204);
         }
 
         public ViewResult Import()
@@ -115,42 +107,17 @@ namespace ModernWorkplaceConcierge.Controllers
         }
 
         // GET: ConditionalAccess
-        public async System.Threading.Tasks.Task<ViewResult> Index()
+        public ViewResult Index()
         {
-            try
-            {
-                var ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
-
-                ConditionalAccessPolicies policies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
-
-                return View(policies.Value);
-
-            }
-            catch (Exception e)
-            {
-                Flash(e.Message);
-
-            }
-
             return View();
         }
 
-        public async System.Threading.Tasks.Task<FileResult> Download(String Id)
+        public async System.Threading.Tasks.Task<FileResult> DownloadAll(string clientId = null)
         {
-            string ca = await GraphHelper.GetConditionalAccessPolicyAsync(Id);
-
-            ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(ca);
-
-            byte[] capolicy = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(conditionalAccessPolicy, Formatting.Indented).ToString());
-
-
-            return File(capolicy, "application/json", "CA-Policy" + Id + ".json");
-        }
-
-        public async System.Threading.Tasks.Task<FileResult> DownloadAll()
-        {
+            SignalRMessage signalR = new SignalRMessage();
+            signalR.clientId = clientId;
             try {
-                string ca = await GraphHelper.GetConditionalAccessPoliciesAsync();
+                string ca = await GraphHelper.GetConditionalAccessPoliciesAsync(clientId);
 
                 ConditionalAccessPolicies conditionalAccessPolicies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
 
@@ -175,8 +142,7 @@ namespace ModernWorkplaceConcierge.Controllers
             }
             catch (Exception e)
             {
-                Flash(e.Message);
-
+                signalR.sendMessage("Error: " + e.Message);
             }
 
             return null;
