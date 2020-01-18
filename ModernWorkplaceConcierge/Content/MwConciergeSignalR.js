@@ -19,6 +19,7 @@
             message = message.replace('Done#!', 'Done');
         }
 
+
         if (message.match("Error") || message.match("Failed") || message.match("Unsupported")) {
 
             $("#messages").prepend("<li class=\"list-group-item list-group-item-danger\"><small>" + (new Date().toISOString().toString()) + " " + message + "</small></li>");
@@ -35,6 +36,7 @@
             $("#messages").prepend("<li class=\"list-group-item list-group-item-warning\"><small>" + (new Date().toLocaleTimeString()) + " " + message + "</small></li>");
             document.getElementById('notificationCount').className = "badge badge-warning";
             document.getElementById('liveMessages').className = "hide show"
+
         } else {
 
             $("#messages").prepend("<li class=\"list-group-item\"><small>" + (new Date().toLocaleTimeString()) + " " + message + "</small></li>");

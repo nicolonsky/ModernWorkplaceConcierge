@@ -42,7 +42,6 @@ namespace ModernWorkplaceConcierge.Helpers
             }
         }
     }
-
 }
     public static class GraphHelper
     {
@@ -103,6 +102,7 @@ namespace ModernWorkplaceConcierge.Helpers
             }
     }
     public static async Task<string> AddIntuneConfig(string result, string clientId = null) {
+
 
             GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
 
@@ -304,7 +304,7 @@ namespace ModernWorkplaceConcierge.Helpers
 
             // Authenticate (add access token) our HttpRequestMessage
             await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
-
+          
             if (!string.IsNullOrEmpty(clientId))
             {
                 var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();

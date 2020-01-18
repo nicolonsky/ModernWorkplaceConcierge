@@ -1,14 +1,16 @@
-﻿@{
+@{
     ViewBag.Current = "IntuneImport";
 }
 
 <div class="jumbotron">
     <h1>Import Intune configuration</h1>
+
     <p>Import previously exported data to your Intune tenant from zip or json files. A list of supported items is available <a href="https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki/Entities-supported-in-exports-and-imports" target="_blank">here</a>.<p>
     <ul>
         <li>No items will be overwritten as this tool performs only POST requests</li>
         <li>For zip-file uploads do not modify the folder structure</li>
     </ul>
+
 </div>
 
 @using (Html.BeginForm("Upload", "Intune", FormMethod.Post, new { enctype = "multipart/form-data" }))
