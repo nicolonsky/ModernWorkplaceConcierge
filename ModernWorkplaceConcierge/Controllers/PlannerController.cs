@@ -176,7 +176,7 @@ namespace ModernWorkplaceConcierge.Controllers
                             // Add the task
                             var request = await GraphHelper.AddPlannerTask(plannerTask, clientId);
 
-                            signalR.sendMessage("Success | imported task: '" + request.Title + "'");
+                            signalR.sendMessage("Successfully imported task '" + request.Title + "'");
 
                             importedTasksCounter++;
 

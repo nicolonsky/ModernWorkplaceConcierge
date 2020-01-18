@@ -2,21 +2,16 @@
     ViewBag.Current = "ConditionalAccessImport";
 }
 
-<div class="jumbotron">
-    <h1>Import Conditional Access policies</h1>
+    <div class="jumbotron">
+        <h1>Import Conditional Access policies</h1>
 
-    <p>Import previously exported Conditional Access policies from *.zip or *.json file(s) to your tenant.</p>
-    <p>
-        <strong>
-            Please note:
-            <ul>
-                <li>No items will be overwritten as this tool performs only POST requests</li>
-                <li>Policies are imported with "diabled" state</li>
-                <li>Unavailable group and application ID's (when exported from another tenant) are discarded on import</li>
-            </ul>
-        </strong>
-    </p>
-</div>
+        <p>Import previously exported Conditional Access policies from *.zip or *.json file(s) to your tenant.</p>
+        <ul>
+            <li>No items will be overwritten as this tool performs only POST requests</li>
+            <li>Policies are imported with "diabled" state</li>
+            <li>Unavailable group and application ID's (when exported from another tenant) are discarded on import</li>
+        </ul>
+    </div>
 
 
 @using (Html.BeginForm("Upload", "ConditionalAccess", FormMethod.Post, new { enctype = "multipart/form-data" }))

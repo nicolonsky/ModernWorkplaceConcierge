@@ -63,6 +63,7 @@ namespace ModernWorkplaceConcierge.Helpers
             conditionalAccessPolicy.id = null;
             conditionalAccessPolicy.state = "disabled";
             conditionalAccessPolicy.createdDateTime = null;
+            conditionalAccessPolicy.modifiedDateTime = null;
 
             try
             {
@@ -73,12 +74,12 @@ namespace ModernWorkplaceConcierge.Helpers
                 });
 
                 var success = await GraphHelper.AddConditionalAccessPolicyAsync(requestContent, clientId);
-                signalR.sendMessage("Success: " + success.displayName);
+                signalR.sendMessage("Success: imported CA policy: '" + success.displayName + "'");
                 return true;
             }
             catch
             {
-                signalR.sendMessage("Discarding tenant specific information: " + conditionalAccessPolicy.displayName);
+                signalR.sendMessage("Discarding tenant specific information for CA policy: '" + conditionalAccessPolicy.displayName + "'");
                 // remove Id's
                 conditionalAccessPolicy.conditions.users.includeUsers = new string[] { "none" };
                 conditionalAccessPolicy.conditions.users.excludeUsers = null;
@@ -95,8 +96,9 @@ namespace ModernWorkplaceConcierge.Helpers
                     NullValueHandling = NullValueHandling.Ignore,
                     Formatting = Formatting.Indented
                 });
-                
-                await GraphHelper.AddConditionalAccessPolicyAsync(requestContent, clientId);
+
+                var success =await GraphHelper.AddConditionalAccessPolicyAsync(requestContent, clientId);
+                signalR.sendMessage("Success: imported CA policy: '" + success.displayName + "'");
                 return true;
             }
     }
