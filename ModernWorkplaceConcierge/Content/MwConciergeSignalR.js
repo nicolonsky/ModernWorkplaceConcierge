@@ -4,21 +4,12 @@
 
     $.connection.hub.logging = true;
 
-    $.connection.hub.start().done(function () {
-        chat.server.sendMessage("SignalR connection established, connection ID: " + $.connection.hub.id);
-
-        var input = document.getElementById('clientId');
-        input.value = $.connection.hub.id;
-        $('#signalRLiveMessages').show();
-    });
-
     chat.client.AddMessage = function (message) {
 
         if (message.includes("Done#!")) {
             $('#loady').hide();
             message = message.replace('Done#!', 'Done');
         }
-
 
         if (message.match("Error") || message.match("Failed") || message.match("Unsupported")) {
 
@@ -44,4 +35,11 @@
 
         document.getElementById('notificationCount').innerHTML = document.getElementById('messages').childNodes.length -1;
     };
+
+    $.connection.hub.start().done(function () {
+        chat.server.sendMessage("SignalR connection established, connection ID: " + $.connection.hub.id);
+        var input = document.getElementById('clientId');
+        input.value = $.connection.hub.id;
+        $('#signalRLiveMessages').show();
+    });
 });
