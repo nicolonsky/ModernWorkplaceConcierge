@@ -256,6 +256,7 @@
     <Compile Include="Helpers\AutopilotConfiguration.cs" />
     <Compile Include="Helpers\ConditionalAccessPolicy.cs" />
     <Compile Include="Helpers\DeviceManagementScripts.cs" />
+    <Compile Include="Helpers\FilenameHelper.cs" />
     <Compile Include="Helpers\GraphHelper.cs" />
     <Compile Include="Helpers\MwHub.cs" />
     <Compile Include="Models\Alert.cs" />

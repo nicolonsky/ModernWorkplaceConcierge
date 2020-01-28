@@ -13,8 +13,6 @@ namespace ModernWorkplaceConcierge.Controllers
 
     public class IntuneConfigExportController : BaseController
     {
-        //https://medium.com/@xavierpenya/how-to-download-zip-files-in-asp-net-core-f31b5c371998
-        //https://www.ryadel.com/en/create-zip-file-archive-programmatically-actionresult-asp-net-core-mvc-c-sharp/
         [HttpPost]
         public async System.Threading.Tasks.Task<FileResult> DownloadAsync(string clientId)
         {
@@ -42,14 +40,16 @@ namespace ModernWorkplaceConcierge.Controllers
                     foreach (DeviceConfiguration item in DeviceConfigurations)
                     {
                         byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
-                        var zipArchiveEntry = archive.CreateEntry("DeviceConfiguration\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                        string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                        var zipArchiveEntry = archive.CreateEntry("DeviceConfiguration\\" + fileName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
                     foreach (DeviceCompliancePolicy item in DeviceCompliancePolicies)
                     {
                         byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
-                        var zipArchiveEntry = archive.CreateEntry("DeviceCompliancePolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                        string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                        var zipArchiveEntry = archive.CreateEntry("DeviceCompliancePolicy\\" + fileName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
@@ -67,7 +67,8 @@ namespace ModernWorkplaceConcierge.Controllers
                             appProtectionPolicy.Add("assignedApps", appProtectionPolicyAssignedApps);
 
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(appProtectionPolicy, Formatting.Indented));
-                            var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                            string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                            var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + fileName + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
                         else if (item.ODataType.Equals("#microsoft.graph.targetedManagedAppConfiguration"))
@@ -82,14 +83,16 @@ namespace ModernWorkplaceConcierge.Controllers
                             appProtectionPolicy.Add("assignedApps", appProtectionPolicyAssignedApps);
 
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(appProtectionPolicy, Formatting.Indented));
-                            var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + "ManagedAppConfiguration_" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                            string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                            var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + "ManagedAppConfiguration_" + fileName + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
 
                         }
                         else
                         {
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
-                            var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                            string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                            var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + fileName + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
                     }
@@ -97,7 +100,8 @@ namespace ModernWorkplaceConcierge.Controllers
                     foreach (WindowsAutopilotDeploymentProfile item in WindowsAutopilotDeploymentProfiles)
                     {
                         byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
-                        var zipArchiveEntry = archive.CreateEntry("WindowsAutopilotDeploymentProfile\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                        string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                        var zipArchiveEntry = archive.CreateEntry("WindowsAutopilotDeploymentProfile\\" + fileName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
@@ -105,21 +109,24 @@ namespace ModernWorkplaceConcierge.Controllers
                     {
                         string fixedItem = await GraphHelper.GetDeviceManagementScriptRawAsync(item.Id, clientId);
                         byte[] temp = Encoding.UTF8.GetBytes(fixedItem);
-                        var zipArchiveEntry = archive.CreateEntry("DeviceManagementScript\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                        string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                        var zipArchiveEntry = archive.CreateEntry("DeviceManagementScript\\" + fileName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
                     foreach (RoleScopeTag item in ScopeTags)
                     {
                         byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
-                        var zipArchiveEntry = archive.CreateEntry("RoleScopeTags\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                        string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                        var zipArchiveEntry = archive.CreateEntry("RoleScopeTags\\" + fileName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
 
                     foreach (DeviceAndAppManagementRoleAssignment item in RoleAssignments)
                     {
                         byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
-                        var zipArchiveEntry = archive.CreateEntry("RoleAssignments\\" + item.DisplayName + ".json", CompressionLevel.Fastest);
+                        string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                        var zipArchiveEntry = archive.CreateEntry("RoleAssignments\\" + fileName + ".json", CompressionLevel.Fastest);
                         using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                     }
                 }
