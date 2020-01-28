@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.IO;
 using System.IO.Compression;
+using Microsoft.Graph;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -125,17 +126,38 @@ namespace ModernWorkplaceConcierge.Controllers
                 {
                     using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
                     {
-                        foreach (ConditionalAccessPolicy item in conditionalAccessPolicies.Value)
+                        foreach (Helpers.ConditionalAccessPolicy item in conditionalAccessPolicies.Value)
                         {
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
                             var zipArchiveEntry = archive.CreateEntry(item.displayName + "_" + item.id + ".json", CompressionLevel.Fastest);
 
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+
+                            foreach (string groupid in item.conditions.users.includeGroups)
+                            {
+                                Group group = await GraphHelper.GetAadGroup(groupid, clientId);
+
+                                signalR.sendMessage(group.DisplayName);
+                            }
+
+                            foreach (string groupid in item.conditions.users.excludeUsers)
+                            {
+                                Group group = await GraphHelper.GetAadGroup(groupid, clientId);
+
+                                signalR.sendMessage(group.DisplayName);
+                            }
+
+                            foreach (string groupid in item.conditions.users.excludeUsers)
+                            {
+                                User user = await GraphHelper.GetAadUser(groupid, clientId);
+
+                                signalR.sendMessage(user.DisplayName);
+                            }
                         }
                     }
 
-                    string domainName = await GraphHelper.GetDefaultDomain();
+                    string domainName = await GraphHelper.GetDefaultDomain(clientId);
 
                     return File(ms.ToArray(), "application/zip", "ConditionalAccessConfig_" + domainName + ".zip");
                 }
