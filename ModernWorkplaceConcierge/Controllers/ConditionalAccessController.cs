@@ -27,7 +27,6 @@ namespace ModernWorkplaceConcierge.Controllers
                 {
                     foreach (HttpPostedFileBase file in files)
                     {
-
                         try
                         {
                             BinaryReader b = new BinaryReader(file.InputStream);
@@ -130,7 +129,9 @@ namespace ModernWorkplaceConcierge.Controllers
                         {
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
-                            var zipArchiveEntry = archive.CreateEntry(item.displayName + "_" + item.id + ".json", CompressionLevel.Fastest);
+                            string fileName = FilenameHelper.ProcessFileName(item.displayName);
+
+                            var zipArchiveEntry = archive.CreateEntry(fileName+ "_" + item.id + ".json", CompressionLevel.Fastest);
 
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
 
