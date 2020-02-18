@@ -232,7 +232,7 @@ namespace ModernWorkplaceConcierge.Helpers
             {
                 TargetedManagedAppConfiguration managedAppConfiguration = JsonConvert.DeserializeObject<TargetedManagedAppConfiguration>(result);
 
-                var response = await AddManagedAppConfigurationAsync(managedAppConfiguration);
+                var response = await AddManagedAppConfigurationAsync(managedAppConfiguration, clientId);
 
                 string requestUrl = graphEndpoint + "/deviceAppManagement/targetedManagedAppConfigurations/" + response.Id + "/targetApps";
 
@@ -266,7 +266,41 @@ namespace ModernWorkplaceConcierge.Helpers
                 return "#microsoft.graph.targetedManagedAppConfiguration | " + response.DisplayName;
 
             }
-            else
+            else if (json.OdataValue.Contains("#microsoft.graph.windowsInformationProtectionPolicy"))
+            {
+                WindowsInformationProtectionPolicy wipPolicy = JsonConvert.DeserializeObject<WindowsInformationProtectionPolicy>(result);
+
+                var graphClient = GetAuthenticatedClient();
+
+                if (!string.IsNullOrEmpty(clientId))
+                {
+                    var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                    hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceAppManagement.WindowsInformationProtectionPolicies.Request().RequestUrl);
+                }
+
+                var response = await graphClient.DeviceAppManagement.WindowsInformationProtectionPolicies.Request().AddAsync(wipPolicy);
+             
+                return "#microsoft.graph.windowsInformationProtectionPolicy | " + response.DisplayName;
+
+            }
+            else if (json.OdataValue.Contains("#microsoft.graph.mdmWindowsInformationProtectionPolicy"))
+            {
+                MdmWindowsInformationProtectionPolicy wipPolicy = JsonConvert.DeserializeObject<MdmWindowsInformationProtectionPolicy>(result);
+
+                var graphClient = GetAuthenticatedClient();
+
+                if (!string.IsNullOrEmpty(clientId))
+                {
+                    var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                    hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceAppManagement.WindowsInformationProtectionPolicies.Request().RequestUrl);
+                }
+
+                var response = await graphClient.DeviceAppManagement.MdmWindowsInformationProtectionPolicies.Request().AddAsync(wipPolicy);
+
+                return "#microsoft.graph.mdmWindowsInformationProtectionPolicy | " + response.DisplayName;
+
+            }
+        else
             {
                 return null;
             }
@@ -319,8 +353,8 @@ namespace ModernWorkplaceConcierge.Helpers
             return conditionalAccessPolicyResult;
         }
 
-    // Get's ESP, Enrollment restrictions, WHFB settings etc...
-    public static async Task<IEnumerable<DeviceEnrollmentConfiguration>> GetDeviceEnrollmentConfigurationsAsync(string clientId = null)
+        // Get's ESP, Enrollment restrictions, WHFB settings etc...
+        public static async Task<IEnumerable<DeviceEnrollmentConfiguration>> GetDeviceEnrollmentConfigurationsAsync(string clientId = null)
         {
             var graphClient = GetAuthenticatedClient();
 
@@ -335,8 +369,37 @@ namespace ModernWorkplaceConcierge.Helpers
             return deviceManagementScripts.CurrentPage;
         }
 
+        public static async Task<Group> GetAadGroup(string id, string clientId = null)
+        {
+            var graphClient = GetAuthenticatedClient();
 
-        public static async Task<IEnumerable<PlannerPlan>> GetplannerPlans()
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Groups[id].Request().RequestUrl);
+            }
+
+            var group = await graphClient.Groups[id].Request().GetAsync();
+
+            return group;
+        }
+
+        public static async Task<User> GetAadUser(string id, string clientId = null)
+        {
+            var graphClient = GetAuthenticatedClient();
+
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Users[id].Request().RequestUrl);
+            }
+
+            var user = await graphClient.Users[id].Request().GetAsync();
+            return user;
+        }
+
+
+    public static async Task<IEnumerable<PlannerPlan>> GetplannerPlans()
         {
             var graphClient = GetAuthenticatedClient();
 
@@ -526,9 +589,16 @@ namespace ModernWorkplaceConcierge.Helpers
             return response;
         }
 
-        public static async Task<TargetedManagedAppConfiguration> AddManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration)
+        public static async Task<TargetedManagedAppConfiguration> AddManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration, string clientId=null)
         {
+
             var graphClient = GetAuthenticatedClient();
+
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.DeviceAppManagement.TargetedManagedAppConfigurations.Request().RequestUrl);
+            }
             var response = await graphClient
                 .DeviceAppManagement
                 .TargetedManagedAppConfigurations
