@@ -629,8 +629,54 @@ namespace ModernWorkplaceConcierge.Helpers
             return deviceManagementScripts;
         }
 
+        public static async Task<Group> CreateGroup(string displayName, string clientId = null)
+        {
+            var graphClient = GetAuthenticatedClient();
 
-        public static async Task<DeviceManagementScript> GetDeviceManagementScriptAsync(string Id)
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.Groups.Request().RequestUrl);
+            }
+
+            // Check if group not already exists
+            try
+            {
+                var check = await graphClient.Groups.Request().Filter($"displayName eq '{displayName}'").GetAsync();
+
+                if (check.FirstOrDefault().Id != null)
+                {
+
+                    if (!string.IsNullOrEmpty(clientId))
+                    {
+                        var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+                        hubContext.Clients.Client(clientId).addMessage("Warning AAD Group with name: '" + displayName + "' already exists!");
+                    }
+                    return check.CurrentPage.FirstOrDefault();
+                }
+            }
+            catch (System.Exception e)
+            {
+                
+            }
+
+
+            Group group = new Group();
+            group.SecurityEnabled = true;
+            group.DisplayName = displayName;
+            group.Description = "Created with the ModernWorkplaceConcierge";
+            group.MailEnabled = false;
+            group.MailNickname = displayName;
+
+            var respGroup = await graphClient.Groups.Request().AddAsync(group);
+
+            return respGroup;
+        
+            
+    }
+
+
+    public static async Task<DeviceManagementScript> GetDeviceManagementScriptAsync(string Id)
         {
             var graphClient = GetAuthenticatedClient();
             DeviceManagementScript deviceManagementScript = await graphClient

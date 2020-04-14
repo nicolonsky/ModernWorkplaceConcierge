@@ -9,6 +9,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.IO;
 using System.IO.Compression;
+using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -16,7 +18,7 @@ namespace ModernWorkplaceConcierge.Controllers
     public class ConditionalAccessController : BaseController
     {
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files, string clientId)
+        public async Task<ActionResult> Upload(HttpPostedFileBase[] files, string clientId)
         {
             SignalRMessage signalR = new SignalRMessage();
             signalR.clientId = clientId;
@@ -99,6 +101,73 @@ namespace ModernWorkplaceConcierge.Controllers
             return new HttpStatusCodeResult(204);
         }
 
+        [HttpPost]
+        public async Task<ActionResult> CreateGroup(string displayName, string selectedBaseline, string policyPrefix, string allowLegacyAuth, string clientId = null)
+        {
+            SignalRMessage signalR = new SignalRMessage
+            {
+                clientId = clientId
+            };
+
+            signalR.sendMessage("Selected baseline: " + selectedBaseline);
+
+
+            // Create exclusion group
+
+            Microsoft.Graph.Group createdGroup = await GraphHelper.CreateGroup(displayName, clientId);
+            List<String> groupsCreated = new List<string>();
+            groupsCreated.Add(createdGroup.Id);
+
+            // Load CA policies
+
+            string[] filePaths = Directory.GetFiles(Server.MapPath("~/Content/PolicySets/" + selectedBaseline));
+
+            // Modify exclusions & Display Name
+
+            List<ConditionalAccessPolicy> conditionalAccessPolicies = new List<ConditionalAccessPolicy>();
+
+            foreach(String filePath in filePaths)
+            {
+                using (var streamReader = new StreamReader(filePath, Encoding.UTF8))
+                {
+                    string textCaPolicy = streamReader.ReadToEnd();
+
+                    ConditionalAccessPolicy conditionalAccessPolicy =  JsonConvert.DeserializeObject<ConditionalAccessPolicy>(textCaPolicy);
+                    conditionalAccessPolicy.conditions.users.excludeGroups = groupsCreated.ToArray();
+                    conditionalAccessPolicy.displayName = conditionalAccessPolicy.displayName.Insert(0, policyPrefix).Replace("<PREFIX> -","");
+
+                    // Check for legacy auth exclusion group
+
+                    if (conditionalAccessPolicy.conditions.clientAppTypes.Contains("other") && conditionalAccessPolicy.grantControls.builtInControls.Contains("block"))
+                    {
+                        // Wee need to initialize a new list to avoid modifications to the existing!
+                        List<String> newGroupsCreated = new List<String>(groupsCreated);
+                        Microsoft.Graph.Group allowLegacyAuthGroup = await GraphHelper.CreateGroup(allowLegacyAuth, clientId);
+                        newGroupsCreated.Add(allowLegacyAuthGroup.Id);
+                        conditionalAccessPolicy.conditions.users.excludeGroups = newGroupsCreated.ToArray();
+                    }
+
+                    // Create the policy
+                    await GraphHelper.ImportCaConfig(JsonConvert.SerializeObject(conditionalAccessPolicy), clientId);
+                }
+            }
+            signalR.sendMessage("Done#!");
+            return new HttpStatusCodeResult(204);
+
+        }
+
+        public async Task<ActionResult> DeployBaseline()
+        {
+            List<String> dirs = new List<string>();
+
+            String[] XmlFiles = Directory.GetDirectories(Server.MapPath("~/Content/PolicySets"));
+
+            for (int x = 0; x < XmlFiles.Length; x++)
+                dirs.Add(Path.GetFileNameWithoutExtension(XmlFiles[x]));
+
+            return View(dirs);
+        }
+
         public ViewResult Import()
         {
 
@@ -112,7 +181,7 @@ namespace ModernWorkplaceConcierge.Controllers
             return View();
         }
 
-        public async System.Threading.Tasks.Task<FileResult> DownloadAll(string clientId = null)
+        public async Task<FileResult> DownloadAll(string clientId = null)
         {
             SignalRMessage signalR = new SignalRMessage();
             signalR.clientId = clientId;
