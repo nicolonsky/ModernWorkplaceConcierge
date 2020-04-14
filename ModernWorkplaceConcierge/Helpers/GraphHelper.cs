@@ -655,7 +655,7 @@ namespace ModernWorkplaceConcierge.Helpers
                     return check.CurrentPage.FirstOrDefault();
                 }
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             {
                 
             }

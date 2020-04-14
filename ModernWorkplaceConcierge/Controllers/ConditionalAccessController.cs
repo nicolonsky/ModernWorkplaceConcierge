@@ -14,9 +14,12 @@ using System.Web.UI.WebControls;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
+
     [Authorize]
     public class ConditionalAccessController : BaseController
     {
+        public readonly string TEMPLATE_CA_POLICY_FOLDER_PATH = "~/Content/PolicySets/";
+
         [HttpPost]
         public async Task<ActionResult> Upload(HttpPostedFileBase[] files, string clientId)
         {
@@ -111,56 +114,68 @@ namespace ModernWorkplaceConcierge.Controllers
 
             signalR.sendMessage("Selected baseline: " + selectedBaseline);
 
-
-            // Create exclusion group
-
-            Microsoft.Graph.Group createdGroup = await GraphHelper.CreateGroup(displayName, clientId);
-            List<String> groupsCreated = new List<string>();
-            groupsCreated.Add(createdGroup.Id);
-
-            // Load CA policies
-
-            string[] filePaths = Directory.GetFiles(Server.MapPath("~/Content/PolicySets/" + selectedBaseline));
-
-            // Modify exclusions & Display Name
-
-            List<ConditionalAccessPolicy> conditionalAccessPolicies = new List<ConditionalAccessPolicy>();
-
-            foreach(String filePath in filePaths)
+            try
             {
-                using (var streamReader = new StreamReader(filePath, Encoding.UTF8))
+                // Create exclusion group (if the group already exists we retrieve the ID)
+                Microsoft.Graph.Group createdGroup = await GraphHelper.CreateGroup(displayName, clientId);
+                List<string> groupsCreated = new List<string>
                 {
-                    string textCaPolicy = streamReader.ReadToEnd();
+                    createdGroup.Id
+                };
 
-                    ConditionalAccessPolicy conditionalAccessPolicy =  JsonConvert.DeserializeObject<ConditionalAccessPolicy>(textCaPolicy);
-                    conditionalAccessPolicy.conditions.users.excludeGroups = groupsCreated.ToArray();
-                    conditionalAccessPolicy.displayName = conditionalAccessPolicy.displayName.Insert(0, policyPrefix).Replace("<PREFIX> -","");
+                // Load CA policies for policy set
+                string[] filePaths = Directory.GetFiles(Server.MapPath(TEMPLATE_CA_POLICY_FOLDER_PATH + selectedBaseline));
 
-                    // Check for legacy auth exclusion group
+                // Modify exclusions & Display Name
+                List<ConditionalAccessPolicy> conditionalAccessPolicies = new List<ConditionalAccessPolicy>();
 
-                    if (conditionalAccessPolicy.conditions.clientAppTypes.Contains("other") && conditionalAccessPolicy.grantControls.builtInControls.Contains("block"))
+                foreach (string filePath in filePaths)
+                {
+                    try
                     {
-                        // Wee need to initialize a new list to avoid modifications to the existing!
-                        List<String> newGroupsCreated = new List<String>(groupsCreated);
-                        Microsoft.Graph.Group allowLegacyAuthGroup = await GraphHelper.CreateGroup(allowLegacyAuth, clientId);
-                        newGroupsCreated.Add(allowLegacyAuthGroup.Id);
-                        conditionalAccessPolicy.conditions.users.excludeGroups = newGroupsCreated.ToArray();
-                    }
+                        using (var streamReader = new StreamReader(filePath, Encoding.UTF8))
+                        {
+                            string textCaPolicy = streamReader.ReadToEnd();
 
-                    // Create the policy
-                    await GraphHelper.ImportCaConfig(JsonConvert.SerializeObject(conditionalAccessPolicy), clientId);
+                            // Modify properties on template
+                            ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(textCaPolicy);
+                            conditionalAccessPolicy.conditions.users.excludeGroups = groupsCreated.ToArray();
+                            conditionalAccessPolicy.displayName = conditionalAccessPolicy.displayName.Insert(0, policyPrefix).Replace("<PREFIX> -", "").Trim();
+
+                            // Check for legacy auth exclusion group
+                            if (conditionalAccessPolicy.conditions.clientAppTypes.Contains("other") && conditionalAccessPolicy.grantControls.builtInControls.Contains("block"))
+                            {
+                                // Wee need to initialize a new list to avoid modifications to the existing!
+                                List<String> newGroupsCreated = new List<String>(groupsCreated);
+                                Microsoft.Graph.Group allowLegacyAuthGroup = await GraphHelper.CreateGroup(allowLegacyAuth, clientId);
+                                newGroupsCreated.Add(allowLegacyAuthGroup.Id);
+                                conditionalAccessPolicy.conditions.users.excludeGroups = newGroupsCreated.ToArray();
+                            }
+
+                            // Create the policy
+                            await GraphHelper.ImportCaConfig(JsonConvert.SerializeObject(conditionalAccessPolicy), clientId);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        signalR.sendMessage("Error: " + e.Message);
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                signalR.sendMessage("Error: " + e.Message);
+            }
+            
             signalR.sendMessage("Done#!");
             return new HttpStatusCodeResult(204);
-
         }
 
-        public async Task<ActionResult> DeployBaseline()
+        public ViewResult DeployBaseline()
         {
             List<String> dirs = new List<string>();
 
-            String[] XmlFiles = Directory.GetDirectories(Server.MapPath("~/Content/PolicySets"));
+            String[] XmlFiles = Directory.GetDirectories(Server.MapPath(TEMPLATE_CA_POLICY_FOLDER_PATH));
 
             for (int x = 0; x < XmlFiles.Length; x++)
                 dirs.Add(Path.GetFileNameWithoutExtension(XmlFiles[x]));
@@ -183,8 +198,10 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public async Task<FileResult> DownloadAll(string clientId = null)
         {
-            SignalRMessage signalR = new SignalRMessage();
-            signalR.clientId = clientId;
+            SignalRMessage signalR = new SignalRMessage
+            {
+                clientId = clientId
+            };
             try {
                 string ca = await GraphHelper.GetConditionalAccessPoliciesAsync(clientId);
 
