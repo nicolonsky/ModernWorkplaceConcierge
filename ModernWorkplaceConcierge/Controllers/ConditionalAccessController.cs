@@ -1,7 +1,6 @@
 ﻿using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +9,6 @@ using System.Web.Mvc;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using System.Web.UI.WebControls;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -124,7 +122,12 @@ namespace ModernWorkplaceConcierge.Controllers
                 };
 
                 // Load CA policies for policy set
-                string[] filePaths = Directory.GetFiles(Server.MapPath(TEMPLATE_CA_POLICY_FOLDER_PATH + selectedBaseline));
+                string[] filePaths = Directory.GetFiles(Server.MapPath(TEMPLATE_CA_POLICY_FOLDER_PATH + selectedBaseline),"*.json");
+
+                if (filePaths.Length == 0)
+                {
+                    signalR.sendMessage($"Warning no Conditional Access Policies found within selected set ({selectedBaseline})!");
+                }
 
                 // Modify exclusions & Display Name
                 List<ConditionalAccessPolicy> conditionalAccessPolicies = new List<ConditionalAccessPolicy>();
@@ -133,27 +136,30 @@ namespace ModernWorkplaceConcierge.Controllers
                 {
                     try
                     {
-                        using (var streamReader = new StreamReader(filePath, Encoding.UTF8))
+                        if (System.IO.File.Exists(filePath))
                         {
-                            string textCaPolicy = streamReader.ReadToEnd();
-
-                            // Modify properties on template
-                            ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(textCaPolicy);
-                            conditionalAccessPolicy.conditions.users.excludeGroups = groupsCreated.ToArray();
-                            conditionalAccessPolicy.displayName = conditionalAccessPolicy.displayName.Insert(0, policyPrefix).Replace("<PREFIX> -", "").Trim();
-
-                            // Check for legacy auth exclusion group
-                            if (conditionalAccessPolicy.conditions.clientAppTypes.Contains("other") && conditionalAccessPolicy.grantControls.builtInControls.Contains("block"))
+                            using (var streamReader = new StreamReader(filePath, Encoding.UTF8))
                             {
-                                // Wee need to initialize a new list to avoid modifications to the existing!
-                                List<String> newGroupsCreated = new List<String>(groupsCreated);
-                                Microsoft.Graph.Group allowLegacyAuthGroup = await GraphHelper.CreateGroup(allowLegacyAuth, clientId);
-                                newGroupsCreated.Add(allowLegacyAuthGroup.Id);
-                                conditionalAccessPolicy.conditions.users.excludeGroups = newGroupsCreated.ToArray();
-                            }
+                                string textCaPolicy = streamReader.ReadToEnd();
 
-                            // Create the policy
-                            await GraphHelper.ImportCaConfig(JsonConvert.SerializeObject(conditionalAccessPolicy), clientId);
+                                // Modify properties on template
+                                ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(textCaPolicy);
+                                conditionalAccessPolicy.conditions.users.excludeGroups = groupsCreated.ToArray();
+                                conditionalAccessPolicy.displayName = conditionalAccessPolicy.displayName.Insert(0, policyPrefix).Replace("<PREFIX> -", "").Trim();
+
+                                // Check for legacy auth exclusion group
+                                if (conditionalAccessPolicy.conditions.clientAppTypes.Contains("other") && conditionalAccessPolicy.grantControls.builtInControls.Contains("block"))
+                                {
+                                    // Wee need to initialize a new list to avoid modifications to the existing!
+                                    List<String> newGroupsCreated = new List<String>(groupsCreated);
+                                    Microsoft.Graph.Group allowLegacyAuthGroup = await GraphHelper.CreateGroup(allowLegacyAuth, clientId);
+                                    newGroupsCreated.Add(allowLegacyAuthGroup.Id);
+                                    conditionalAccessPolicy.conditions.users.excludeGroups = newGroupsCreated.ToArray();
+                                }
+
+                                // Create the policy
+                                await GraphHelper.ImportCaConfig(JsonConvert.SerializeObject(conditionalAccessPolicy), clientId);
+                            }
                         }
                     }
                     catch (Exception e)
@@ -185,9 +191,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public ViewResult Import()
         {
-
             return View();
-
         }
 
         // GET: ConditionalAccess

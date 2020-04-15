@@ -10,35 +10,44 @@
     <p>Deploy a full set of Conditional Access Policies and generate an AAD group excluded from all policies. Policy sets are provided by <a href="https://github.com/AlexFilipin/ConditionalAccess" target="_blank">@@AlexFilipin</a>. Kudos for his excellent work!</p>
 </div>
 
-
-@using (Html.BeginForm("CreateGroup", "ConditionalAccess", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("CreateGroup", "ConditionalAccess", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data", autocomplete = "off" }))
 {
-<div class="form-group">
-
     <input type="text" name="clientId" class="d-none" id="clientId" required>
-
-    <label for="displayName">Conditional Access Excluded Group</label>
-    <input type="text" name="displayName" class="form-control" placeholder="aad-conditional-access-exclusions" id="displayName" required>
-    <small id="aadHelp" class="form-text text-muted">This Azure AD Group will be created (if it does not exist) and excluded from all Conditional Access policies.</small>
-    <br />
-
-    <label for="displayName">Legacy Authentication Excluded Group</label>
-    <input type="text" name="allowLegacyAuth" class="form-control" placeholder="aad-conditional-access-allow-legacy-auth" id="allowLegacyAuth" required>
-    <small id="aadHelp" class="form-text text-muted">This Azure AD Group will be created (if it does not exist) and excluded from the policy preventing legacy authentication.</small>
-    <br />
-
-    <label for="displayName">Conditional Access Policy Prefix</label> 
-    <small id="aadHelp" class="form-text text-muted">Optional (This prefix will be added to all policie's display name.)</small>
-    <input type="text" name="policyPrefix" class="form-control" id="policyPrefix" placeholder="CAR -">
-
-
-    <br />
-    <label for="displayName">Conditional Access Policy Set</label>
-    @Html.DropDownList("selectedBaseline", new SelectList(Model), new { @class = "form-control" })
-    <small id="aadHelp" class="form-text text-muted">Select your desired conditional access policy set.</small>
-    <br />
-    <button class="btn btn-primary" type="submit" id="upload">Deploy ✨</button>
-</div>
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <label for="displayName">Conditional Access Excluded Group</label>
+                <input type="text" name="displayName" class="form-control" data-toggle="tooltip" data-placement="bottom" placeholder="aad-conditional-access-exclusions" id="displayName" required>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="allowLegacyAuth">Legacy Authentication Excluded Group</label>
+                <input type="text" name="allowLegacyAuth" class="form-control" data-toggle="tooltip" data-placement="bottom" placeholder="aad-conditional-access-allow-legacy-auth" id="allowLegacyAuth" required>
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <label for="policyPrefix">Conditional Access Policy Prefix (optional)</label>
+                <input type="text" name="policyPrefix" class="form-control" data-toggle="tooltip" data-placement="bottom" id="policyPrefix" placeholder="CAR -">
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="selectedBaseline">Conditional Access Policy Set</label>
+                @Html.DropDownList("selectedBaseline", new SelectList(Model), new { @class = "form-control", data_toggle = "tooltip", data_placement = "bottom" })
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <button class="btn btn-info" type="submit" id="upload">Deploy ✨</button>
+            </div>
+        </div>
+    </div>
 }
 
 @section scripts {
@@ -48,4 +57,11 @@
     <!--SignalR script to update the chat page and send messages.-->
     <script src="~/Content/MwConciergeSignalR.js"></script>
 
+    <!-- Tooltips -->
+    <script>
+        $('#displayName').tooltip({ 'trigger': 'focus', 'title': 'This Azure AD Group will be created (if it does not exist) and excluded from all Conditional Access policies.' });
+        $('#allowLegacyAuth').tooltip({ 'trigger': 'focus', 'title': 'This Azure AD Group will be created (if it does not exist) and excluded from the policy preventing legacy authentication.' });
+        $('#policyPrefix').tooltip({ 'trigger': 'focus', 'title': 'This prefix will be added to all policies display name.' });
+        $('#selectedBaseline').tooltip({ 'trigger': 'focus', 'title': 'Select your desired conditional access policy set.' });
+    </script>
 }

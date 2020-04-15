@@ -49,9 +49,15 @@ namespace ModernWorkplaceConcierge.Helpers
         public object[] clientAppTypes { get; set; }
         public object platforms { get; set; }
         public object locations { get; set; }
-        public object deviceStates { get; set; }
+        public DeviceStates deviceStates { get; set; }
         public Applications applications { get; set; }
         public Users users { get; set; }
+    }
+
+    public class DeviceStates
+    {
+        public string[] includeStates { get; set; }
+        public string[] excludeStates { get; set; }
     }
 
     public class Applications
