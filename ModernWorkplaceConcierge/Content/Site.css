@@ -9,10 +9,20 @@ a {
     color: #17a2b8;
 }
 
-    a:hover {
-        color: #17a2b8;
-    }
-
+a:hover {
+    color: #17a2b8;
+}
+.dropdown-item.active, .dropdown-item:active {
+    background-color: #17a2b8;
+}
+.dropdown-item:hover a {
+    background-color: #17a2b8;
+    color: white;
+}
+.dropdown-item:hover {
+    background-color: #17a2b8;
+    color: white;
+}
 
 body {
     padding-top: 4.5rem;

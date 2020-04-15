@@ -74,7 +74,7 @@
                             <a class="dropdown-toggle @((ViewBag.Current.StartsWith("ConditionalAccess")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ConditionalAccess</a>
                             <div class="dropdown-menu dropdown-menu-right">
                                 @Html.ActionLink("Baseline Policies", "DeployBaseline", "ConditionalAccess", new { area = "" },
-                                new { @class = ViewBag.Current == "DeployBasline" ? "dropdown-item active" : "dropdown-item" })
+                                new { @class = ViewBag.Current == "ConditionalAccessDeployBasline" ? "dropdown-item active" : "dropdown-item" })
 
                                 @Html.ActionLink("Export", "Index", "ConditionalAccess", new { area = "" },
                                 new { @class = ViewBag.Current == "ConditionalAccessExport" ? "dropdown-item active" : "dropdown-item" })
