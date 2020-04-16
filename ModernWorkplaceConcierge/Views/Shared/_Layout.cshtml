@@ -64,9 +64,6 @@
 
                                 @Html.ActionLink("AutoPilotConfiguration", "Index", "AutoPilotConfiguration", new { area = "" },
                                new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
-
-                                @Html.ActionLink("Custom Roles", "Roles", "Intune", new { area = "" },
-                               new { @class = ViewBag.Current == "IntuneRoles" ? "dropdown-item active" : "dropdown-item" })
                             </div>
                         </li>
 
@@ -171,15 +168,18 @@
     <br />
     <br />
     <br />
-    <footer class="footer mt-auto fixed-bottom py-2">
-        
-        <div class="container">
-            <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span>
-            <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
-        </div>
-    </footer>
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+    <div class="container">
+        <img src="/Content/Images/concierge.svg" class="fixed-bottom float-md-right" style="width: 10%;margin: 1.5em;">
+    </div>
+
+        <footer class="footer mt-auto fixed-bottom py-2">
+            <div class="container">
+                <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span>
+                <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
+            </div>
+        </footer>
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
 </body>
 </html>

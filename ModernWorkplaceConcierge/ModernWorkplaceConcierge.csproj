@@ -285,6 +285,7 @@
     <Content Include="Content\bootstrap-reboot.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Images\concierge.svg" />
     <Content Include="Content\MwConciergeSignalR.js" />
     <Content Include="Content\Prismjs\prism.css" />
     <Content Include="Content\Prismjs\prism.js" />
@@ -419,7 +420,6 @@
     <Content Include="Views\AutoPilotConfiguration\Detail.cshtml" />
     <Content Include="Views\ConditionalAccess\Index.cshtml" />
     <Content Include="Views\Intune\_PowerShellScriptContent.cshtml" />
-    <Content Include="Views\Intune\Roles.cshtml" />
     <Content Include="Views\Planner\Index.cshtml" />
     <Content Include="Scripts\umd\popper.min.js.map" />
     <Content Include="Scripts\umd\popper.js.map" />
