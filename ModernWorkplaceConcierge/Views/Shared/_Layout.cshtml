@@ -59,10 +59,10 @@
                                 @Html.ActionLink("Import", "Import", "Intune", new { area = "" },
                                new { @class = ViewBag.Current == "IntuneImport" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("DeviceManagementScripts", "DeviceManagementScripts", "Intune", new { area = "" },
+                                @Html.ActionLink("PowerShell Scripts", "DeviceManagementScripts", "Intune", new { area = "" },
                                 new { @class = ViewBag.Current == "IntuneDeviceManagementScripts" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("AutoPilotConfiguration", "Index", "AutoPilotConfiguration", new { area = "" },
+                                @Html.ActionLink("Offline Autopilot Profiles", "Index", "AutoPilotConfiguration", new { area = "" },
                                new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
                             </div>
                         </li>
@@ -72,6 +72,9 @@
                             <div class="dropdown-menu dropdown-menu-right">
                                 @Html.ActionLink("Baseline Policies", "DeployBaseline", "ConditionalAccess", new { area = "" },
                                 new { @class = ViewBag.Current == "ConditionalAccessDeployBasline" ? "dropdown-item active" : "dropdown-item" })
+
+                                @Html.ActionLink("Documentation", "Documentation", "ConditionalAccess", new { area = "" },
+                                new { @class = ViewBag.Current == "ConditionalAccessDocumentation" ? "dropdown-item active" : "dropdown-item" })
 
                                 @Html.ActionLink("Export", "Index", "ConditionalAccess", new { area = "" },
                                 new { @class = ViewBag.Current == "ConditionalAccessExport" ? "dropdown-item active" : "dropdown-item" })

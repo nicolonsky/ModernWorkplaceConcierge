@@ -63,18 +63,18 @@ namespace ModernWorkplaceConcierge.Helpers
     public class Applications
     {
         public string[] includeApplications { get; set; }
-        public object[] excludeApplications { get; set; }
-        public object[] includeUserActions { get; set; }
+        public string[] excludeApplications { get; set; }
+        public string[] includeUserActions { get; set; }
     }
 
     public class Users
     {
         public string[] includeUsers { get; set; }
-        public object[] excludeUsers { get; set; }
-        public object[] includeGroups { get; set; }
-        public object[] excludeGroups { get; set; }
+        public string[] excludeUsers { get; set; }
+        public string[] includeGroups { get; set; }
+        public string[] excludeGroups { get; set; }
         public string[] includeRoles { get; set; }
-        public object[] excludeRoles { get; set; }
+        public string[] excludeRoles { get; set; }
     }
 
     public class Sessioncontrols

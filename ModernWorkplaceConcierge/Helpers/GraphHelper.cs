@@ -754,6 +754,51 @@ public static class GraphHelper
         return deviceConfigurations.CurrentPage;
     }
 
+    public static async Task<Group> GetGroup(string Id, string clientId = null)
+    {
+        var graphClient = GetAuthenticatedClient();
+
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+            hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Groups[Id].Request().RequestUrl);
+        }
+
+        var group = await graphClient.Groups[Id].Request().GetAsync();
+
+        return group;
+    }
+
+    public static async Task<IEnumerable<DirectoryRoleTemplate>> GetDirectoryRoleTemplates(string clientId = null)
+    {
+        var graphClient = GetAuthenticatedClient();
+
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+            hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.DirectoryRoleTemplates.Request().RequestUrl);
+        }
+
+        var roles = await graphClient.DirectoryRoleTemplates.Request().GetAsync();
+
+        return roles.CurrentPage;
+    }
+
+    public static async Task<User> GetUserById(string Id, string clientId = null)
+    {
+        var graphClient = GetAuthenticatedClient();
+
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+            hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Users[Id].Request().RequestUrl);
+        }
+
+        var user = await graphClient.Users[Id].Request().GetAsync();
+
+        return user;
+    }
+
     public static async Task<DeviceConfiguration> AddDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration, string clientId)
     {
         var graphClient = GetAuthenticatedClient();

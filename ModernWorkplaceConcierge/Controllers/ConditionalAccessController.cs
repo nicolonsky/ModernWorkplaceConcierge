@@ -10,6 +10,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -201,7 +202,7 @@ namespace ModernWorkplaceConcierge.Controllers
             return View();
         }
 
-        public async Task<FileResult> DownloadAll(string clientId = null)
+        public async Task<ActionResult> DownloadAll(string clientId = null)
         {
             SignalRMessage signalR = new SignalRMessage
             {
@@ -220,7 +221,16 @@ namespace ModernWorkplaceConcierge.Controllers
                         {
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
-                            var zipArchiveEntry = archive.CreateEntry(item.displayName + "_" + item.id + ".json", CompressionLevel.Fastest);
+                            string displayName = item.displayName;
+
+                            char[] illegal = Path.GetInvalidFileNameChars();
+                            
+                            foreach (char illegalChar in illegal)
+                            {
+                                displayName = displayName.Replace(illegalChar, '-');
+                            }
+
+                            var zipArchiveEntry = archive.CreateEntry(displayName + "_" + item.id + ".json", CompressionLevel.Fastest);
 
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
@@ -228,80 +238,96 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     string domainName = await GraphHelper.GetDefaultDomain();
 
-                    return File(ms.ToArray(), "application/zip", "ConditionalAccessConfig_" + domainName + ".zip");
+                    return File(ms.ToArray(), "application/zip", "ConditionalAccessConfig_" + ".zip");
                 }
             }
             catch (Exception e)
             {
-                signalR.sendMessage("Error: " + e.Message);
+                signalR.sendMessage("Error " + e);
+                
             }
+            return new HttpStatusCodeResult(204);
+        }
 
-            return null;
+        public ViewResult Documentation()
+        {
+            return View();
         }
 
         public async Task<FileResult> CreateDocumentation(string clientId = null)
         {
+
             SignalRMessage signalR = new SignalRMessage
             {
                 clientId = clientId
             };
-            try
+
+            if (!string.IsNullOrEmpty(clientId))
             {
-                string ca = await GraphHelper.GetConditionalAccessPoliciesAsync(clientId);
-
-                ConditionalAccessPolicies conditionalAccessPolicies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
-
-                DataTable dataTable = new DataTable();
-
-                dataTable.BeginInit();
-                dataTable.Columns.Add("Name");
-                dataTable.Columns.Add("Description");
-                dataTable.Columns.Add("IncludedUsers");
-                dataTable.Columns.Add("ExcludedUsers");
-                dataTable.Columns.Add("IncludedGroups");
-                dataTable.Columns.Add("ExcludedGroups");
-                dataTable.Columns.Add("IncludedRoles");
-                dataTable.Columns.Add("ExcludedRoles");
-                dataTable.Columns.Add("IncludedApps");
-                dataTable.Columns.Add("ExcludedApps");
-
-                foreach (ConditionalAccessPolicy conditionalAccessPolicy in conditionalAccessPolicies.Value)
-                {
-                    DataRow row = dataTable.NewRow();
-                    row["Name"] = conditionalAccessPolicy.displayName;
-                    row["IncludedUsers"] = String.Join(";", conditionalAccessPolicy.conditions.users.includeUsers);
-                    row["ExcludedUsers"] = String.Join(";", conditionalAccessPolicy.conditions.users.excludeUsers);
-                    row["IncludedGroups"] = String.Join(";", conditionalAccessPolicy.conditions.users.includeGroups);
-                    row["ExcludedGroups"] = String.Join(";", conditionalAccessPolicy.conditions.users.excludeGroups);
-                    row["IncludedRoles"] = String.Join(";", conditionalAccessPolicy.conditions.users.includeRoles);
-                    row["ExcludedRoles"] = String.Join(";", conditionalAccessPolicy.conditions.users.excludeRoles);
-
-                    dataTable.Rows.Add(row);
-
-                }
-
-                StringBuilder sb = new StringBuilder();
-
-                IEnumerable<string> columnNames = dataTable.Columns.Cast<DataColumn>().
-                                                  Select(column => column.ColumnName);
-                sb.AppendLine(string.Join(",", columnNames));
-
-                foreach (DataRow row in dataTable.Rows)
-                {
-                    IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
-                    sb.AppendLine(string.Join(",", fields));
-                }
-
-
-                return File(Encoding.ASCII.GetBytes(sb.ToString()), "application/text", "ConditionalAccessReport.csv");
-
-            }
-            catch (Exception e)
-            {
-                signalR.sendMessage("Error: " + e.Message);
+                signalR.sendMessage("Building report....");
             }
 
-            return null;
+            string ca = await GraphHelper.GetConditionalAccessPoliciesAsync(clientId);
+
+            ConditionalAccessPolicies conditionalAccessPolicies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
+
+            DataTable dataTable = new DataTable();
+
+            dataTable.BeginInit();
+            dataTable.Columns.Add("Name");
+            dataTable.Columns.Add("Description");
+            dataTable.Columns.Add("IncludedUsers");
+            dataTable.Columns.Add("ExcludedUsers");
+            dataTable.Columns.Add("IncludedGroups");
+            dataTable.Columns.Add("ExcludedGroups");
+            dataTable.Columns.Add("IncludedRoles");
+            dataTable.Columns.Add("ExcludedRoles");
+            dataTable.Columns.Add("IncludedApps");
+            dataTable.Columns.Add("ExcludedApps");
+
+
+            // Init cache for AAD Object ID's in CA policies
+            AzureADIDCache azureADIDCache = new AzureADIDCache(clientId);
+
+            foreach (ConditionalAccessPolicy conditionalAccessPolicy in conditionalAccessPolicies.Value)
+            {
+                // Init a new row
+                DataRow row = dataTable.NewRow();
+
+                row["Name"] = conditionalAccessPolicy.displayName;
+                row["IncludedUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeUsers))}\"";
+                row["ExcludedUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeUsers))}\"";
+                row["IncludedGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeGroups))}\"";
+                row["ExcludedGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeGroups))}\"";
+                row["IncludedRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeRoles))}\"";
+                row["ExcludedRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeRoles))}\"";
+                row["IncludedApps"] = $"\"{String.Join("\n", azureADIDCache.getApplicationDisplayNames(conditionalAccessPolicy.conditions.applications.includeApplications))}\"";
+                row["ExcludedApps"] = $"\"{String.Join("\n", azureADIDCache.getApplicationDisplayNames(conditionalAccessPolicy.conditions.applications.excludeApplications))}\"";
+
+                // Add new row to table
+                dataTable.Rows.Add(row);
+            }
+
+            // Convert datatable to CSV string output
+
+            StringBuilder sb = new StringBuilder();
+
+            IEnumerable<string> columnNames = dataTable.Columns.Cast<DataColumn>().
+                                                Select(column => column.ColumnName);
+            sb.AppendLine(string.Join(",", columnNames));
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
+                sb.AppendLine(string.Join(",", fields));
+            }
+
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                signalR.sendMessage("Success: Report generated");
+            }
+
+            return File(Encoding.ASCII.GetBytes(sb.ToString()), "application/text", "ConditionalAccessReport.csv");
         }
     }   
 }
