@@ -501,6 +501,31 @@ public static class GraphHelper
         return response;
     }
 
+    public static async Task ClearConditonalAccessPolicies ()
+    {
+        var graphClient = GetAuthenticatedClient();
+        var policies = await graphClient
+            .ConditionalAccess
+            .Policies
+            .Request()
+            .GetAsync();
+
+
+        foreach (Microsoft.Graph.ConditionalAccessPolicy policy in policies)
+        {
+            string requestUrl = graphEndpoint + "/conditionalAccess/policies/" + policy.Id;
+
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+
+            // Send the request and get the response.
+            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
+        }
+       
+    }
+
     public static async Task<IEnumerable<RoleScopeTag>> GetRoleScopeTags(string clientId = null)
     {
         var graphClient = GetAuthenticatedClient();
@@ -645,9 +670,8 @@ public static class GraphHelper
         {
             var check = await graphClient.Groups.Request().Filter($"displayName eq '{displayName}'").GetAsync();
 
-            if (check.FirstOrDefault().Id != null)
+            if (check.FirstOrDefault() != null && check.FirstOrDefault().Id != null)
             {
-
                 if (!string.IsNullOrEmpty(clientId))
                 {
                     var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
@@ -658,9 +682,7 @@ public static class GraphHelper
         }
         catch (System.Exception)
         {
-
         }
-
 
         Group group = new Group();
         group.SecurityEnabled = true;

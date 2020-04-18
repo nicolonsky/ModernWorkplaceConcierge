@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Graph;
 
@@ -102,6 +103,11 @@ namespace ModernWorkplaceConcierge.Helpers
                 }
             }
             return displayNames;
+        }
+
+        internal Task<List<string>> getGroupDisplayNamesAsync(object includeUsers)
+        {
+            throw new NotImplementedException();
         }
 
         public List<string> getApplicationDisplayNames(string[] applicationIDs)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Graph;
+﻿using CsvHelper.Configuration;
+using Microsoft.Graph;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -47,11 +48,23 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         public object[] signInRiskLevels { get; set; }
         public object[] clientAppTypes { get; set; }
-        public object platforms { get; set; }
-        public object locations { get; set; }
+        public Platforms platforms { get; set; }
+        public Locations locations { get; set; }
         public DeviceStates deviceStates { get; set; }
         public Applications applications { get; set; }
         public Users users { get; set; }
+    }
+
+    public class Platforms
+    {
+        public string[] includePlatforms { get; set; }
+        public string[] excludePlatforms { get; set; }
+    }
+
+    public class Locations
+    {
+        public string[] includeLocations { get; set; }
+        public string[] excludeLocations { get; set; }
     }
 
     public class DeviceStates
@@ -80,8 +93,8 @@ namespace ModernWorkplaceConcierge.Helpers
     public class Sessioncontrols
     {
         public object cloudAppSecurity { get; set; }
-        public object signInFrequency { get; set; }
-        public object persistentBrowser { get; set; }
+        public SignInFrequency signInFrequency { get; set; }
+        public PersistentBrowser persistentBrowser { get; set; }
         public Applicationenforcedrestrictions applicationEnforcedRestrictions { get; set; }
     }
 
@@ -90,4 +103,16 @@ namespace ModernWorkplaceConcierge.Helpers
         public bool isEnabled { get; set; }
     }
 
+    public class SignInFrequency
+    {
+        public int value { get; set; }
+        public string type { get; set; }
+        public bool isEnabled { get; set; }
+    }
+
+    public class PersistentBrowser
+    {
+        public string mode { get; set; }
+        public bool isEnabled { get; set; }
+    }
 }
