@@ -22,13 +22,19 @@
 
             $("#messages").prepend("<li class=\"list-group-item list-group-item-success\"><small>" + (new Date().toLocaleTimeString()) + " " + message + "</small></li>");
 
-        } else if (message.match("Discarding") || message.match("Truncating")) {
+        } else if (message.match("Discarding") || message.match("Truncating") || message.match("Warning")) {
 
             $("#messages").prepend("<li class=\"list-group-item list-group-item-warning\"><small>" + (new Date().toLocaleTimeString()) + " " + message + "</small></li>");
             document.getElementById('notificationCount').className = "badge badge-warning";
-            document.getElementById('liveMessages').className = "hide show"
+            document.getElementById('liveMessages').className = "hide show";
 
-        } else {
+        } else if (message.match("Warning")) {
+
+            $("#messages").prepend("<li class=\"list-group-item list-group-item-warning\"><small>" + (new Date().toLocaleTimeString()) + " " + message + "</small></li>");
+            document.getElementById('notificationCount').className = "badge badge-warning";
+            document.getElementById('liveMessages').className = "hide show";
+
+        }else {
 
             $("#messages").prepend("<li class=\"list-group-item\"><small>" + (new Date().toLocaleTimeString()) + " " + message + "</small></li>");
         }

@@ -5,11 +5,12 @@
 }
 
     <div class="jumbotron">
-        <h1>Windows Autopilot Offline Profiles</h1>
-        <p>Download Windows Autopilot profiles ready for OSD with SCCM, mOSD... Inject profile during OSD to: <pre>%WINDIR%\Provisioning\Autopilot\AutoPilotConfigurationFile.json</pre></p>
+        <h1>Offline Autopilot Profiles</h1>
+        <p>Download Windows Autopilot profiles ready for OSD with SCCM, mOSD...</p>
+        Inject profile during OSD to: <code class="text-dark">%WINDIR%\Provisioning\Autopilot\AutoPilotConfigurationFile.json</code>
     </div>
 
-    <table class="table">
+    <table class="table table-borderless">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.DisplayName)
@@ -36,8 +37,8 @@
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
-                    @Html.ActionLink("Details", "Detail", new { id = item.Id }) |
-                    @Html.ActionLink("Download", "DownloadAutopilotConfigurationJSON", new { id = item.Id })
+                    @Html.ActionLink("Details", "Detail", new { id = item.Id }, new { @class = "btn btn-outline-light" })
+                    @Html.ActionLink("Download", "DownloadAutopilotConfigurationJSON", new { id = item.Id }, new { @class = "btn btn-outline-light" })
                 </td>
             </tr>
         }

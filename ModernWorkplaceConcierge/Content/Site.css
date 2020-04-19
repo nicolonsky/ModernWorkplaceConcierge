@@ -1,21 +1,65 @@
 ﻿/*
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT license.
+ *
+ *    !#23364A;
  */
+
+a {
+    color: #17a2b8;
+}
+
+a:hover {
+    color: #17a2b8;
+}
+.dropdown-item.active, .dropdown-item:active {
+    background-color: #17a2b8;
+}
+.dropdown-item:hover a {
+    background-color: #17a2b8;
+    color: white;
+}
+.dropdown-item:hover {
+    background-color: #17a2b8;
+    color: white;
+}
 
 body {
     padding-top: 4.5rem;
+    background-color: #215b7d;
+    color: white;
+}
+
+.table {
+    color: #ffffff;
+}
+
+.text-muted {
+    color: #adadad !important;
+}
+
+.card-body {
+    color: black;
+}
+
+.jumbotron {
+    background-color: white;
+    color: #18161C;
+}
+
+.footer {
+    background-color: #31302f;
+    color: #F9F9F7;
+}
+
+.bg-dark {
+    background-color: #31302f !important;
 }
 
 .alert-pre {
     word-wrap: break-word;
     word-break: break-all;
     white-space: pre-wrap;
-}
-
-.footer {
-    background-color: #f5f5f5;
-    color: gray
 }
 
 .mt-auto, .my-auto {

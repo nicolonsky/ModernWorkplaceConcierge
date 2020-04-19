@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="~/Content/Site.css" />
 
     <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/umd/popper.min.js"></script>
 
     <script type="text/javascript">
         var sdkInstance = "appInsightsSDK"; window[sdkInstance] = "appInsights"; var aiName = window[sdkInstance], aisdk = window[aiName] || function (e) { function n(e) { t[e] = function () { var n = arguments; t.queue.push(function () { t[e].apply(t, n) }) } } var t = { config: e }; t.initialize = !0; var i = document, a = window; setTimeout(function () { var n = i.createElement("script"); n.src = e.url || "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js", i.getElementsByTagName("script")[0].parentNode.appendChild(n) }); try { t.cookie = i.cookie } catch (e) { } t.queue = [], t.version = 2; for (var r = ["Event", "PageView", "Exception", "Trace", "DependencyData", "Metric", "PageViewPerformance"]; r.length;)n("track" + r.pop()); n("startTrackPage"), n("stopTrackPage"); var s = "Track" + r[0]; if (n("start" + s), n("stop" + s), n("addTelemetryInitializer"), n("setAuthenticatedUserContext"), n("clearAuthenticatedUserContext"), n("flush"), t.SeverityLevel = { Verbose: 0, Information: 1, Warning: 2, Error: 3, Critical: 4 }, !(!0 === e.disableExceptionTracking || e.extensionConfig && e.extensionConfig.ApplicationInsightsAnalytics && !0 === e.extensionConfig.ApplicationInsightsAnalytics.disableExceptionTracking)) { n("_" + (r = "onerror")); var o = a[r]; a[r] = function (e, n, i, a, s) { var c = o && o(e, n, i, a, s); return !0 !== c && t["_" + r]({ message: e, url: n, lineNumber: i, columnNumber: a, error: s }), c }, e.autoExceptionInstrumented = !0 } return t }(
@@ -58,20 +59,23 @@
                                 @Html.ActionLink("Import", "Import", "Intune", new { area = "" },
                                new { @class = ViewBag.Current == "IntuneImport" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("DeviceManagementScripts", "DeviceManagementScripts", "Intune", new { area = "" },
+                                @Html.ActionLink("PowerShell Scripts", "DeviceManagementScripts", "Intune", new { area = "" },
                                 new { @class = ViewBag.Current == "IntuneDeviceManagementScripts" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("AutoPilotConfiguration", "Index", "AutoPilotConfiguration", new { area = "" },
+                                @Html.ActionLink("Offline Autopilot Profiles", "Index", "AutoPilotConfiguration", new { area = "" },
                                new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
-
-                                @Html.ActionLink("Custom Roles", "Roles", "Intune", new { area = "" },
-                               new { @class = ViewBag.Current == "IntuneRoles" ? "dropdown-item active" : "dropdown-item" })
                             </div>
                         </li>
 
                         <li class="nav-item dropdown">
                             <a class="dropdown-toggle @((ViewBag.Current.StartsWith("ConditionalAccess")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ConditionalAccess</a>
                             <div class="dropdown-menu dropdown-menu-right">
+                                @Html.ActionLink("Baseline Policies", "DeployBaseline", "ConditionalAccess", new { area = "" },
+                                new { @class = ViewBag.Current == "ConditionalAccessDeployBasline" ? "dropdown-item active" : "dropdown-item" })
+
+                                @Html.ActionLink("Documentation", "Documentation", "ConditionalAccess", new { area = "" },
+                                new { @class = ViewBag.Current == "ConditionalAccessDocumentation" ? "dropdown-item active" : "dropdown-item" })
+
                                 @Html.ActionLink("Export", "Index", "ConditionalAccess", new { area = "" },
                                 new { @class = ViewBag.Current == "ConditionalAccessExport" ? "dropdown-item active" : "dropdown-item" })
 
@@ -167,15 +171,18 @@
     <br />
     <br />
     <br />
-    <footer class="footer mt-auto fixed-bottom py-2">
-        
-        <div class="container">
-            <span class="">Instance: <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span></span>
-            <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
-        </div>
-    </footer>
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+    <div class="container">
+        <img src="/Content/Images/concierge.svg" class="fixed-bottom float-md-right" style="width: 10%;margin: 1.5em;">
+    </div>
+
+        <footer class="footer mt-auto fixed-bottom py-2">
+            <div class="container">
+                <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span>
+                <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
+            </div>
+        </footer>
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
 </body>
 </html>

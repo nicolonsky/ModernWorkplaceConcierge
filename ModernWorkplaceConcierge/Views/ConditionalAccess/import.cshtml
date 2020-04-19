@@ -2,29 +2,30 @@
     ViewBag.Current = "ConditionalAccessImport";
 }
 
-    <div class="jumbotron">
-        <h1>Import Conditional Access policies</h1>
+<div class="jumbotron">
+    <h1>Import Conditional Access policies</h1>
+    <p>Import previously exported Conditional Access policies from *.zip or *.json file(s) to your tenant.</p>
+    <ul>
+        <li>No items will be overwritten as this tool performs only POST requests</li>
+        <li>Policies are imported with "disabled" state</li>
+        <li>Unavailable group and application ID's (when exported from another tenant) might get discarded on import</li>
+    </ul>
+</div>
 
-        <p>Import previously exported Conditional Access policies from *.zip or *.json file(s) to your tenant.</p>
-        <ul>
-            <li>No items will be overwritten as this tool performs only POST requests</li>
-            <li>Policies are imported with "diabled" state</li>
-            <li>Unavailable group and application ID's (when exported from another tenant) are discarded on import</li>
-        </ul>
-    </div>
 
-
-@using (Html.BeginForm("Upload", "ConditionalAccess", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Upload", "ConditionalAccess", FormMethod.Post, new { @class = "form", enctype = "multipart/form-data" }))
 {
-    <div class="form-group">
+    <input type="text" name="clientId" class="d-none" id="clientId">
 
-        <input type="text" name="clientId" class="d-none" id="clientId">
-
-        <div class="custom-file">
-            <input type="file" name="files" class="custom-file-input" id="file" accept=".json,.zip" multiple>
-            <label class="custom-file-label" for="file">Choose file</label>
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <div class="custom-file">
+                    <input type="file" name="files" class="custom-file-input" id="file" accept=".json,.zip" multiple>
+                    <label class="custom-file-label" for="file">Choose file</label>
+                </div>
+            </div>
         </div>
-
         <script>
             // Add the following code if you want the name of the file appear on select
             $(".custom-file-input").on("change", function () {
@@ -33,13 +34,16 @@
                 $("#upload").removeAttr("disabled");
             });
         </script>
-
-        <br />
-        <br />
-        <button class="btn btn-primary" type="submit" id="upload" disabled>
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none" id="loady"></span>
-            Import
-        </button>
+    </div>
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <button class="btn btn-info" type="submit" id="upload" disabled>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none" id="loady"></span>
+                    Import
+                </button>
+            </div>
+        </div>
     </div>
 }
 

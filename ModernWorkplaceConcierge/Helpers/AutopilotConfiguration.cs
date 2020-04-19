@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using Microsoft.Graph;
 using ModernWorkplaceConcierge.Helpers;
-using ServiceStack;
 using Newtonsoft.Json;
 
 namespace ModernWorkplaceConcierge.Helpers

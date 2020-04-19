@@ -1,10 +1,5 @@
-﻿using Microsoft.Graph;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Web;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
@@ -47,35 +42,53 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         public object[] signInRiskLevels { get; set; }
         public object[] clientAppTypes { get; set; }
-        public object platforms { get; set; }
-        public object locations { get; set; }
-        public object deviceStates { get; set; }
+        public Platforms platforms { get; set; }
+        public Locations locations { get; set; }
+        public DeviceStates deviceStates { get; set; }
         public Applications applications { get; set; }
         public Users users { get; set; }
+    }
+
+    public class Platforms
+    {
+        public string[] includePlatforms { get; set; }
+        public string[] excludePlatforms { get; set; }
+    }
+
+    public class Locations
+    {
+        public string[] includeLocations { get; set; }
+        public string[] excludeLocations { get; set; }
+    }
+
+    public class DeviceStates
+    {
+        public string[] includeStates { get; set; }
+        public string[] excludeStates { get; set; }
     }
 
     public class Applications
     {
         public string[] includeApplications { get; set; }
-        public object[] excludeApplications { get; set; }
-        public object[] includeUserActions { get; set; }
+        public string[] excludeApplications { get; set; }
+        public string[] includeUserActions { get; set; }
     }
 
     public class Users
     {
         public string[] includeUsers { get; set; }
-        public object[] excludeUsers { get; set; }
-        public object[] includeGroups { get; set; }
-        public object[] excludeGroups { get; set; }
+        public string[] excludeUsers { get; set; }
+        public string[] includeGroups { get; set; }
+        public string[] excludeGroups { get; set; }
         public string[] includeRoles { get; set; }
-        public object[] excludeRoles { get; set; }
+        public string[] excludeRoles { get; set; }
     }
 
     public class Sessioncontrols
     {
         public object cloudAppSecurity { get; set; }
-        public object signInFrequency { get; set; }
-        public object persistentBrowser { get; set; }
+        public SignInFrequency signInFrequency { get; set; }
+        public PersistentBrowser persistentBrowser { get; set; }
         public Applicationenforcedrestrictions applicationEnforcedRestrictions { get; set; }
     }
 
@@ -84,4 +97,16 @@ namespace ModernWorkplaceConcierge.Helpers
         public bool isEnabled { get; set; }
     }
 
+    public class SignInFrequency
+    {
+        public int value { get; set; }
+        public string type { get; set; }
+        public bool isEnabled { get; set; }
+    }
+
+    public class PersistentBrowser
+    {
+        public string mode { get; set; }
+        public bool isEnabled { get; set; }
+    }
 }

@@ -6,12 +6,11 @@
 
 @if (Model.DisplayName != null)
 {
-    <h1>@Model.DisplayName</h1>
-    <h4>WindowsAutopilotDeploymentProfile</h4>
 
-    <br />
-    <table class="table">
-        <thead class="thead-light">
+    <h1>Autopilot Profile Details</h1>
+
+    <table class="table table-borderless table-responsive-sm table-sm mt-5">
+        <thead class="thead">
             <tr>
                 <th>Key</th>
                 <th>Value</th>
@@ -64,13 +63,13 @@
     </table>
     <br />
 
-    @Html.ActionLink("Back", "Index", "AutoPilotConfiguration", new { area = "" }, new { @class = "btn btn-light btn-large" })
+    @Html.ActionLink("Back", "Index", "AutoPilotConfiguration", new { area = "" }, new { @class = "btn btn-outline-light" })
 }
 else
 {
-<div class="alert alert-danger" role="alert">
-    <h4 class="alert-heading">Error</h4>
-    Could not fetch WindowsAutopilotDeploymentProfile.
-</div>
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Error</h4>
+        Could not fetch WindowsAutopilotDeploymentProfile.
+    </div>
 }
 
