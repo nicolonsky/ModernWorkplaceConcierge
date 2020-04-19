@@ -31,7 +31,7 @@ namespace ModernWorkplaceConcierge.Helpers
             foreach (String userID in userIDs)
             {
                 // Check for UID
-                if (Guid.TryParse(userID, out _))
+                if (Guid.TryParse(userID, out Guid result))
                 {
                     // Check if AAD Object in in cache
                     if (graphCache.ContainsKey(userID))
@@ -59,7 +59,7 @@ namespace ModernWorkplaceConcierge.Helpers
             foreach (String groupID in groupIDs)
             {
                 // Check for UID
-                if (Guid.TryParse(groupID, out _))
+                if (Guid.TryParse(groupID, out Guid result))
                 {
                     // Check if AAD Object in in cache
                     if (graphCache.ContainsKey(groupID))
@@ -93,7 +93,7 @@ namespace ModernWorkplaceConcierge.Helpers
             foreach (String roleID in roleIDs)
             {
                 // Check for UID
-                if (Guid.TryParse(roleID, out _))
+                if (Guid.TryParse(roleID, out Guid result))
                 {
                     displayNames.Add(roleTemplates.Where(role => role.Id == roleID).Select(role => role.DisplayName).First());
                 }
@@ -390,7 +390,7 @@ namespace ModernWorkplaceConcierge.Helpers
             foreach (String applicationID in applicationIDs)
             {
                 // Check for UID
-                if (Guid.TryParse(applicationID, out _))
+                if (Guid.TryParse(applicationID, out Guid result))
                 {
                     if (dict.TryGetValue(applicationID, out _))
                     {

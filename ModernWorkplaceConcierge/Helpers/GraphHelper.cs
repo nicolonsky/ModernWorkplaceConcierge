@@ -996,7 +996,7 @@ public static class GraphHelper
             new Microsoft.Graph.DelegateAuthenticationProvider(
                 async (requestMessage) =>
                 {
-                    requestMessage.Headers.Authorization =
+                     requestMessage.Headers.Authorization =
                         new AuthenticationHeaderValue("Bearer", accessToken);
                 }));
 

@@ -26,7 +26,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>3.5</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.8</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -157,9 +157,11 @@
     <Reference Include="System.Numerics.Vectors, Version=4.1.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.6.0-preview5.19224.8\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.1\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.InteropServices" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
@@ -169,6 +171,7 @@
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.Threading.Thread" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
@@ -295,6 +298,118 @@
     <Content Include="Content\bootstrap-reboot.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="Content\PolicySets\Bare minimum\Admin protection - All apps Require MFA For M365 admins.json" />
+    <Content Include="Content\PolicySets\Bare minimum\Admin protection - Azure management Require MFA.json" />
+    <Content Include="Content\PolicySets\Bare minimum\Attack surface reduction - All apps Block access When using active sync.json" />
+    <Content Include="Content\PolicySets\Bare minimum\Attack surface reduction - All apps Block access When using legacy authentication.json" />
+    <Content Include="Content\PolicySets\Bare minimum\Base protection - All apps Require MFA or trusted device or trusted location.json" />
+    <Content Include="Content\PolicySets\Bare minimum\Base protection - Register security information Require trusted device or location For internal users.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Admin protection - All apps Block access For internal M365 admins When any risk is detected.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Admin protection - All apps Require MFA For M365 admins.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Admin protection - All apps Require trusted device For M365 admins.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Admin protection - All apps Require trusted location For M365 admins.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Admin protection - Azure management Block access For internal users When any risk is detected.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Admin protection - Azure management Require MFA.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Admin protection - Azure management Require trusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Admin protection - Azure management Require trusted location.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Application protection - Specific apps Require MFA.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Application protection - Specific apps Require trusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Application protection - Specific apps Require trusted location.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Attack surface reduction - All apps Block access When using active sync.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Attack surface reduction - All apps Block access When using legacy authentication.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Attack surface reduction - All apps Block access When using unknown or unsupported device platforms.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Base protection - All apps Block access For AADP2 users When high risk is detected.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Base protection - All apps Require MFA For AADP2 users When medium risk is detected.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Base protection - All apps Require MFA or trusted device or trusted location.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Base protection - Register security information Require trusted device or location For internal users.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Data protection - All apps No persistent browser session When on untrusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Data protection - All apps Short Sign-in frequency When on untrusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Data protection - O365 Require app protection policy When using modern authentication clients on iOS or Android.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Data protection - O365 Require approved client app When using modern authentication clients on iOS or Android.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Data protection - O365 Require trusted device When using modern authentication clients on Windows and macOS.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1 and AADP2\Data protection - O365 Use app enforced restrictions When using a browser on untrusted devices.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Admin protection - All apps Require MFA For M365 admins.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Admin protection - All apps Require trusted device For M365 admins.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Admin protection - All apps Require trusted location For M365 admins.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Admin protection - Azure management Require MFA.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Admin protection - Azure management Require trusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Admin protection - Azure management Require trusted location.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Application protection - Specific apps Require MFA.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Application protection - Specific apps Require trusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Application protection - Specific apps Require trusted location.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Attack surface reduction - All apps Block access When using active sync.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Attack surface reduction - All apps Block access When using legacy authentication.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Attack surface reduction - All apps Block access When using unknown or unsupported device platforms.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Base protection - All apps Require MFA or trusted device or trusted location.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Base protection - Register security information Require trusted device or location For internal users.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Data protection - All apps No persistent browser session When on untrusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Data protection - All apps Short Sign-in frequency When on untrusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Data protection - O365 Require app protection policy When using modern authentication clients on iOS or Android.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Data protection - O365 Require approved client app When using modern authentication clients on iOS or Android.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Data protection - O365 Require trusted device When using modern authentication clients on Windows and macOS.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP1\Data protection - O365 Use app enforced restrictions When using a browser on untrusted devices.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Admin protection - All apps Block access For internal M365 admins When any risk is detected.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Admin protection - All apps Require MFA For M365 admins.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Admin protection - All apps Require trusted device For M365 admins.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Admin protection - All apps Require trusted location For M365 admins.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Admin protection - Azure management Block access For internal users When any risk is detected.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Admin protection - Azure management Require MFA.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Admin protection - Azure management Require trusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Admin protection - Azure management Require trusted location.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Application protection - Specific apps Require MFA.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Application protection - Specific apps Require trusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Application protection - Specific apps Require trusted location.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Attack surface reduction - All apps Block access When using active sync.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Attack surface reduction - All apps Block access When using legacy authentication.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Attack surface reduction - All apps Block access When using unknown or unsupported device platforms.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Base protection - All apps Block access For internal users When high risk is detected.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Base protection - All apps Require MFA For internal users When medium risk is detected.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Base protection - All apps Require MFA or trusted device or trusted location.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Base protection - Register security information Require trusted device or location For internal users.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Data protection - All apps No persistent browser session When on untrusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Data protection - All apps Short Sign-in frequency When on untrusted device.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Data protection - O365 Require app protection policy When using modern authentication clients on iOS or Android.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Data protection - O365 Require approved client app When using modern authentication clients on iOS or Android.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Data protection - O365 Require trusted device When using modern authentication clients on Windows and macOS.json" />
+    <Content Include="Content\PolicySets\Device trust with AADP2\Data protection - O365 Use app enforced restrictions When using a browser on untrusted devices.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Admin protection - All apps Block access For internal M365 admins When any risk is detected.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Admin protection - All apps Require MFA For M365 admins.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Admin protection - All apps Require trusted location For M365 admins.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Admin protection - Azure management Block access For internal users When any risk is detected.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Admin protection - Azure management Require MFA.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Admin protection - Azure management Require trusted location.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Application protection - Specific apps Require MFA.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Application protection - Specific apps Require trusted location.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Attack surface reduction - All apps Block access When using active sync.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Attack surface reduction - All apps Block access When using legacy authentication.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Base protection - All apps Block access For AADP2 users When high risk is detected.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Base protection - All apps Require MFA For AADP2 users When medium risk is detected.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Base protection - All apps Require MFA or trusted device or trusted location.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1 and AADP2\Base protection - Register security information Require trusted device or location For internal users.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Admin protection - All apps Require MFA For M365 admins.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Admin protection - All apps Require trusted location For M365 admins.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Admin protection - Azure management Require MFA.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Admin protection - Azure management Require trusted location.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Application protection - Specific apps Require MFA.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Application protection - Specific apps Require trusted location.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Attack surface reduction - All apps Block access When using active sync.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Attack surface reduction - All apps Block access When using legacy authentication.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Base protection - All apps Require MFA or trusted device or trusted location.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP1\Base protection - Register security information Require trusted device or location For internal users.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Admin protection - All apps Block access For internal M365 admins When any risk is detected.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Admin protection - All apps Require MFA For M365 admins.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Admin protection - All apps Require trusted location For M365 admins.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Admin protection - Azure management Block access For internal users When any risk is detected.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Admin protection - Azure management Require MFA.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Admin protection - Azure management Require trusted location.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Application protection - Specific apps Require MFA.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Application protection - Specific apps Require trusted location.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Attack surface reduction - All apps Block access When using active sync.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Attack surface reduction - All apps Block access When using legacy authentication.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Base protection - All apps Block access For internal users When high risk is detected.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Base protection - All apps Require MFA For internal users When medium risk is detected.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Base protection - All apps Require MFA or trusted device or trusted location.json" />
+    <Content Include="Content\PolicySets\Network trust with AADP2\Base protection - Register security information Require trusted device or location For internal users.json" />
     <None Include="Properties\PublishProfiles\mwconciergedev - Web Deploy.pubxml" />
     <Content Include="Scripts\esm\popper-utils.js" />
     <Content Include="Scripts\esm\popper-utils.min.js" />

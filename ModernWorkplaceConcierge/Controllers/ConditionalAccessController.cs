@@ -10,9 +10,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using System.Data;
-using System.Text.RegularExpressions;
-using CsvHelper;
-using System.Globalization;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -107,7 +104,7 @@ namespace ModernWorkplaceConcierge.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateGroup(string displayName, string selectedBaseline, string policyPrefix, string allowLegacyAuth, string clientId = null)
+        public async Task<ActionResult> DeployBaseline(string displayName, string selectedBaseline, string policyPrefix, string allowLegacyAuth, string clientId = null)
         {
             SignalRMessage signalR = new SignalRMessage
             {
@@ -286,7 +283,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
             dataTable.BeginInit();
             dataTable.Columns.Add("Name");
-            dataTable.Columns.Add("Description");
+            dataTable.Columns.Add("State");
             dataTable.Columns.Add("IncludedUsers");
             dataTable.Columns.Add("ExcludedUsers");
             dataTable.Columns.Add("IncludedGroups");
@@ -296,10 +293,10 @@ namespace ModernWorkplaceConcierge.Controllers
             dataTable.Columns.Add("IncludedApps");
             dataTable.Columns.Add("ExcludedApps");
             dataTable.Columns.Add("ClientAppTypes");
-            dataTable.Columns.Add("ExcludePlatforms");
             dataTable.Columns.Add("IncludePlatforms");
-            dataTable.Columns.Add("ExcludeLocations");
+            dataTable.Columns.Add("ExcludePlatforms");
             dataTable.Columns.Add("IncludeLocations");
+            dataTable.Columns.Add("ExcludeLocations");
             dataTable.Columns.Add("IncludeDeviceStates");
             dataTable.Columns.Add("ExcludeDeviceStates");
             dataTable.Columns.Add("GrantControls");
@@ -320,6 +317,7 @@ namespace ModernWorkplaceConcierge.Controllers
                     DataRow row = dataTable.NewRow();
 
                     row["Name"] = conditionalAccessPolicy.displayName;
+                    row["State"] = conditionalAccessPolicy.state;
                     row["IncludedUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeUsers))}\"";
                     row["ExcludedUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeUsers))}\"";
                     row["IncludedGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeGroups))}\"";
@@ -364,8 +362,8 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     if (conditionalAccessPolicy.grantControls != null && conditionalAccessPolicy.grantControls.builtInControls != null)
                     {
-                        row["GrantControlsOperator"] = $"\"{String.Join("\n", conditionalAccessPolicy.grantControls.builtInControls)}\"";
-                        row["GrantControls"] = $"\"{String.Join("\n", conditionalAccessPolicy.grantControls.op)}\"";
+                        row["GrantControls"] = $"\"{String.Join("\n", conditionalAccessPolicy.grantControls.builtInControls)}\"";
+                        row["GrantControlsOperator"] = $"\"{String.Join("\n", conditionalAccessPolicy.grantControls.op)}\"";
                     }
 
                     if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.applicationEnforcedRestrictions != null)
@@ -415,7 +413,9 @@ namespace ModernWorkplaceConcierge.Controllers
                 signalR.sendMessage("Success: Report generated");
             }
 
-            return File(Encoding.ASCII.GetBytes(sb.ToString()), "application/text", "ConditionalAccessReport.csv");
+            string domainName = await GraphHelper.GetDefaultDomain(clientId);
+
+            return File(Encoding.ASCII.GetBytes(sb.ToString()), "text/csvt", "ConditionalAccessReport_" + domainName +".csv");
         }
     }   
 }
