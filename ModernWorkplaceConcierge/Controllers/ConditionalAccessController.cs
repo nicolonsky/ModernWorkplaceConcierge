@@ -318,12 +318,14 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     row["Name"] = conditionalAccessPolicy.displayName;
                     row["State"] = conditionalAccessPolicy.state;
+
                     row["IncludedUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeUsers))}\"";
                     row["ExcludedUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeUsers))}\"";
                     row["IncludedGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeGroups))}\"";
                     row["ExcludedGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeGroups))}\"";
                     row["IncludedRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeRoles))}\"";
                     row["ExcludedRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeRoles))}\"";
+
                     row["IncludedApps"] = $"\"{String.Join("\n", azureADIDCache.getApplicationDisplayNames(conditionalAccessPolicy.conditions.applications.includeApplications))}\"";
                     row["ExcludedApps"] = $"\"{String.Join("\n", azureADIDCache.getApplicationDisplayNames(conditionalAccessPolicy.conditions.applications.excludeApplications))}\"";
                     

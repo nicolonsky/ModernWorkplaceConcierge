@@ -402,6 +402,10 @@ namespace ModernWorkplaceConcierge.Helpers
                     }
 
                 }
+                else
+                {
+                    displayNames.Add(applicationID);
+                }
             }
             return displayNames;
         }
