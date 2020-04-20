@@ -258,6 +258,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\AutopilotConfiguration.cs" />
+    <Compile Include="Helpers\AzureADApplicationIdentifiers.cs" />
     <Compile Include="Helpers\AzureADIDCache.cs" />
     <Compile Include="Helpers\ConditionalAccessPolicy.cs" />
     <Compile Include="Helpers\DeviceManagementScripts.cs" />

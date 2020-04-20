@@ -284,14 +284,20 @@ namespace ModernWorkplaceConcierge.Controllers
             dataTable.BeginInit();
             dataTable.Columns.Add("Name");
             dataTable.Columns.Add("State");
+
+            // Assignments: first include then exclude
             dataTable.Columns.Add("IncludedUsers");
-            dataTable.Columns.Add("ExcludedUsers");
             dataTable.Columns.Add("IncludedGroups");
-            dataTable.Columns.Add("ExcludedGroups");
             dataTable.Columns.Add("IncludedRoles");
+
+            dataTable.Columns.Add("ExcludedUsers");
+            dataTable.Columns.Add("ExcludedGroups");
             dataTable.Columns.Add("ExcludedRoles");
+
+
             dataTable.Columns.Add("IncludedApps");
             dataTable.Columns.Add("ExcludedApps");
+            dataTable.Columns.Add("IncludeUserActions");
             dataTable.Columns.Add("ClientAppTypes");
             dataTable.Columns.Add("IncludePlatforms");
             dataTable.Columns.Add("ExcludePlatforms");
@@ -326,9 +332,12 @@ namespace ModernWorkplaceConcierge.Controllers
                     row["IncludedRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeRoles))}\"";
                     row["ExcludedRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeRoles))}\"";
 
-                    row["IncludedApps"] = $"\"{String.Join("\n", azureADIDCache.getApplicationDisplayNames(conditionalAccessPolicy.conditions.applications.includeApplications))}\"";
-                    row["ExcludedApps"] = $"\"{String.Join("\n", azureADIDCache.getApplicationDisplayNames(conditionalAccessPolicy.conditions.applications.excludeApplications))}\"";
-                    
+                    row["IncludedApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.includeApplications))}\"";
+                    row["ExcludedApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.excludeApplications))}\"";
+
+
+                    row["IncludeUserActions"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.includeUserActions))}\"";
+
 
                     if (conditionalAccessPolicy.conditions.platforms != null && conditionalAccessPolicy.conditions.platforms.includePlatforms != null)
                     {
@@ -410,12 +419,12 @@ namespace ModernWorkplaceConcierge.Controllers
                 sb.AppendLine(string.Join(",", fields));
             }
 
+            string domainName = await GraphHelper.GetDefaultDomain(clientId);
+
             if (!string.IsNullOrEmpty(clientId))
             {
                 signalR.sendMessage("Success: Report generated");
             }
-
-            string domainName = await GraphHelper.GetDefaultDomain(clientId);
 
             return File(Encoding.ASCII.GetBytes(sb.ToString()), "text/csvt", "ConditionalAccessReport_" + domainName +".csv");
         }

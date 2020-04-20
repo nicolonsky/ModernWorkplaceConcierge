@@ -806,6 +806,21 @@ public static class GraphHelper
         return roles.CurrentPage;
     }
 
+    public static async Task<IEnumerable<ServicePrincipal>> GetServicePrincipals(string clientId = null)
+    {
+        var graphClient = GetAuthenticatedClient();
+
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+            hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.ServicePrincipals.Request().RequestUrl);
+        }
+
+        var servicePrincipals = await graphClient.ServicePrincipals.Request().GetAsync();
+
+        return servicePrincipals.CurrentPage;
+    }
+
     public static async Task<User> GetUserById(string Id, string clientId = null)
     {
         var graphClient = GetAuthenticatedClient();
