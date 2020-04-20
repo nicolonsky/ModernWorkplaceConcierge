@@ -13,7 +13,6 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-- group: 'IntuneConciergeKeyVault'
 - name: 'solution'
   value: '**/*.sln'
 - name: 'buildPlatform'
@@ -29,16 +28,6 @@ steps:
     command: 'restore'
     restoreSolution: '**/*.sln'
     feedsToUse: 'select'
-
-- task: replacetokens@3
-  inputs:
-    targetFiles: '**/*.config'
-    encoding: 'auto'
-    writeBOM: true
-    actionOnMissing: 'warn'
-    keepToken: false
-    tokenPrefix: '#{'
-    tokenSuffix: '}#'
 - task: VersionAssemblies@2
   inputs:
     Path: '$(Build.SourcesDirectory)'
