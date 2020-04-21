@@ -64,6 +64,19 @@ public static class GraphHelper
         conditionalAccessPolicy.createdDateTime = null;
         conditionalAccessPolicy.modifiedDateTime = null;
 
+
+        // Check for device state and display warning (API issue)
+
+        if (conditionalAccessPolicy.conditions.deviceStates != null)
+        {
+            signalR.sendMessage("Warning device states are currently not imported by the Graph API, you need to enable them manually on the policy!");
+        }
+
+        if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.applicationEnforcedRestrictions != null)
+        {
+            signalR.sendMessage("Warning you need to enable Exchange online and SharePoint online for app enforced restrictions!");
+        }
+
         try
         {
             string requestContent = JsonConvert.SerializeObject(conditionalAccessPolicy, new JsonSerializerSettings()
@@ -295,7 +308,7 @@ public static class GraphHelper
     {
         var graphClient = GetAuthenticatedClient();
 
-        string requestUrl = graphEndpoint + "/conditionalAccess/policies";
+        string requestUrl = graphEndpoint + "/identity/conditionalAccess/policies";
 
         HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
         {
@@ -740,7 +753,7 @@ public static class GraphHelper
     {
         var graphClient = GetAuthenticatedClient();
 
-        string requestUrl = graphEndpoint + "/conditionalAccess/policies";
+        string requestUrl = graphEndpoint + "/identity/conditionalAccess/policies";
 
         HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
 
