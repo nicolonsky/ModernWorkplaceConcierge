@@ -19,6 +19,7 @@ namespace ModernWorkplaceConcierge.Helpers
         private string clientId;
         private IEnumerable<DirectoryRoleTemplate> roleTemplates;
         private IEnumerable<ServicePrincipal> servicePrincipals;
+        private IEnumerable<NamedLocation> namedLocations;
 
         public AzureADIDCache (string clientId = null)
         {
@@ -101,6 +102,30 @@ namespace ModernWorkplaceConcierge.Helpers
                 else
                 {
                     displayNames.Add(roleID);
+                }
+            }
+            return displayNames;
+        }
+
+        public async Task<List<string>> getNamedLocationDisplayNamesAsync(string[] locationIDs)
+        {
+
+            if (namedLocations == null || namedLocations.Count() == 0)
+            {
+                namedLocations = await GraphHelper.GetNamedLocationsAsync(clientId);
+            }
+
+            List<String> displayNames = new List<string>();
+            foreach (String locationID in locationIDs)
+            {
+                // Check for UID
+                if (Guid.TryParse(locationID, out Guid result))
+                {
+                    displayNames.Add(namedLocations.Where(loc => loc.Id == locationID).Select(loc => loc.DisplayName).First());
+                }
+                else
+                {
+                    displayNames.Add(locationID);
                 }
             }
             return displayNames;

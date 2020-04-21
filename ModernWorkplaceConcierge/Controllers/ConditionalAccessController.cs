@@ -351,12 +351,12 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     if (conditionalAccessPolicy.conditions.locations != null && conditionalAccessPolicy.conditions.locations.includeLocations != null)
                     {
-                        row["IncludeLocations"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.locations.includeLocations)}\"";
+                        row["IncludeLocations"] = $"\"{String.Join("\n", await azureADIDCache.getNamedLocationDisplayNamesAsync(conditionalAccessPolicy.conditions.locations.includeLocations))}\"";
                     }
 
                     if (conditionalAccessPolicy.conditions.locations != null && conditionalAccessPolicy.conditions.locations.excludeLocations != null)
                     {
-                        row["ExcludeLocations"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.locations.excludeLocations)}\"";
+                        row["ExcludeLocations"] = $"\"{String.Join("\n", await azureADIDCache.getNamedLocationDisplayNamesAsync(conditionalAccessPolicy.conditions.locations.excludeLocations))}\"";
                     }
 
                     row["ClientAppTypes"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.clientAppTypes)}\"";
@@ -389,13 +389,12 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.persistentBrowser != null)
                     {
-                        row["PersistentBrowser"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.persistentBrowser.mode)}\"";
+                        row["PersistentBrowser"] = conditionalAccessPolicy.sessionControls.persistentBrowser.mode;
                     }
 
                     if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.signInFrequency != null)
                     {
-                        row["SignInFrequency"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.signInFrequency.isEnabled)}\"";
-                        row["SignInFrequency"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.signInFrequency.type)}\"";
+                        row["SignInFrequency"] = conditionalAccessPolicy.sessionControls.signInFrequency.value + " " + conditionalAccessPolicy.sessionControls.signInFrequency.type;
                     }
 
                     // Add new row to table

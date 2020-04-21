@@ -279,7 +279,8 @@ namespace ModernWorkplaceConcierge.Helpers
                 {"71234da4-b92f-429d-b8ec-6e62652e50d7", "MicrosoftCustomerEngagementPortal"},
                 {"b861dbcc-a7ef-4219-a005-0e4de4ea7dcf", "DataExportServiceforMicrosoftDynamics365"},
                 {"2db8cb1d-fb6c-450b-ab09-49b6ae35186b", "MicrosoftDynamicsCRMLearningPath"},
-                {"2e49aa60-1bd3-43b6-8ab6-03ada3d9f08b", "DynamicsDataIntegration"}
+                {"2e49aa60-1bd3-43b6-8ab6-03ada3d9f08b", "DynamicsDataIntegration"},
+                {"d1ddf0e4-d672-4dae-b554-9d5bdfd93547", "Microsoft Intune Powershell" }
             };
     }
 }

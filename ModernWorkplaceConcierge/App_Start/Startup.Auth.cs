@@ -15,6 +15,7 @@ using System.Configuration;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
+using System;
 
 namespace ModernWorkplaceConcierge
 {
@@ -44,6 +45,7 @@ namespace ModernWorkplaceConcierge
                     TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = false
+
                     },
                     Notifications = new OpenIdConnectAuthenticationNotifications
                     {
@@ -86,12 +88,23 @@ namespace ModernWorkplaceConcierge
 
                 var userDetails = await GraphHelper.GetUserDetailsAsync(result.AccessToken);
 
+                string profilePhoto;
+                var photo = await GraphHelper.GetUserPhotoAsync(result.AccessToken);
+                if (photo != null)
+                {
+                    profilePhoto = "data:image/png;base64, " + Convert.ToBase64String(photo);
+                }
+                else
+                {
+                    profilePhoto = null;
+                }
+                
                 var cachedUser = new CachedUser()
                 {
                     DisplayName = userDetails.DisplayName,
                     Email = string.IsNullOrEmpty(userDetails.Mail) ?
                     userDetails.UserPrincipalName : userDetails.Mail,
-                    Avatar = string.Empty
+                    Avatar = profilePhoto
                 };
 
                 tokenStore.SaveUserDetails(cachedUser);

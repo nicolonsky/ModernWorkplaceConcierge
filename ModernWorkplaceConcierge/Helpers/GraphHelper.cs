@@ -18,6 +18,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using Microsoft.AspNet.SignalR;
+using System.IO;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
@@ -331,6 +332,21 @@ public static class GraphHelper
         ModernWorkplaceConcierge.Helpers.ConditionalAccessPolicy conditionalAccessPolicyResult = JsonConvert.DeserializeObject<ModernWorkplaceConcierge.Helpers.ConditionalAccessPolicy>(await response.Content.ReadAsStringAsync());
 
         return conditionalAccessPolicyResult;
+    }
+
+    public static async Task<IEnumerable<NamedLocation>> GetNamedLocationsAsync(string clientId = null)
+    {
+        var graphClient = GetAuthenticatedClient();
+
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
+            hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.ConditionalAccess.NamedLocations.Request().RequestUrl);
+        }
+
+        var namedLocations = await graphClient.ConditionalAccess.NamedLocations.Request().GetAsync();
+
+        return namedLocations.CurrentPage;
     }
 
     // Get's ESP, Enrollment restrictions, WHFB settings etc...
@@ -1021,16 +1037,33 @@ public static class GraphHelper
     public static async Task<User> GetUserDetailsAsync(string accessToken)
     {
         var graphClient = new GraphServiceClient(
-            new Microsoft.Graph.DelegateAuthenticationProvider(
+            new DelegateAuthenticationProvider(
                 async (requestMessage) =>
                 {
-                     requestMessage.Headers.Authorization =
+                    requestMessage.Headers.Authorization =
                         new AuthenticationHeaderValue("Bearer", accessToken);
                 }));
 
         return await graphClient.Me.Request().GetAsync();
-
     }
+
+    public static async Task<byte[]> GetUserPhotoAsync(string accessToken)
+    {
+        var graphClient = new GraphServiceClient(
+            new DelegateAuthenticationProvider(
+                async (requestMessage) =>
+                {
+                    requestMessage.Headers.Authorization = 
+                       new AuthenticationHeaderValue("Bearer", accessToken);
+                }));
+
+        var content =  await graphClient.Me.Photo.Content.Request().GetAsync();
+
+        byte[] bytes = new byte[content.Length];
+        content.Read(bytes, 0, (int)content.Length);
+        return bytes;
+    }
+
 
     private static GraphServiceClient GetAuthenticatedClient()
     {
