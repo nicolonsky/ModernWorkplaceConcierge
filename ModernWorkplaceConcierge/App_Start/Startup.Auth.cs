@@ -89,21 +89,31 @@ namespace ModernWorkplaceConcierge
                 var userDetails = await GraphHelper.GetUserDetailsAsync(result.AccessToken);
 
                 string profilePhoto;
-                var photo = await GraphHelper.GetUserPhotoAsync(result.AccessToken);
-                if (photo != null)
+
+                try
                 {
-                    profilePhoto = "data:image/png;base64, " + Convert.ToBase64String(photo);
+                    
+                    var photo = await GraphHelper.GetUserPhotoAsync(result.AccessToken);
+                    if (photo != null)
+                    {
+                        profilePhoto = "data:image/png;base64, " + Convert.ToBase64String(photo);
+                    }
+                    else
+                    {
+                        profilePhoto = null;
+                    }
                 }
-                else
+                catch
                 {
                     profilePhoto = null;
                 }
+
+                
                 
                 var cachedUser = new CachedUser()
                 {
                     DisplayName = userDetails.DisplayName,
-                    Email = string.IsNullOrEmpty(userDetails.Mail) ?
-                    userDetails.UserPrincipalName : userDetails.Mail,
+                    Email = userDetails.UserPrincipalName,
                     Avatar = profilePhoto
                 };
 
