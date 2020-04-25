@@ -20,11 +20,13 @@ namespace ModernWorkplaceConcierge.Helpers
         private IEnumerable<DirectoryRoleTemplate> roleTemplates;
         private IEnumerable<ServicePrincipal> servicePrincipals;
         private IEnumerable<NamedLocation> namedLocations;
+        private GraphConditionalAccess graphConditionalAccess;
 
         public AzureADIDCache (string clientId = null)
         {
             this.clientId = clientId;
             this.graphCache = new Dictionary<string, string>();
+            this.graphConditionalAccess = new GraphConditionalAccess(clientId);
         }
 
         public async System.Threading.Tasks.Task<List<string>> getUserDisplayNamesAsync(string[] userIDs)
@@ -112,7 +114,7 @@ namespace ModernWorkplaceConcierge.Helpers
 
             if (namedLocations == null || namedLocations.Count() == 0)
             {
-                namedLocations = await GraphHelper.GetNamedLocationsAsync(clientId);
+                namedLocations = await graphConditionalAccess.GetNamedLocationsAsync();
             }
 
             List<String> displayNames = new List<string>();

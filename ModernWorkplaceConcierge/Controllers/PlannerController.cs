@@ -36,9 +36,7 @@ namespace ModernWorkplaceConcierge.Controllers
         [HttpPost]
         public async System.Threading.Tasks.Task<ActionResult> Import(HttpPostedFileBase file, string PlannerPlan, string clientId)
         {
-            SignalRMessage signalR = new SignalRMessage();
-            signalR.clientId = clientId;
-
+            SignalRMessage signalR = new SignalRMessage(clientId);
             try {
 
                 // Get current planner object

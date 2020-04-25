@@ -108,8 +108,6 @@ namespace ModernWorkplaceConcierge
                     profilePhoto = null;
                 }
 
-                
-                
                 var cachedUser = new CachedUser()
                 {
                     DisplayName = userDetails.DisplayName,

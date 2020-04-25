@@ -4,11 +4,9 @@
 
 <div class="jumbotron">
     <h1>Import Conditional Access policies</h1>
-    <p>Import previously exported Conditional Access policies from *.zip or *.json file(s) to your tenant.</p>
+    <p>Import previously exported Conditional Access policies to your tenant.</p>
     <ul>
-        <li>No items will be overwritten as this tool performs only POST requests</li>
-        <li>Policies are imported with "disabled" state</li>
-        <li>Unavailable group and application ID's (when exported from another tenant) might get discarded on import</li>
+        <li>Unavailable group and application ID's (when exported from another tenant) might be discarded on imports</li>
     </ul>
 </div>
 
@@ -20,10 +18,17 @@
     <div class="form-row">
         <div class="col">
             <div class="form-group">
+                <label for="overwriteBehaviour">File</label>
                 <div class="custom-file">
                     <input type="file" name="files" class="custom-file-input" id="file" accept=".json,.zip" multiple>
-                    <label class="custom-file-label" for="file">Choose file</label>
+                    <label class="custom-file-label overflow-hidden" for="file">Choose file</label>
                 </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="overwriteBehaviour">When a policy already exists (based on it's ObjectID)</label>
+                @Html.DropDownList("overwriteBehaviour", EnumHelper.GetSelectList(typeof(ModernWorkplaceConcierge.Models.OverwriteBehaviour)), new { @class = "form-control" })
             </div>
         </div>
         <script>

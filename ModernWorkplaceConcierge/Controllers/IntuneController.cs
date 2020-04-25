@@ -28,9 +28,7 @@ namespace ModernWorkplaceConcierge.Controllers
         [HttpPost]
         public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files, string clientId)
         {
-            SignalRMessage signalR = new SignalRMessage();
-            signalR.clientId = clientId;
-
+            SignalRMessage signalR = new SignalRMessage(clientId);
             try
             {
 
