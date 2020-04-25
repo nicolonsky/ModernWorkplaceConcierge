@@ -16,15 +16,8 @@ using System.Web;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
-    public class GraphConditionalAccess
+    public class GraphConditionalAccess : GraphClient
     {
-        // Load configuration settings from PrivateSettings.config
-        private static readonly string appId = ConfigurationManager.AppSettings["AppId"];
-        private static readonly string appSecret = ConfigurationManager.AppSettings["AppSecret"];
-        private static readonly string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
-        private static readonly string graphScopes = ConfigurationManager.AppSettings["AppScopes"];
-        private static readonly string graphEndpoint = ConfigurationManager.AppSettings["GraphEndpoint"];
-
         private GraphServiceClient graphServiceClient;
         private string clientId;
         private SignalRMessage signalRMessage;
@@ -34,35 +27,6 @@ namespace ModernWorkplaceConcierge.Helpers
             this.graphServiceClient = GetAuthenticatedClient();
             this.clientId = clientId;
             this.signalRMessage = new SignalRMessage(clientId);
-        }
-
-        private Microsoft.Graph.GraphServiceClient GetAuthenticatedClient()
-        {
-            return new Microsoft.Graph.GraphServiceClient(
-                new Microsoft.Graph.DelegateAuthenticationProvider(
-                    async (requestMessage) =>
-                    {
-                        var idClient = ConfidentialClientApplicationBuilder.Create(appId)
-                            .WithRedirectUri(redirectUri)
-                            .WithClientSecret(appSecret)
-                            .Build();
-
-                        var tokenStore = new SessionTokenStore(idClient.UserTokenCache,
-                            HttpContext.Current, ClaimsPrincipal.Current);
-
-                        var accounts = await idClient.GetAccountsAsync();
-
-                    // By calling this here, the token can be refreshed
-                    // if it's expired right before the Graph call is made
-                    var scopes = graphScopes.Split(' ');
-                        var result = await idClient.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
-                            .ExecuteAsync();
-
-                        requestMessage.Headers.Authorization =
-                            new AuthenticationHeaderValue("Bearer", result.AccessToken);
-                    }
-                )
-            );
         }
 
         public async Task<IEnumerable<NamedLocation>> GetNamedLocationsAsync(string clientId = null)
@@ -171,13 +135,14 @@ namespace ModernWorkplaceConcierge.Helpers
         public async Task<IEnumerable<ConditionalAccessPolicy>> GetConditionalAccessPoliciesAsync(string clientId = null)
         {
 
-            string requestUrl = graphEndpoint + "/identity/conditionalAccess/policies";
+            string requestUrl = $"{graphEndpoint}/identity/conditionalAccess/policies";
+
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);
 
             // Authenticate (add access token) our HttpRequestMessage
             await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
 
-            signalRMessage.sendMessage("GET: " + requestUrl);
+            signalRMessage.sendMessage($"{hrm.Method}:  { requestUrl}");
 
             // Send the request and get the response.
             HttpResponseMessage response = await graphServiceClient.HttpProvider.SendAsync(hrm);
@@ -186,6 +151,26 @@ namespace ModernWorkplaceConcierge.Helpers
             ConditionalAccessPolicies conditionalAccessPolicies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(result);
 
             return conditionalAccessPolicies.Value;
+        }
+
+        public async Task ClearConditonalAccessPolicies()
+        {
+            var policies = await graphServiceClient.ConditionalAccess.Policies.Request().GetAsync();
+
+            foreach (Microsoft.Graph.ConditionalAccessPolicy policy in policies)
+            {
+                string requestUrl = $"{graphEndpoint}/conditionalAccess/policies/{policy.Id}";
+
+                HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
+
+                signalRMessage.sendMessage($"{hrm.Method}:  { requestUrl}");
+
+                // Authenticate (add access token) our HttpRequestMessage
+                await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+
+                // Send the request and get the response.
+                HttpResponseMessage response = await graphServiceClient.HttpProvider.SendAsync(hrm);
+            }
         }
     }
 }

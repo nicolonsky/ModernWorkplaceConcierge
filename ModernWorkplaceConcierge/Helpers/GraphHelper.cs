@@ -274,28 +274,6 @@ public static class GraphHelper
         return deviceManagementScripts.CurrentPage;
     }
 
-
-    public static async Task<IEnumerable<PlannerPlan>> GetplannerPlans()
-    {
-        var graphClient = GetAuthenticatedClient();
-
-        //SendMessage("GET: " +"GET: " +graphClient.Me.Planner.Plans.Request().RequestUrl);
-        var response = await graphClient.Me.Planner.Plans.Request().GetAsync();
-        return response.CurrentPage;
-    }
-
-    public static async Task<PlannerPlan> GetplannerPlan(string id, string clientId = null)
-    {
-        var graphClient = GetAuthenticatedClient();
-        if (!string.IsNullOrEmpty(clientId))
-        {
-            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-            hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Planner.Plans[id].Request().RequestUrl);
-        }
-        var response = await graphClient.Planner.Plans[id].Request().GetAsync();
-        return response;
-    }
-
     public static async Task<User> GetUser(string displayName, string clientId = null)
     {
         var graphClient = GetAuthenticatedClient();
@@ -315,103 +293,9 @@ public static class GraphHelper
         return response.CurrentPage.First();
     }
 
-    public static async Task<PlannerTask> AddPlannerTask(PlannerTask plannerTask, string clientId)
-    {
-        var graphClient = GetAuthenticatedClient();
+   
 
-        if (!string.IsNullOrEmpty(clientId))
-        {
-            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-            hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.Planner.Tasks.Request().RequestUrl);
-        }
-        var response = await graphClient.Planner.Tasks.Request().AddAsync(plannerTask);
-
-        return response;
-    }
-
-    public static async Task<PlannerTaskDetails> GetPlannerTaskDetails(string taskId)
-    {
-        var graphClient = GetAuthenticatedClient();
-        var response = await graphClient
-            .Planner
-            .Tasks[taskId]
-            .Details
-            .Request()
-            .GetAsync();
-
-        return response;
-    }
-
-    public static async Task<IEnumerable<PlannerBucket>> GetPlannerBuckets(string planId, string clientId = null)
-    {
-        var graphClient = GetAuthenticatedClient();
-        if (!string.IsNullOrEmpty(clientId))
-        {
-            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-            hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Planner.Plans[planId].Buckets.Request().RequestUrl);
-        }
-        var response = await graphClient
-                .Planner
-                .Plans[planId]
-                .Buckets
-                .Request()
-                .GetAsync();
-
-        return response.CurrentPage;
-    }
-
-    public static async Task<PlannerBucket> AddPlannerBucket(PlannerBucket plannerBucket, string clientId = null)
-    {
-        var graphClient = GetAuthenticatedClient();
-
-        if (!string.IsNullOrEmpty(clientId))
-        {
-            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-            hubContext.Clients.Client(clientId).addMessage("POST: " + graphClient.Planner.Buckets.Request().RequestUrl);
-        }
-        var response = await graphClient
-                .Planner
-                .Buckets
-                .Request()
-                .AddAsync(plannerBucket);
-
-        return response;
-    }
-
-    public static async Task<PlannerTaskDetails> AddPlannerTaskDetails(PlannerTaskDetails plannerTaskDetails, string taskId, string clientId = null)
-    {
-
-        var graphClient = GetAuthenticatedClient();
-
-        if (!string.IsNullOrEmpty(clientId))
-        {
-            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-            hubContext.Clients.Client(clientId).addMessage("GET: " + graphClient.Planner.Tasks[taskId].Details.Request().RequestUrl);
-        }
-
-        var originalTaskDescription = await graphClient
-                .Planner
-                .Tasks[taskId]
-                .Details
-                .Request()
-                .GetAsync();
-
-        if (!string.IsNullOrEmpty(clientId))
-        {
-            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MwHub>();
-            hubContext.Clients.Client(clientId).addMessage("PATCH: " + graphClient.Planner.Tasks[taskId].Details.Request().RequestUrl);
-        }
-
-        var response = await graphClient
-                .Planner
-                .Tasks[taskId]
-                .Details
-                .Request()
-                .Header("If-Match", originalTaskDescription.GetEtag())
-                .UpdateAsync(plannerTaskDetails);
-
-        return response;
-    }
+    
 
     public static async Task<IEnumerable<DeviceAndAppManagementRoleAssignment>> GetRoleAssignments(string clientId = null)
     {
@@ -437,31 +321,6 @@ public static class GraphHelper
             .AddAsync(roleAssignment);
 
         return response;
-    }
-
-    public static async Task ClearConditonalAccessPolicies ()
-    {
-        var graphClient = GetAuthenticatedClient();
-        var policies = await graphClient
-            .ConditionalAccess
-            .Policies
-            .Request()
-            .GetAsync();
-
-
-        foreach (Microsoft.Graph.ConditionalAccessPolicy policy in policies)
-        {
-            string requestUrl = graphEndpoint + "/conditionalAccess/policies/" + policy.Id;
-
-            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
-
-            // Authenticate (add access token) our HttpRequestMessage
-            await graphClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
-
-            // Send the request and get the response.
-            HttpResponseMessage response = await graphClient.HttpProvider.SendAsync(hrm);
-        }
-       
     }
 
     public static async Task<IEnumerable<RoleScopeTag>> GetRoleScopeTags(string clientId = null)

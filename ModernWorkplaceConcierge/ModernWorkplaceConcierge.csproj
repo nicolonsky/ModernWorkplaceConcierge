@@ -263,8 +263,10 @@
     <Compile Include="Helpers\ConditionalAccessPolicy.cs" />
     <Compile Include="Helpers\DeviceManagementScripts.cs" />
     <Compile Include="Helpers\FilenameHelper.cs" />
+    <Compile Include="Helpers\GraphClient.cs" />
     <Compile Include="Helpers\GraphConditionalAccess.cs" />
     <Compile Include="Helpers\GraphHelper.cs" />
+    <Compile Include="Helpers\GraphPlanner.cs" />
     <Compile Include="Helpers\MwHub.cs" />
     <Compile Include="Models\Alert.cs" />
     <Compile Include="Models\OverwriteBehaviour.cs" />

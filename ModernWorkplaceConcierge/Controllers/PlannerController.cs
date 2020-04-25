@@ -23,7 +23,8 @@ namespace ModernWorkplaceConcierge.Controllers
             try
             {
                 // Get all plans
-                var plans = await GraphHelper.GetplannerPlans();
+                GraphPlanner graphPlanner = new GraphPlanner(null);
+                var plans = await graphPlanner.GetplannerPlansAsync();
 
                 return View(plans);
             }
@@ -37,10 +38,11 @@ namespace ModernWorkplaceConcierge.Controllers
         public async System.Threading.Tasks.Task<ActionResult> Import(HttpPostedFileBase file, string PlannerPlan, string clientId)
         {
             SignalRMessage signalR = new SignalRMessage(clientId);
+            GraphPlanner graphPlanner = new GraphPlanner(clientId);
             try {
 
                 // Get current planner object
-                var planner = await GraphHelper.GetplannerPlan(PlannerPlan);
+                var planner = await graphPlanner.GetplannerPlanAsync(PlannerPlan);
                 
                 // Count imported tasks
                 int importedTasksCounter = 0;
@@ -72,7 +74,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 }
 
                 // Get existing planner buckets
-                IEnumerable<PlannerBucket> plannerBuckets = await GraphHelper.GetPlannerBuckets(PlannerPlan, clientId);
+                IEnumerable<PlannerBucket> plannerBuckets = await graphPlanner.GetPlannerBucketsAsync(PlannerPlan);
 
                 // Create planner bucket if not exists
                 foreach (string bucket in bucketsToCreate)
@@ -87,7 +89,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                 PlanId = PlannerPlan
                             };
 
-                            var reponse = await GraphHelper.AddPlannerBucket(plannerBucket, clientId);
+                            var reponse = await graphPlanner.AddPlannerBucketAsync(plannerBucket);
                         }
                     }
                     catch
@@ -96,7 +98,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 }
 
                 // Get available planner buckets
-                plannerBuckets = await GraphHelper.GetPlannerBuckets(PlannerPlan, clientId);
+                plannerBuckets = await graphPlanner.GetPlannerBucketsAsync(PlannerPlan);
 
                 // create tasks
                 foreach (JToken task in trelloBoard.SelectToken("cards"))
@@ -172,7 +174,7 @@ namespace ModernWorkplaceConcierge.Controllers
                             }
 
                             // Add the task
-                            var request = await GraphHelper.AddPlannerTask(plannerTask, clientId);
+                            var request = await graphPlanner.AddPlannerTaskAsync(plannerTask);
 
                             signalR.sendMessage("Successfully imported task '" + request.Title + "'");
 
@@ -254,7 +256,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                     signalR.sendMessage("Error: " + e.Message);
                                 }
 
-                                var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id, clientId);
+                                var response = await graphPlanner.AddPlannerTaskDetailsAsync(plannerTaskDetails, request.Id);
                             }
 
                         }
