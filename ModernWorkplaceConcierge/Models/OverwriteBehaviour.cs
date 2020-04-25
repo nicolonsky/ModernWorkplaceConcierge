@@ -11,6 +11,7 @@ namespace ModernWorkplaceConcierge.Models
     {
         IMPORT_AS_DUPLICATE,
         DISCARD,
-        OVERWRITE,
+        OVERWRITE_BY_ID,
+        OVERWRITE_BY_NAME
     }
 }

@@ -106,26 +106,33 @@ namespace ModernWorkplaceConcierge.Controllers
                             case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
                                 await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
                                 break;
-                            case OverwriteBehaviour.OVERWRITE:
+                            case OverwriteBehaviour.OVERWRITE_BY_ID:
 
                                 // match by object ID
                                 if (conditionalAccessPolicies.Any(policy => policy.id.Equals(conditionalAccessPolicy.id)))
                                 {
                                     await graphConditionalAccess.PatchConditionalAccessPolicyAsync(conditionalAccessPolicy);
                                 }
-                                //// Match by displayName and replace Object ID of existing policy
-                                //else if (conditionalAccessPolicies.Any(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)))
-                                //{
-                                //    string replaceObjectId = conditionalAccessPolicies.Where(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)).Select(policy => policy.id).First();
-                                //    conditionalAccessPolicy.id = replaceObjectId;
-                                //    await graphConditionalAccess.PatchConditionalAccessPolicyAsync(conditionalAccessPolicy);
-                                //}
                                 // Create a new policy
                                 else
                                 {
                                     var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
                                     signalRMessage.sendMessage($"Success: created CA policy: '{result.displayName}' ({result.id})");
                                 }
+                                break;
+                            case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                                if (conditionalAccessPolicies.Any(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)))
+                                {
+                                    string replaceObjectId = conditionalAccessPolicies.Where(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)).Select(policy => policy.id).First();
+                                    conditionalAccessPolicy.id = replaceObjectId;
+                                    await graphConditionalAccess.PatchConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                                }
+                                else
+                                {
+                                    var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                                    signalRMessage.sendMessage($"Success: created CA policy: '{result.displayName}' ({result.id})");
+                                }
+
                                 break;
                         }
                     }
