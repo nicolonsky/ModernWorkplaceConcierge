@@ -4,14 +4,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Web;
 using System.Web.Mvc;
-using Newtonsoft.Json;
 using Microsoft.Graph;
 using System.Text;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using Microsoft.AspNet.SignalR;
-using Microsoft.AspNetCore.Mvc;
 
 
 namespace ModernWorkplaceConcierge.Controllers
@@ -31,6 +25,7 @@ namespace ModernWorkplaceConcierge.Controllers
             SignalRMessage signalR = new SignalRMessage(clientId);
             try
             {
+                GraphIntuneImport graphIntuneImport = new GraphIntuneImport(clientId);
 
                 if (files.Length > 0 && files[0].FileName.Contains(".json"))
                 {
@@ -42,7 +37,7 @@ namespace ModernWorkplaceConcierge.Controllers
                             byte[] binData = b.ReadBytes(file.ContentLength);
                             string result = Encoding.UTF8.GetString(binData);
 
-                            string response = await GraphHelper.AddIntuneConfig(result, clientId);
+                            string response = await graphIntuneImport.AddIntuneConfig(result);
                             signalR.sendMessage("Success " + response);
 
                         }
@@ -82,7 +77,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                                         if (!string.IsNullOrEmpty(result))
                                                         {
-                                                            string response = await GraphHelper.AddIntuneConfig(result, clientId);
+                                                            string response = await graphIntuneImport.AddIntuneConfig(result);
 
                                                             if (!(string.IsNullOrEmpty(response)))
                                                             {
@@ -126,52 +121,17 @@ namespace ModernWorkplaceConcierge.Controllers
             return View();
         }
 
-        // GET: Export
-        public async System.Threading.Tasks.Task<ViewResult> Roles()
-        {
-            try
-            {
-                var roleDefinitions = await GraphHelper.GetRoleDefinitions();
-
-                return View(roleDefinitions);
-            }
-            catch (Exception e)
-            {
-                Flash(e.Message, e.StackTrace.ToString());
-                return View();
-            } 
-        }
-
-        public async System.Threading.Tasks.Task<ActionResult> Copy(string Id)
-        {
-            try
-            {
-                var role = await GraphHelper.CopyRoleDefinition(Id);
-
-                return RedirectToAction("Roles");
-
-            }
-            catch (Exception e)
-            {
-                Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
-
-                return RedirectToAction("Roles");
-            }
-        }
-
         public async System.Threading.Tasks.Task<ViewResult> DeviceManagementScripts()
         {
             try
             {
-                var scripts = await GraphHelper.GetDeviceManagementScriptsAsync();
-
+                GraphIntune graphIntune = new GraphIntune(null);
+                var scripts = await graphIntune.GetDeviceManagementScriptsAsync();
                 return View(scripts);
-
             }
             catch (Exception e)
             {
                 Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
-
                 return View();
             }
         }
@@ -180,27 +140,24 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             try
             {
-                var scripts = await GraphHelper.GetDeviceManagementScriptAsync(Id);
-
+                GraphIntune graphIntune = new GraphIntune(null);
+                var scripts = await graphIntune.GetDeviceManagementScriptAsync(Id);
                 string powerShellCode = Encoding.UTF8.GetString(scripts.ScriptContent);
-
                 return PartialView("_PowerShellScriptContent", powerShellCode);
 
             }
             catch (Exception e)
             {
                 Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
-
                 return PartialView();
             }
         }
 
         public async System.Threading.Tasks.Task<FileResult> DownloadDeviceManagementScript(String Id)
         {
-            DeviceManagementScript script = await GraphHelper.GetDeviceManagementScriptAsync(Id);
-
+            GraphIntune graphIntune = new GraphIntune(null);
+            DeviceManagementScript script = await graphIntune.GetDeviceManagementScriptAsync(Id);
             return File(script.ScriptContent, "text/plain", script.FileName);
-
         }
     }
 }

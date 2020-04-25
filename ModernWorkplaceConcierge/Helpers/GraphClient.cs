@@ -11,13 +11,12 @@ namespace ModernWorkplaceConcierge.Helpers
 {
     public class GraphClient
     {
-
         // Load configuration settings from PrivateSettings.config
         protected static readonly string appId = ConfigurationManager.AppSettings["AppId"];
         protected static readonly string appSecret = ConfigurationManager.AppSettings["AppSecret"];
         protected static readonly string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
         protected static readonly string graphScopes = ConfigurationManager.AppSettings["AppScopes"];
-        protected static readonly string graphEndpoint = ConfigurationManager.AppSettings["GraphEndpoint"];
+        public static readonly string graphEndpoint = ConfigurationManager.AppSettings["GraphEndpoint"];
 
         protected GraphServiceClient GetAuthenticatedClient()
         {

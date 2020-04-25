@@ -1,18 +1,9 @@
-﻿using Microsoft.AspNet.SignalR;
-using Microsoft.Graph;
-using Microsoft.Identity.Client;
-using ModernWorkplaceConcierge.TokenStorage;
+﻿using Microsoft.Graph;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace ModernWorkplaceConcierge.Helpers
 {

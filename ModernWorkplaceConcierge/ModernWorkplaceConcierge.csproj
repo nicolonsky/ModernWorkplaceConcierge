@@ -266,8 +266,12 @@
     <Compile Include="Helpers\GraphClient.cs" />
     <Compile Include="Helpers\GraphConditionalAccess.cs" />
     <Compile Include="Helpers\GraphHelper.cs" />
+    <Compile Include="Helpers\GraphIntune.cs" />
+    <Compile Include="Helpers\GraphIntuneImport.cs" />
+    <Compile Include="Helpers\GraphJson.cs" />
     <Compile Include="Helpers\GraphPlanner.cs" />
     <Compile Include="Helpers\MwHub.cs" />
+    <Compile Include="Helpers\SignalRMessage.cs" />
     <Compile Include="Models\Alert.cs" />
     <Compile Include="Models\OverwriteBehaviour.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
