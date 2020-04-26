@@ -1,5 +1,6 @@
 ﻿using Microsoft.Graph;
 using ModernWorkplaceConcierge.Helpers;
+using ModernWorkplaceConcierge.Models;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -18,12 +19,12 @@ namespace ModernWorkplaceConcierge.Controllers
         }
 
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files, string clientId)
+        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files, OverwriteBehaviour overwriteBehaviour, string clientId)
         {
             SignalRMessage signalR = new SignalRMessage(clientId);
             try
             {
-                GraphIntuneImport graphIntuneImport = new GraphIntuneImport(clientId);
+                GraphIntuneImport graphIntuneImport = new GraphIntuneImport(clientId, overwriteBehaviour);
 
                 if (files.Length > 0 && files[0].FileName.Contains(".json"))
                 {
