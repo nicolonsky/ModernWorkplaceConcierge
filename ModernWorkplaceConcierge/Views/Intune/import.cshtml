@@ -27,8 +27,11 @@
         <div class="col">
             <div class="form-group">
                 <label for="overwriteBehaviour">When a configuration already exists</label>
-                @Html.DropDownList("overwriteBehaviour", EnumHelper.GetSelectList(typeof(ModernWorkplaceConcierge.Models.OverwriteBehaviour)), new { @class = "form-control" })
+                @Html.DropDownList("overwriteBehaviour", EnumHelper.GetSelectList(typeof(ModernWorkplaceConcierge.Models.OverwriteBehaviour)), new { @class = "form-control readonly"})
             </div>
+            <script>
+                $('option:not(:selected)').attr('disabled', true);
+            </script>
         </div>
     </div>
     <div class="form-row">

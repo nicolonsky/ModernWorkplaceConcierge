@@ -1,0 +1,58 @@
+﻿
+@{
+    ViewBag.Current = "AboutIndex";
+}
+
+<div class="card">
+    <div class="card-body">
+        <h3 class="card-title">Info</h3>
+        <p class="card-text">This tool was initially created to learn some C# programming and beter understand the Microsoft Graph API.</p>
+        <p style="text-indent: 2em;">... Now fellow workplace engineers have a tool supporting them with powerful automation for various Enterprise Mobility + Security features.</p>
+        <p>This tool is open source and proudly presented by Nicola Suter. Made in Switzerland <img src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/flag-for-switzerland_1f1e8-1f1ed.png" width="20px" /></p>
+        <a href="https://github.com/nicolonsky/ModernWorkplaceConcierge" target="_blank" class="card-link">GitHub Repository</a>
+        <a href="https://tech.nicolonsky.ch" target="_blank" class="card-link">Nicola's tech blog</a>
+    </div>
+</div>
+
+
+<div class="card mt-3">
+    <div class="card-body">
+        <h3 class="card-title">Permissions</h3>
+        <p class="card-text">The Modern Workplace Concierge asks you for the following delegated permissions:</p>
+        @{
+            string permissions = @System.Configuration.ConfigurationManager.AppSettings["AppScopes"].ToString();
+
+            string[] allpermissions = permissions.Split(' ');
+            Array.Sort(allpermissions);
+            <ul>
+                @foreach (var permission in allpermissions)
+                {
+                    <li>@permission</li>
+                }
+            </ul>
+        }
+        <p>Delegated permissions mean that it requires a signed in in user in order to perform any actions.</p>
+        <a href="https://docs.microsoft.com/en-us/graph/permissions-reference" target="_blank" class="card-link">Microsoft Graph permissions reference</a>
+        <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#permission-types" target="_blank" class="card-link">Permissions and consent in the Microsoft identity platform endpoint</a>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <h3 class="card-title">Instance Details</h3>
+        @{
+            <ul>
+                <li>TokenEndpoint: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["TokenEndpoint"].ToString()</code></li>
+                <li>Application ID: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["AppId"].ToString()</code></li>
+                <li>Redirect URI: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["RedirectUri"].ToString()</code></li>
+                <li>Graph Endpoint: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["GraphEndpoint"].ToString()</code></li>
+                <li>Build: <code class="text-dark">@typeof(ModernWorkplaceConcierge.BundleConfig).Assembly.GetName().Version</code></li>
+                <li>Instance: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</code></li>
+            </ul>
+        }
+    </div>
+</div>
+
+
+
+

@@ -16,7 +16,6 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         // Load configuration settings from PrivateSettings.config
         private static readonly string appId = ConfigurationManager.AppSettings["AppId"];
-
         private static readonly string appSecret = ConfigurationManager.AppSettings["AppSecret"];
         private static readonly string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
         private static readonly string graphScopes = ConfigurationManager.AppSettings["AppScopes"];

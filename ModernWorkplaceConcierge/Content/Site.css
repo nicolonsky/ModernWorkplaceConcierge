@@ -9,8 +9,12 @@ a {
     color: #17a2b8;
 }
 
-    a:hover {
-        color: #17a2b8;
+a:hover {
+    color: #17a2b8;
+}
+
+    a.card-link:hover {
+        text-decoration: underline;
     }
 
 .dropdown-item.active, .dropdown-item:active {

@@ -7,7 +7,12 @@ namespace ModernWorkplaceConcierge.Controllers
         // GET: About
         public ActionResult Index()
         {
-            return View("Terms");
+            return View();
+        }
+
+        public ActionResult Terms()
+        {
+            return View();
         }
     }
 }

@@ -547,6 +547,7 @@
     <Content Include="Views\ConditionalAccess\DeployBaseline.cshtml" />
     <Content Include="Views\ConditionalAccess\Documentation.cshtml" />
     <Content Include="Views\About\Terms.cshtml" />
+    <Content Include="Views\About\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
