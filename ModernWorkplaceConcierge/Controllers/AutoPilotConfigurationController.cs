@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ModernWorkplaceConcierge.Helpers;
+using Newtonsoft.Json;
+using System;
 using System.Text;
 using System.Web.Mvc;
-using ModernWorkplaceConcierge.Helpers;
-using Newtonsoft.Json;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -28,7 +28,7 @@ namespace ModernWorkplaceConcierge.Controllers
         public async System.Threading.Tasks.Task<FileResult> DownloadAutopilotConfigurationJSON(string Id)
         {
             GraphIntune graphIntune = new GraphIntune(null);
-            var profile =  await graphIntune.GetWindowsAutopilotDeploymentProfile(Id);
+            var profile = await graphIntune.GetWindowsAutopilotDeploymentProfile(Id);
             var org = await GraphHelper.GetOrgDetailsAsync();
 
             AutopilotConfiguration windowsAutopilotDeploymentProfile = new AutopilotConfiguration(profile, org);

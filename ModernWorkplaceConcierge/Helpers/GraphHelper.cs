@@ -1,14 +1,14 @@
-﻿using Microsoft.Graph;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using ModernWorkplaceConcierge.TokenStorage;
+﻿using Microsoft.AspNet.SignalR;
+using Microsoft.Graph;
 using Microsoft.Identity.Client;
+using ModernWorkplaceConcierge.TokenStorage;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web;
-using Microsoft.AspNet.SignalR;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
@@ -16,11 +16,11 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         // Load configuration settings from PrivateSettings.config
         private static readonly string appId = ConfigurationManager.AppSettings["AppId"];
+
         private static readonly string appSecret = ConfigurationManager.AppSettings["AppSecret"];
         private static readonly string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
         private static readonly string graphScopes = ConfigurationManager.AppSettings["AppScopes"];
         private static readonly string graphEndpoint = ConfigurationManager.AppSettings["GraphEndpoint"];
-
 
         public static async Task<User> GetUser(string displayName, string clientId = null)
         {
@@ -205,7 +205,6 @@ namespace ModernWorkplaceConcierge.Helpers
             return bytes;
         }
 
-
         private static GraphServiceClient GetAuthenticatedClient()
         {
             return new GraphServiceClient(
@@ -222,9 +221,9 @@ namespace ModernWorkplaceConcierge.Helpers
 
                         var accounts = await idClient.GetAccountsAsync();
 
-                    // By calling this here, the token can be refreshed
-                    // if it's expired right before the Graph call is made
-                    var scopes = graphScopes.Split(' ');
+                        // By calling this here, the token can be refreshed
+                        // if it's expired right before the Graph call is made
+                        var scopes = graphScopes.Split(' ');
                         var result = await idClient.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
                             .ExecuteAsync();
 

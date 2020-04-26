@@ -246,6 +246,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AboutController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AutoPilotConfigurationController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -545,6 +546,7 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\ConditionalAccess\DeployBaseline.cshtml" />
     <Content Include="Views\ConditionalAccess\Documentation.cshtml" />
+    <Content Include="Views\About\Terms.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

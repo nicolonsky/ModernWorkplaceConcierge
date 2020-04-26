@@ -3,28 +3,24 @@ using ModernWorkplaceConcierge.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web;
-using System.Web.Mvc;
+using System.Data;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using System.Data;
-using Microsoft.Ajax.Utilities;
-using System.Net.Http;
-using System.Collections;
+using System.Web;
+using System.Web.Mvc;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
-
     [Authorize]
     public class ConditionalAccessController : BaseController
     {
         private readonly string TEMPLATE_CA_POLICY_FOLDER_PATH = "~/Content/PolicySets/";
 
         [HttpPost]
-        public async Task<ActionResult> Upload(HttpPostedFileBase[] files, OverwriteBehaviour overwriteBehaviour,string clientId)
+        public async Task<ActionResult> Upload(HttpPostedFileBase[] files, OverwriteBehaviour overwriteBehaviour, string clientId)
         {
             SignalRMessage signalRMessage = new SignalRMessage(clientId);
 
@@ -106,6 +102,7 @@ namespace ModernWorkplaceConcierge.Controllers
                             case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
                                 await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
                                 break;
+
                             case OverwriteBehaviour.OVERWRITE_BY_ID:
 
                                 // match by object ID
@@ -120,6 +117,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                     signalRMessage.sendMessage($"Success: created CA policy: '{result.displayName}' ({result.id})");
                                 }
                                 break;
+
                             case OverwriteBehaviour.OVERWRITE_BY_NAME:
                                 if (conditionalAccessPolicies.Any(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)))
                                 {
@@ -165,7 +163,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 };
 
                 // Load CA policies for policy set
-                string[] filePaths = Directory.GetFiles(Server.MapPath(TEMPLATE_CA_POLICY_FOLDER_PATH + selectedBaseline),"*.json");
+                string[] filePaths = Directory.GetFiles(Server.MapPath(TEMPLATE_CA_POLICY_FOLDER_PATH + selectedBaseline), "*.json");
 
                 if (filePaths.Length == 0)
                 {
@@ -215,7 +213,7 @@ namespace ModernWorkplaceConcierge.Controllers
             {
                 signalR.sendMessage("Error: " + e.Message);
             }
-            
+
             signalR.sendMessage("Done#!");
             return new HttpStatusCodeResult(204);
         }
@@ -249,7 +247,6 @@ namespace ModernWorkplaceConcierge.Controllers
 
             try
             {
-
                 GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(clientId);
                 IEnumerable<ConditionalAccessPolicy> conditionalAccessPolicies = await graphConditionalAccess.GetConditionalAccessPoliciesAsync();
 
@@ -283,7 +280,6 @@ namespace ModernWorkplaceConcierge.Controllers
             catch (Exception e)
             {
                 signalR.sendMessage("Error " + e);
-
             }
             return new HttpStatusCodeResult(204);
         }
@@ -454,7 +450,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 signalR.sendMessage("Success: Report generated");
             }
 
-            return File(Encoding.ASCII.GetBytes(sb.ToString()), "text/csvt", "ConditionalAccessReport_" + domainName +".csv");
+            return File(Encoding.ASCII.GetBytes(sb.ToString()), "text/csvt", "ConditionalAccessReport_" + domainName + ".csv");
         }
-    }   
+    }
 }

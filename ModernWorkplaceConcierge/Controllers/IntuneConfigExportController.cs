@@ -1,16 +1,15 @@
-﻿using ModernWorkplaceConcierge.Helpers;
+﻿using Microsoft.Graph;
+using ModernWorkplaceConcierge.Helpers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.IO;
 using System.IO.Compression;
-using System.Web.Mvc;
-using Newtonsoft.Json;
-using Microsoft.Graph;
 using System.Text;
-using Newtonsoft.Json.Linq;
+using System.Web.Mvc;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
     [Authorize]
-
     public class IntuneConfigExportController : BaseController
     {
         [HttpPost]
@@ -31,7 +30,6 @@ namespace ModernWorkplaceConcierge.Controllers
             {
                 using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
                 {
-
                     foreach (DeviceEnrollmentConfiguration item in DeviceEnrollmentConfig)
                     {
                         byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
@@ -88,7 +86,6 @@ namespace ModernWorkplaceConcierge.Controllers
                             string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
                             var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + "ManagedAppConfiguration_" + fileName + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
-
                         }
                         else
                         {

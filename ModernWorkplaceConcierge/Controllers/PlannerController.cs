@@ -1,16 +1,15 @@
-﻿using ModernWorkplaceConcierge.Helpers;
+﻿using Microsoft.Graph;
+using ModernWorkplaceConcierge.Helpers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
+using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using Newtonsoft.Json;
-using Microsoft.Graph;
-using System.Text;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Collections;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -39,11 +38,11 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             SignalRMessage signalR = new SignalRMessage(clientId);
             GraphPlanner graphPlanner = new GraphPlanner(clientId);
-            try {
-
+            try
+            {
                 // Get current planner object
                 var planner = await graphPlanner.GetplannerPlanAsync(PlannerPlan);
-                
+
                 // Count imported tasks
                 int importedTasksCounter = 0;
 
@@ -53,7 +52,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 string result = Encoding.UTF8.GetString(binData);
 
                 JsonReader reader = new JsonTextReader(new StringReader(result));
-                // Do not parse datetime values 
+                // Do not parse datetime values
                 reader.DateParseHandling = DateParseHandling.None;
                 reader.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
                 JObject trelloBoard = JObject.Load(reader);
@@ -119,7 +118,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                         if (isInArchivedList)
                         {
-                            signalR.sendMessage("Discarding task because stored in an archived list: '" + plannerTask.Title+"'");
+                            signalR.sendMessage("Discarding task because stored in an archived list: '" + plannerTask.Title + "'");
                         }
                         else
                         {
@@ -165,7 +164,6 @@ namespace ModernWorkplaceConcierge.Controllers
                                         User user = await GraphHelper.GetUser(assignedToname);
 
                                         plannerTask.Assignments.AddAssignee(user.Id);
-
                                     }
                                 }
                             }
@@ -191,7 +189,6 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                 if (!string.IsNullOrEmpty(taskDescription))
                                 {
-
                                     plannerTaskDetails.Description = taskDescription;
                                 }
 
@@ -228,7 +225,6 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                         foreach (JToken checklistItem in checklistItems)
                                         {
-
                                             string checklistItemName = (string)checklistItem;
 
                                             // truncate string because checklist items are limited to 100 characters
@@ -258,9 +254,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                 var response = await graphPlanner.AddPlannerTaskDetailsAsync(plannerTaskDetails, request.Id);
                             }
-
                         }
-                    
                     }
                     catch (Exception e)
                     {

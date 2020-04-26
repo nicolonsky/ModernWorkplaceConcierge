@@ -11,8 +11,8 @@ namespace ModernWorkplaceConcierge.Helpers
 {
     public class GraphIntune : GraphClient
     {
-        private GraphServiceClient graphServiceClient;
         private string clientId;
+        private GraphServiceClient graphServiceClient;
         private SignalRMessage signalRMessage;
 
         public GraphIntune(string clientId)
@@ -22,45 +22,22 @@ namespace ModernWorkplaceConcierge.Helpers
             this.graphServiceClient = GetAuthenticatedClient();
         }
 
-        // Get's ESP, Enrollment restrictions, WHFB settings etc...
-        public async Task<IEnumerable<DeviceEnrollmentConfiguration>> GetDeviceEnrollmentConfigurationsAsync()
+        public static string ConvertToApppProtectionAssignment(string AppProtectionPolicy)
         {
-            var resource = graphServiceClient.DeviceManagement.DeviceEnrollmentConfigurations.Request();
-            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var deviceManagementScripts = await resource.GetAsync();
-            return deviceManagementScripts.CurrentPage;
-        }
+            // Get assigned apps
+            JObject config = JObject.Parse(AppProtectionPolicy);
+            ArrayList assignedApps = new ArrayList();
 
-        public async Task<IEnumerable<DeviceAndAppManagementRoleAssignment>> GetRoleAssignmentsAsync()
-        {
-            var resource = graphServiceClient.DeviceManagement.RoleAssignments.Request();
-            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var response = await resource.GetAsync();
-            return response;
-        }
+            foreach (var app in config.SelectToken("assignedApps").Children())
+            {
+                assignedApps.Add(app.ToObject<ManagedMobileApp>());
+            }
 
-        public async Task<IEnumerable<RoleScopeTag>> GetRoleScopeTagsAsync()
-        {
-            var resource = graphServiceClient.DeviceManagement.RoleScopeTags.Request();
-            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var response = await resource.GetAsync();
-            return response;
-        }
+            string requestBody = JsonConvert.SerializeObject(assignedApps, Formatting.Indented);
+            requestBody = requestBody.Insert(0, "{ \"apps\":");
+            requestBody = requestBody.Insert(requestBody.Length, "}");
 
-        public async Task<IEnumerable<DeviceManagementScript>> GetDeviceManagementScriptsAsync()
-        {
-            var resource = graphServiceClient.DeviceManagement.DeviceManagementScripts.Request();
-            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var result = await resource.GetAsync();
-            return result.CurrentPage;
-        }
-
-        public async Task<IosManagedAppProtection> AddIosManagedAppProtectionAsync(IosManagedAppProtection managedAppProtection)
-        {
-            var resource = graphServiceClient.DeviceAppManagement.IosManagedAppProtections.Request();
-            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
-            var response = await resource.AddAsync(managedAppProtection);
-            return response;
+            return requestBody;
         }
 
         public async Task<AndroidManagedAppProtection> AddAndroidManagedAppProtectionAsync(AndroidManagedAppProtection managedAppProtection)
@@ -71,12 +48,77 @@ namespace ModernWorkplaceConcierge.Helpers
             return response;
         }
 
+        public async Task<DeviceCompliancePolicy> AddDeviceCompliancePolicyAsync(DeviceCompliancePolicy deviceCompliancePolicy)
+        {
+            var resource = graphServiceClient.DeviceManagement.DeviceCompliancePolicies.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var result = await resource.AddAsync(deviceCompliancePolicy);
+            return result;
+        }
+
+        public async Task<DeviceConfiguration> AddDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration)
+        {
+            var resource = graphServiceClient.DeviceManagement.DeviceConfigurations.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var result = await resource.AddAsync(deviceConfiguration);
+            return result;
+        }
+
         public async Task<DeviceManagementScript> AddDeviceManagementScriptsAsync(DeviceManagementScript deviceManagementScript)
         {
             var resource = graphServiceClient.DeviceManagement.DeviceManagementScripts.Request();
             signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
             var response = await resource.AddAsync(deviceManagementScript);
             return response;
+        }
+
+        public async Task<IosManagedAppProtection> AddIosManagedAppProtectionAsync(IosManagedAppProtection managedAppProtection)
+        {
+            var resource = graphServiceClient.DeviceAppManagement.IosManagedAppProtections.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var response = await resource.AddAsync(managedAppProtection);
+            return response;
+        }
+
+        public async Task<TargetedManagedAppConfiguration> AddManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration)
+        {
+            var resource = graphServiceClient.DeviceAppManagement.TargetedManagedAppConfigurations.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var response = await resource.AddAsync(managedAppConfiguration);
+            return response;
+        }
+
+        public async Task<WindowsAutopilotDeploymentProfile> AddWindowsAutopilotDeploymentProfile(WindowsAutopilotDeploymentProfile autopilotDeploymentProfile)
+        {
+            var resource = graphServiceClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var response = await resource.AddAsync(autopilotDeploymentProfile);
+            return response;
+        }
+
+        public async Task<IEnumerable<DeviceCompliancePolicy>> GetDeviceCompliancePoliciesAsync()
+        {
+            var resource = graphServiceClient.DeviceManagement.DeviceCompliancePolicies.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var deviceCompliancePolicies = await resource.GetAsync();
+            return deviceCompliancePolicies.CurrentPage;
+        }
+
+        public async Task<IEnumerable<DeviceConfiguration>> GetDeviceConfigurationsAsync()
+        {
+            var resource = graphServiceClient.DeviceManagement.DeviceConfigurations.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var deviceConfigurations = await resource.GetAsync();
+            return deviceConfigurations.CurrentPage;
+        }
+
+        // Get's ESP, Enrollment restrictions, WHFB settings etc...
+        public async Task<IEnumerable<DeviceEnrollmentConfiguration>> GetDeviceEnrollmentConfigurationsAsync()
+        {
+            var resource = graphServiceClient.DeviceManagement.DeviceEnrollmentConfigurations.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var deviceManagementScripts = await resource.GetAsync();
+            return deviceManagementScripts.CurrentPage;
         }
 
         public async Task<DeviceManagementScript> GetDeviceManagementScriptAsync(string Id)
@@ -103,44 +145,12 @@ namespace ModernWorkplaceConcierge.Helpers
             return result;
         }
 
-        public async Task<IEnumerable<DeviceConfiguration>> GetDeviceConfigurationsAsync()
+        public async Task<IEnumerable<DeviceManagementScript>> GetDeviceManagementScriptsAsync()
         {
-            var resource = graphServiceClient.DeviceManagement.DeviceConfigurations.Request();
+            var resource = graphServiceClient.DeviceManagement.DeviceManagementScripts.Request();
             signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var deviceConfigurations = await resource.GetAsync();
-            return deviceConfigurations.CurrentPage;
-        }
-
-        public async Task<DeviceConfiguration> AddDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration)
-        {
-            var resource = graphServiceClient.DeviceManagement.DeviceConfigurations.Request();
-            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
-            var result = await resource.AddAsync(deviceConfiguration);
-            return result;
-        }
-
-        public async Task<IEnumerable<DeviceCompliancePolicy>> GetDeviceCompliancePoliciesAsync()
-        {
-            var resource = graphServiceClient.DeviceManagement.DeviceCompliancePolicies.Request();
-            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var deviceCompliancePolicies = await resource.GetAsync();
-            return deviceCompliancePolicies.CurrentPage;
-        }
-
-        public async Task<DeviceCompliancePolicy> AddDeviceCompliancePolicyAsync(DeviceCompliancePolicy deviceCompliancePolicy)
-        {
-            var resource = graphServiceClient.DeviceManagement.DeviceCompliancePolicies.Request();
-            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
-            var result = await resource.AddAsync(deviceCompliancePolicy);
-            return result;
-        }
-
-        public async Task<IEnumerable<ManagedAppPolicy>> GetManagedAppProtectionAsync()
-        {
-            var resource = graphServiceClient.DeviceAppManagement.ManagedAppPolicies.Request();
-            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var managedAppProtection = await resource.GetAsync();
-            return managedAppProtection.CurrentPage;
+            var result = await resource.GetAsync();
+            return result.CurrentPage;
         }
 
         public async Task<IEnumerable<ManagedMobileApp>> GetManagedAppProtectionAssignmentAsync(string Id)
@@ -151,12 +161,12 @@ namespace ModernWorkplaceConcierge.Helpers
             return response.CurrentPage;
         }
 
-        public async Task<IEnumerable<ManagedMobileApp>> GetTargetedManagedAppConfigurationsAssignedAppsAsync(string Id)
+        public async Task<IEnumerable<ManagedAppPolicy>> GetManagedAppProtectionAsync()
         {
-            var resource = graphServiceClient.DeviceAppManagement.TargetedManagedAppConfigurations[Id].Apps.Request();
+            var resource = graphServiceClient.DeviceAppManagement.ManagedAppPolicies.Request();
             signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var apps = await resource.GetAsync();
-            return apps.CurrentPage;
+            var managedAppProtection = await resource.GetAsync();
+            return managedAppProtection.CurrentPage;
         }
 
         public async Task<ManagedAppPolicy> GetManagedAppProtectionAsync(string Id)
@@ -167,12 +177,28 @@ namespace ModernWorkplaceConcierge.Helpers
             return managedAppProtection;
         }
 
-        public async Task<IEnumerable<WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
+        public async Task<IEnumerable<DeviceAndAppManagementRoleAssignment>> GetRoleAssignmentsAsync()
         {
-            var resource = graphServiceClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request();
+            var resource = graphServiceClient.DeviceManagement.RoleAssignments.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var response = await resource.GetAsync();
+            return response;
+        }
 
-            var windowsAutopilotDeploymentProfiles = await resource.GetAsync();
-            return windowsAutopilotDeploymentProfiles.CurrentPage;
+        public async Task<IEnumerable<RoleScopeTag>> GetRoleScopeTagsAsync()
+        {
+            var resource = graphServiceClient.DeviceManagement.RoleScopeTags.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var response = await resource.GetAsync();
+            return response;
+        }
+
+        public async Task<IEnumerable<ManagedMobileApp>> GetTargetedManagedAppConfigurationsAssignedAppsAsync(string Id)
+        {
+            var resource = graphServiceClient.DeviceAppManagement.TargetedManagedAppConfigurations[Id].Apps.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var apps = await resource.GetAsync();
+            return apps.CurrentPage;
         }
 
         public async Task<WindowsAutopilotDeploymentProfile> GetWindowsAutopilotDeploymentProfile(string Id)
@@ -183,43 +209,16 @@ namespace ModernWorkplaceConcierge.Helpers
             return windowsAutopilotDeploymentProfile;
         }
 
-        public async Task<WindowsAutopilotDeploymentProfile> AddWindowsAutopilotDeploymentProfile(WindowsAutopilotDeploymentProfile autopilotDeploymentProfile)
+        public async Task<IEnumerable<WindowsAutopilotDeploymentProfile>> GetWindowsAutopilotDeploymentProfiles()
         {
             var resource = graphServiceClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request();
-            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
-            var response = await resource.AddAsync(autopilotDeploymentProfile);
-            return response;
-        }
 
-        public async Task<TargetedManagedAppConfiguration> AddManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration)
-        {
-            var resource = graphServiceClient.DeviceAppManagement.TargetedManagedAppConfigurations.Request();
-            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
-            var response = await resource.AddAsync(managedAppConfiguration);
-            return response;
-        }
-
-        public static string ConvertToApppProtectionAssignment(string AppProtectionPolicy)
-        {
-            // Get assigned apps
-            JObject config = JObject.Parse(AppProtectionPolicy);
-            ArrayList assignedApps = new ArrayList();
-
-            foreach (var app in config.SelectToken("assignedApps").Children())
-            {
-                assignedApps.Add(app.ToObject<ManagedMobileApp>());
-            }
-
-            string requestBody = JsonConvert.SerializeObject(assignedApps, Formatting.Indented);
-            requestBody = requestBody.Insert(0, "{ \"apps\":");
-            requestBody = requestBody.Insert(requestBody.Length, "}");
-
-            return requestBody;
+            var windowsAutopilotDeploymentProfiles = await resource.GetAsync();
+            return windowsAutopilotDeploymentProfiles.CurrentPage;
         }
 
         public async Task<AndroidManagedAppProtection> ImportAndroidManagedAppProtectionAsync(string androidManagedAppProtection)
         {
-
             AndroidManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<AndroidManagedAppProtection>(androidManagedAppProtection);
             var response = await AddAndroidManagedAppProtectionAsync(managedAppProtection);
             string requestUrl = graphEndpoint + "/deviceAppManagement/androidManagedAppProtections/" + response.Id + "/targetApps";
@@ -229,7 +228,6 @@ namespace ModernWorkplaceConcierge.Helpers
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {
                 Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
-
             };
 
             // Authenticate (add access token) our HttpRequestMessage
@@ -239,7 +237,7 @@ namespace ModernWorkplaceConcierge.Helpers
             await graphServiceClient.HttpProvider.SendAsync(hrm);
             return response;
         }
-    
+
         public async Task<IosManagedAppProtection> ImportIosManagedAppProtectionAsync(string iosManagedAppProtection)
         {
             IosManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<IosManagedAppProtection>(iosManagedAppProtection);
@@ -251,7 +249,6 @@ namespace ModernWorkplaceConcierge.Helpers
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {
                 Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
-
             };
 
             // Authenticate (add access token) our HttpRequestMessage
@@ -273,7 +270,6 @@ namespace ModernWorkplaceConcierge.Helpers
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {
                 Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
-
             };
 
             // Authenticate (add access token) our HttpRequestMessage

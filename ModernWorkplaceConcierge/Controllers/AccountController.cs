@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-using ModernWorkplaceConcierge.TokenStorage;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
+using ModernWorkplaceConcierge.TokenStorage;
 using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
@@ -28,7 +28,7 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             if (Request.IsAuthenticated)
             {
-                var tokenStore = new SessionTokenStore(null, 
+                var tokenStore = new SessionTokenStore(null,
                     System.Web.HttpContext.Current, ClaimsPrincipal.Current);
 
                 tokenStore.Clear();

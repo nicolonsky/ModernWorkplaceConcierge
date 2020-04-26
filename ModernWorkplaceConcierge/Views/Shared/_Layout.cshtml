@@ -48,6 +48,10 @@
                         @Html.ActionLink("Home", "Index", "Home", new { area = "" },
                             new { @class = ViewBag.Current == "Home" ? "nav-link active" : "nav-link" })
                     </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("About", "Index","About", new { area = "" },
+                            new { @class = ViewBag.Current == "About" ? "nav-link active" : "nav-link" })
+                    </li>
                     @if (Request.IsAuthenticated)
                     {
                         <li class="nav-item dropdown">

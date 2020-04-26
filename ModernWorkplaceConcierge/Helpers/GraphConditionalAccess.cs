@@ -13,7 +13,7 @@ namespace ModernWorkplaceConcierge.Helpers
         private string clientId;
         private SignalRMessage signalRMessage;
 
-        public GraphConditionalAccess (string clientId)
+        public GraphConditionalAccess(string clientId)
         {
             this.graphServiceClient = GetAuthenticatedClient();
             this.clientId = clientId;
@@ -29,7 +29,6 @@ namespace ModernWorkplaceConcierge.Helpers
 
         public async Task<ConditionalAccessPolicy> AddConditionalAccessPolicyAsync(ConditionalAccessPolicy conditionalAccessPolicy, string clientId = null)
         {
-
             // Following properties need to be disabled for successful POST
             conditionalAccessPolicy.id = null;
             conditionalAccessPolicy.state = "disabled";
@@ -44,7 +43,6 @@ namespace ModernWorkplaceConcierge.Helpers
                     NullValueHandling = NullValueHandling.Ignore,
                     Formatting = Formatting.Indented
                 }), Encoding.UTF8, "application/json")
-
             };
 
             if (conditionalAccessPolicy.conditions.deviceStates != null)
@@ -101,12 +99,11 @@ namespace ModernWorkplaceConcierge.Helpers
             {
                 var response = await AddConditionalAccessPolicyAsync(conditionalAccessPolicy);
                 return response;
-
             }
             catch
             {
                 signalRMessage.sendMessage("Discarding tenant specific information for CA policy: '" + conditionalAccessPolicy.displayName + "'");
-                
+
                 // remove Id's
                 conditionalAccessPolicy.conditions.users.includeUsers = new string[] { "none" };
                 conditionalAccessPolicy.conditions.users.excludeUsers = null;
@@ -125,7 +122,6 @@ namespace ModernWorkplaceConcierge.Helpers
 
         public async Task<IEnumerable<ConditionalAccessPolicy>> GetConditionalAccessPoliciesAsync(string clientId = null)
         {
-
             string requestUrl = $"{graphEndpoint}/identity/conditionalAccess/policies";
 
             HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Get, requestUrl);

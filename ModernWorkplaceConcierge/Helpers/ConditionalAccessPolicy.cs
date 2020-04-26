@@ -7,6 +7,7 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         [JsonProperty("@odata.context")]
         public String OdataContext { get; set; }
+
         [JsonProperty("value")]
         public ConditionalAccessPolicy[] Value { get; set; }
 
@@ -33,6 +34,7 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         [JsonProperty("operator")]
         public string op { get; set; }
+
         public string[] builtInControls { get; set; }
         public object[] customAuthenticationFactors { get; set; }
         public object[] termsOfUse { get; set; }

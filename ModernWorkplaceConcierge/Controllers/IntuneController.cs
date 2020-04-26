@@ -1,12 +1,11 @@
-﻿using ModernWorkplaceConcierge.Helpers;
+﻿using Microsoft.Graph;
+using ModernWorkplaceConcierge.Helpers;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.Graph;
-using System.Text;
-
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -15,7 +14,6 @@ namespace ModernWorkplaceConcierge.Controllers
     {
         public ActionResult Import()
         {
-           
             return View();
         }
 
@@ -36,10 +34,7 @@ namespace ModernWorkplaceConcierge.Controllers
                             BinaryReader b = new BinaryReader(file.InputStream);
                             byte[] binData = b.ReadBytes(file.ContentLength);
                             string result = Encoding.UTF8.GetString(binData);
-
-                            string response = await graphIntuneImport.AddIntuneConfig(result);
-                            signalR.sendMessage("Success " + response);
-
+                            await graphIntuneImport.AddIntuneConfig(result);
                         }
                         catch (Exception e)
                         {
@@ -77,12 +72,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                                         if (!string.IsNullOrEmpty(result))
                                                         {
-                                                            string response = await graphIntuneImport.AddIntuneConfig(result);
-
-                                                            if (!(string.IsNullOrEmpty(response)))
-                                                            {
-                                                                signalR.sendMessage("Success " +  response);
-                                                            }
+                                                            await graphIntuneImport.AddIntuneConfig(result);
                                                         }
                                                     }
                                                 }
@@ -107,7 +97,8 @@ namespace ModernWorkplaceConcierge.Controllers
                     signalR.sendMessage("Error unsupported file: " + files[0].FileName);
                 }
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 signalR.sendMessage("Error: " + e.Message);
             }
 
@@ -136,7 +127,7 @@ namespace ModernWorkplaceConcierge.Controllers
             }
         }
 
-        public async System.Threading.Tasks.Task<PartialViewResult>PowerShellScriptContent(string Id)
+        public async System.Threading.Tasks.Task<PartialViewResult> PowerShellScriptContent(string Id)
         {
             try
             {
@@ -144,7 +135,6 @@ namespace ModernWorkplaceConcierge.Controllers
                 var scripts = await graphIntune.GetDeviceManagementScriptAsync(Id);
                 string powerShellCode = Encoding.UTF8.GetString(scripts.ScriptContent);
                 return PartialView("_PowerShellScriptContent", powerShellCode);
-
             }
             catch (Exception e)
             {
