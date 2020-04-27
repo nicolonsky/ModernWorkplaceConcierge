@@ -97,9 +97,9 @@
                         <a class="dropdown-toggle @((ViewBag.Current.StartsWith("About") ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">About</a>
                         <div class="dropdown-menu dropdown-menu-right">
                             @Html.ActionLink("Info", "Index", "About", new { area = "" },
-                            new { @class = ViewBag.Current == "IntuneExport" ? "dropdown-item active" : "dropdown-item" })
+                            new { @class = ViewBag.Current == "AboutIndex" ? "dropdown-item active" : "dropdown-item" })
                             @Html.ActionLink("Terms & Conditions", "Terms", "About", new { area = "" },
-                            new { @class = ViewBag.Current == "IntuneExport" ? "dropdown-item active" : "dropdown-item" })
+                            new { @class = ViewBag.Current == "AboutTerms" ? "dropdown-item active" : "dropdown-item" })
 
                         </div>
                     </li>

@@ -5,8 +5,8 @@
 
 <div class="card">
     <div class="card-body">
-        <h3 class="card-title">Info</h3>
-        <p class="card-text">This tool was initially created to learn some C# programming and beter understand the Microsoft Graph API.</p>
+        <h3 class="card-title">Motivation</h3>
+        <p class="card-text">This tool was initially created to learn some C# programming and to better understand the Microsoft Graph API.</p>
         <p style="text-indent: 2em; font-style: italic; line-height:initial;">...Now fellow workplace engineers have a tool supporting them with powerful automation for various Enterprise Mobility + Security features.</p>
         <p>Managing Intune (MEM), Conditional Access configuration requires a lot of clicking around in the portal. While the author of this tool is daydreaming about of "EM+S" as code the Modern Workplace Concierge automates most of this tasks and provides functionality to import and export configurations. Even across different tenants. So replicating, upating, rolling-back or even migrating you configuration to a new tenant becomes fairly easy.</p>
         <p>This Modern Workplace Concierge is open source and proudly presented by Nicola Suter. Made in Switzerland <img src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/237/flag-for-switzerland_1f1e8-1f1ed.png" width="25" />.</p>
@@ -19,13 +19,13 @@
 <div class="card mt-3">
     <div class="card-body">
         <h3 class="card-title">Permissions</h3>
-        <p class="card-text">The Modern Workplace Concierge asks you for the following delegated permissions:</p>
+        <p class="card-text">The Modern Workplace Concierge needs the following delegated Microsoft Graph permissions:</p>
         @{
             string permissions = @System.Configuration.ConfigurationManager.AppSettings["AppScopes"].ToString();
 
             string[] allpermissions = permissions.Split(' ');
             Array.Sort(allpermissions);
-            <ul>
+            <ul style="font-weight: 100;">
                 @foreach (var permission in allpermissions)
                 {
                     <li>@permission</li>
@@ -41,7 +41,7 @@
         <h3 class="card-title">Instance Details</h3>
         <p>App Configuration</p>
         @{
-            <ul>
+            <ul style="font-weight: 100;">
                 <li>TokenEndpoint: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["TokenEndpoint"].ToString()</code></li>
                 <li>Application ID: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["AppId"].ToString()</code></li>
                 <li>Redirect URI: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["RedirectUri"].ToString()</code></li>
@@ -51,17 +51,15 @@
         }
         <p>Azure DevOps CI</p>
         @{
-                <ul>
-                    <li>Repository: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["Repository"].ToString()</code></li>
-                    <li>Branch: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["Branch"].ToString()</code></li>
-                    <li>CommitID: <a target="_blank" class="text-info" href="https://github.com/@System.Configuration.ConfigurationManager.AppSettings["Repository"].ToString()/commit/@System.Configuration.ConfigurationManager.AppSettings["CommitID"].ToString()">@System.Configuration.ConfigurationManager.AppSettings["CommitID"].ToString()</a></li>
-                    <li>Build: <code class="text-dark">@typeof(ModernWorkplaceConcierge.BundleConfig).Assembly.GetName().Version</code></li>
-                    <li>DeploymentTime: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["DeploymentTime"].ToString()</code></li>
-                    <li><img src="https://dev.azure.com/nicolonsky/ModernWorkplaceTools/_apis/build/status/ModernWorkplaceConcierge%20-%20CI?branchName=master" /></li>
-                </ul>
+            <ul style="font-weight: 100;">
+                <li>Repository: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["Repository"].ToString()</code></li>
+                <li>Branch: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["Branch"].ToString()</code></li>
+                <li>Commit: <a target="_blank" class="text-info" href="https://github.com/@System.Configuration.ConfigurationManager.AppSettings["Repository"].ToString()/commit/@System.Configuration.ConfigurationManager.AppSettings["CommitID"].ToString()">@System.Configuration.ConfigurationManager.AppSettings["CommitID"].ToString()</a></li>
+                <li>Build: <code class="text-dark">@typeof(ModernWorkplaceConcierge.BundleConfig).Assembly.GetName().Version</code></li>
+                <li>DeploymentTime: <code class="text-dark">@System.Configuration.ConfigurationManager.AppSettings["DeploymentTime"].ToString()</code></li>
+                <li><img src="https://dev.azure.com/nicolonsky/ModernWorkplaceTools/_apis/build/status/ModernWorkplaceConcierge%20-%20CI?branchName=master" /></li>
+            </ul>
         }
-
-        
     </div>
 </div>
 

@@ -88,14 +88,20 @@ namespace ModernWorkplaceConcierge.Controllers
                         switch (overwriteBehaviour)
                         {
                             case OverwriteBehaviour.DISCARD:
-                                if (!conditionalAccessPolicies.Any(p => p.id.Contains(conditionalAccessPolicy.id)))
+                                // Check for any policy with same name or id
+                                if (conditionalAccessPolicies.All(p => !p.id.Contains(conditionalAccessPolicy.id) && conditionalAccessPolicies.All(policy => !policy.displayName.Equals(conditionalAccessPolicy.displayName))))
                                 {
                                     var response = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
-                                    signalRMessage.sendMessage($"Success: created CA policy: '{response.displayName}' ({response.id})");
                                 }
                                 else
                                 {
-                                    signalRMessage.sendMessage($"Discarding Policy '{conditionalAccessPolicy.displayName}' ({conditionalAccessPolicy.id}) already exists!");
+                                    if (conditionalAccessPolicies.Any(p => p.id.Contains(conditionalAccessPolicy.id))){
+                                        signalRMessage.sendMessage($"Discarding Policy '{conditionalAccessPolicy.displayName}' ({conditionalAccessPolicy.id}) already exists!");
+                                    }
+                                    else
+                                    {
+                                        signalRMessage.sendMessage($"Discarding Policy '{conditionalAccessPolicy.displayName}' - policy with this name already exists!");
+                                    }  
                                 }
                                 break;
 
@@ -114,7 +120,6 @@ namespace ModernWorkplaceConcierge.Controllers
                                 else
                                 {
                                     var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
-                                    signalRMessage.sendMessage($"Success: created CA policy: '{result.displayName}' ({result.id})");
                                 }
                                 break;
 
@@ -128,7 +133,6 @@ namespace ModernWorkplaceConcierge.Controllers
                                 else
                                 {
                                     var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
-                                    signalRMessage.sendMessage($"Success: created CA policy: '{result.displayName}' ({result.id})");
                                 }
 
                                 break;

@@ -52,7 +52,7 @@ namespace ModernWorkplaceConcierge.Helpers
 
             if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.applicationEnforcedRestrictions != null)
             {
-                signalRMessage.sendMessage("Warning you need to enable Exchange online and SharePoint online for app enforced restrictions!");
+                signalRMessage.sendMessage("Warning you need to configure Exchange online and SharePoint online for app enforced restrictions!");
             }
 
             // Authenticate (add access token) our HttpRequestMessage
@@ -61,7 +61,13 @@ namespace ModernWorkplaceConcierge.Helpers
 
             // Send the request and get the response.
             HttpResponseMessage response = await graphServiceClient.HttpProvider.SendAsync(hrm);
+
             ConditionalAccessPolicy conditionalAccessPolicyResult = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(await response.Content.ReadAsStringAsync());
+
+            if (response.IsSuccessStatusCode)
+            {
+                signalRMessage.sendMessage($"Success: created CA policy: '{conditionalAccessPolicyResult.displayName}' ({conditionalAccessPolicyResult.id})");
+            }
 
             return conditionalAccessPolicyResult;
         }
