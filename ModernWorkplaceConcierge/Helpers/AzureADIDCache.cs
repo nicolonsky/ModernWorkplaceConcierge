@@ -1,30 +1,32 @@
-﻿using System;
+﻿using Microsoft.Graph;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
-using Microsoft.Graph;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
     /*
-        Stores Azure AD Object IDs in order to avoid multiple queries for the same resource's display names 
-         
+        Stores Azure AD Object IDs in order to avoid multiple queries for the same resource's display names
+
     */
+
     public class AzureADIDCache
     {
-
         // Store Object ID and displayName
-        private Dictionary<String, String> graphCache; 
+        private Dictionary<String, String> graphCache;
+
         private string clientId;
         private IEnumerable<DirectoryRoleTemplate> roleTemplates;
         private IEnumerable<ServicePrincipal> servicePrincipals;
         private IEnumerable<NamedLocation> namedLocations;
+        private GraphConditionalAccess graphConditionalAccess;
 
-        public AzureADIDCache (string clientId = null)
+        public AzureADIDCache(string clientId = null)
         {
             this.clientId = clientId;
             this.graphCache = new Dictionary<string, string>();
+            this.graphConditionalAccess = new GraphConditionalAccess(clientId);
         }
 
         public async System.Threading.Tasks.Task<List<string>> getUserDisplayNamesAsync(string[] userIDs)
@@ -85,7 +87,6 @@ namespace ModernWorkplaceConcierge.Helpers
 
         public async System.Threading.Tasks.Task<List<string>> getRoleDisplayNamesAsync(string[] roleIDs)
         {
-
             if (roleTemplates == null || roleTemplates.Count() == 0)
             {
                 roleTemplates = await GraphHelper.GetDirectoryRoleTemplates(clientId);
@@ -109,10 +110,9 @@ namespace ModernWorkplaceConcierge.Helpers
 
         public async Task<List<string>> getNamedLocationDisplayNamesAsync(string[] locationIDs)
         {
-
             if (namedLocations == null || namedLocations.Count() == 0)
             {
-                namedLocations = await GraphHelper.GetNamedLocationsAsync(clientId);
+                namedLocations = await graphConditionalAccess.GetNamedLocationsAsync();
             }
 
             List<String> displayNames = new List<string>();
@@ -131,11 +131,9 @@ namespace ModernWorkplaceConcierge.Helpers
             return displayNames;
         }
 
-
-
         public async Task<List<string>> getApplicationDisplayNamesAsync(string[] applicationIDs)
         {
-            if (servicePrincipals == null || ! servicePrincipals.Any())
+            if (servicePrincipals == null || !servicePrincipals.Any())
             {
                 servicePrincipals = await GraphHelper.GetServicePrincipals(clientId);
             }
@@ -169,5 +167,5 @@ namespace ModernWorkplaceConcierge.Helpers
             }
             return displayNames;
         }
-    }  
+    }
 }

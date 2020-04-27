@@ -246,6 +246,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AboutController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AutoPilotConfigurationController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -263,10 +264,17 @@
     <Compile Include="Helpers\ConditionalAccessPolicy.cs" />
     <Compile Include="Helpers\DeviceManagementScripts.cs" />
     <Compile Include="Helpers\FilenameHelper.cs" />
+    <Compile Include="Helpers\GraphClient.cs" />
+    <Compile Include="Helpers\GraphConditionalAccess.cs" />
     <Compile Include="Helpers\GraphHelper.cs" />
+    <Compile Include="Helpers\GraphIntune.cs" />
+    <Compile Include="Helpers\GraphIntuneImport.cs" />
+    <Compile Include="Helpers\GraphJson.cs" />
+    <Compile Include="Helpers\GraphPlanner.cs" />
     <Compile Include="Helpers\MwHub.cs" />
+    <Compile Include="Helpers\SignalRMessage.cs" />
     <Compile Include="Models\Alert.cs" />
-    <Compile Include="Models\api.cs" />
+    <Compile Include="Models\OverwriteBehaviour.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="TokenStorage\SessionTokenStore.cs" />
@@ -538,6 +546,8 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\ConditionalAccess\DeployBaseline.cshtml" />
     <Content Include="Views\ConditionalAccess\Documentation.cshtml" />
+    <Content Include="Views\About\Terms.cshtml" />
+    <Content Include="Views\About\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

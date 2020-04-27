@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-using ModernWorkplaceConcierge.Helpers;
-using ModernWorkplaceConcierge.TokenStorage;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -10,12 +8,14 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Notifications;
 using Microsoft.Owin.Security.OpenIdConnect;
+using ModernWorkplaceConcierge.Helpers;
+using ModernWorkplaceConcierge.TokenStorage;
 using Owin;
+using System;
 using System.Configuration;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
-using System;
 
 namespace ModernWorkplaceConcierge
 {
@@ -23,6 +23,7 @@ namespace ModernWorkplaceConcierge
     {
         // Load configuration settings from PrivateSettings.config
         private static readonly string tokenEndpoint = ConfigurationManager.AppSettings["TokenEndpoint"];
+
         private static readonly string appId = ConfigurationManager.AppSettings["AppId"];
         private static readonly string appSecret = ConfigurationManager.AppSettings["AppSecret"];
         private static readonly string redirectUri = ConfigurationManager.AppSettings["RedirectUri"];
@@ -45,7 +46,6 @@ namespace ModernWorkplaceConcierge
                     TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = false
-
                     },
                     Notifications = new OpenIdConnectAuthenticationNotifications
                     {
@@ -92,7 +92,6 @@ namespace ModernWorkplaceConcierge
 
                 try
                 {
-                    
                     var photo = await GraphHelper.GetUserPhotoAsync(result.AccessToken);
                     if (photo != null)
                     {
@@ -108,8 +107,6 @@ namespace ModernWorkplaceConcierge
                     profilePhoto = null;
                 }
 
-                
-                
                 var cachedUser = new CachedUser()
                 {
                     DisplayName = userDetails.DisplayName,

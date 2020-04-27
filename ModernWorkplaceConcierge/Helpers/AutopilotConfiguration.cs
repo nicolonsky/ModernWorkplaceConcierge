@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Microsoft.Graph;
-using ModernWorkplaceConcierge.Helpers;
+﻿using Microsoft.Graph;
 using Newtonsoft.Json;
+using System;
 
 namespace ModernWorkplaceConcierge.Helpers
 {
-    public class CloudAssignedAadServerData {
-
+    public class CloudAssignedAadServerData
+    {
         public ZeroTouchConfig ZeroTouchConfig;
 
-        public CloudAssignedAadServerData (ZeroTouchConfig zeroTouchConfig)
+        public CloudAssignedAadServerData(ZeroTouchConfig zeroTouchConfig)
         {
             this.ZeroTouchConfig = new ZeroTouchConfig(zeroTouchConfig.CloudAssignedTenantDomain, zeroTouchConfig.ForcedEnrollment);
         }
-
     }
+
     public class ZeroTouchConfig
     {
         public String CloudAssignedTenantUpn;
@@ -47,8 +43,8 @@ namespace ModernWorkplaceConcierge.Helpers
         public String ZtdCorrelationId;
         public String CloudAssignedTenantDomain;
         public String CloudAssignedLanguage;
-        
-        public AutopilotConfiguration (Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
+
+        public AutopilotConfiguration(Microsoft.Graph.WindowsAutopilotDeploymentProfile profile, Microsoft.Graph.Organization organization)
         {
             Comment_File = "Offline Autopilot Profile " + profile.DisplayName;
 
@@ -72,7 +68,7 @@ namespace ModernWorkplaceConcierge.Helpers
 
             CloudAssignedOobeConfig = 8 + 256;
 
-            if  (profile.OutOfBoxExperienceSettings.UserType.Equals("standard"))
+            if (profile.OutOfBoxExperienceSettings.UserType.Equals("standard"))
             {
                 CloudAssignedOobeConfig += 2;
             }
@@ -119,7 +115,6 @@ namespace ModernWorkplaceConcierge.Helpers
                 {
                     CloudAssignedTenantDomain = domain.Name;
                 }
-
             }
 
             int hideEscapeLink = 0;

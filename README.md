@@ -6,11 +6,13 @@ The [Modern Workplace Concierge](https://mwconcierge.azurewebsites.net/) is a he
 
 * Import and export Intune configuration and settings
 * Import and export Conditional Access policies
+* Document Conditional Access policies
+* Deploy a Conditional Access baseline
 * Download OSD ready offline Autopilot profiles
-* Re-Download stored PowerShell scripts in Intune (as PowerShell)
+* Re-download uploaded PowerShell scripts from Intune
 * Import trello boards to Microsoft Planner
 
-The tool is built on ASP.NET and works with the Microsoft Graph Beta API (because on the Beta endpoint are more entities available).
+The tool is built on ASP.NET and works with the Microsoft Graph Beta API.
 
 ## Supported entities
 
@@ -20,17 +22,13 @@ Supported configuration in imports and exports are documented on this project's 
 
 To Authenticate with the Microsoft Graph API a multi tenant Azure AD application performs authentication and you will need to provide admin consent to the Azure AD application before you can use this tool.
 
-<img src="https://github.com/nicolonsky/ModernWorkplaceConcierge/blob/master/Doc/Consent.png" alt="Consent" width="25%">
-
-As the tool performs only GET and POST requests to the Graph API no unitended or negative effects should occur. Additionally conditional access policies are imported as disabled to prevent a lockout.
-
 ## Privacy
 
-All up- and downloaded data is processed in memory and not stored persistent. No usage data with Azure AD tenant ID's or Azure AD user information is collected. The app uses Azure application insights and traces the performance markers [what-does-application-insights-monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview#what-does-application-insights-monitor).
+The app uses Azure application insights and traces performance markers [what-does-application-insights-monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview#what-does-application-insights-monitor). All data is processed in memory and not stored persistent or used for further processing.
 
 ### Host your own instance
 
-If you cannot use the public instance of the ModernWorkplaceConcierge (because of legal and/or compliance reasons) you can deploy an instance in your Azure tenant.
+If you are not allowed to or don't like to use the public instance of the Modern Workplace Concierge you can deploy an instance in your Azure tenant & setup an app registration.
 [Wiki documentation for Self-hosting a custom instance](https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki/Self-hosting-a-custom-instance).
 
 [![Deploy to Azure](https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png)](https://azuredeploy.net/?repository=https://github.com/nicolonsky/ModernWorkplaceConcierge/tree/master)
