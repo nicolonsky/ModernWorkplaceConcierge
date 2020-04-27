@@ -10,11 +10,11 @@ namespace ModernWorkplaceConcierge.Helpers
 {
     public class GraphIntuneImport
     {
-        private GraphIntune graphIntune;
-        private SignalRMessage signalRMessage;
-        private OverwriteBehaviour overwriteBehaviour;
         private IEnumerable<DeviceCompliancePolicy> compliancePolicies;
         private IEnumerable<DeviceConfiguration> deviceConfigurations;
+        private GraphIntune graphIntune;
+        private OverwriteBehaviour overwriteBehaviour;
+        private SignalRMessage signalRMessage;
 
         public GraphIntuneImport(string clientId, OverwriteBehaviour overwriteBehaviour)
         {
@@ -46,20 +46,25 @@ namespace ModernWorkplaceConcierge.Helpers
                     switch (overwriteBehaviour)
                     {
                         case OverwriteBehaviour.DISCARD:
-                            if (!compliancePolicies.Any(p => p.Id.Contains(deviceCompliancePolicy.Id)))
+                            if (compliancePolicies.All(p => !p.Id.Contains(deviceCompliancePolicy.Id)) && compliancePolicies.All(p => !p.DisplayName.Contains(deviceCompliancePolicy.DisplayName)))
                             {
-                                var response = await graphIntune.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
-                                signalRMessage.sendMessage($"Success: added {response.ODataType} '{response.DisplayName}'");
+                                await graphIntune.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
                             }
                             else
                             {
-                                signalRMessage.sendMessage($"Discarding Policy '{deviceCompliancePolicy.DisplayName}' ({deviceCompliancePolicy.DisplayName}) already exists!");
+                                if (compliancePolicies.Any(p => p.Id.Contains(deviceCompliancePolicy.Id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{deviceCompliancePolicy.DisplayName}' ({deviceCompliancePolicy.Id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{deviceCompliancePolicy.DisplayName}' - configuration with this name already exists!");
+                                }
                             }
                             break;
 
                         case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
-                            var deviceCompliancePolicyResponse2 = await graphIntune.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
-                            signalRMessage.sendMessage($"Success: added {deviceCompliancePolicyResponse2.ODataType} '{deviceCompliancePolicyResponse2.DisplayName}'");
+                            await graphIntune.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
                             break;
 
                         case OverwriteBehaviour.OVERWRITE_BY_ID:
@@ -73,8 +78,7 @@ namespace ModernWorkplaceConcierge.Helpers
                             // Create a new policy
                             else
                             {
-                                var deviceCompliancePolicyResponse3 = await graphIntune.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
-                                signalRMessage.sendMessage($"Success: added {deviceCompliancePolicyResponse3.ODataType} '{deviceCompliancePolicyResponse3.DisplayName}'");
+                                await graphIntune.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
                             }
                             break;
 
@@ -88,8 +92,7 @@ namespace ModernWorkplaceConcierge.Helpers
                             }
                             else
                             {
-                                var deviceCompliancePolicyResponse4 = await graphIntune.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
-                                signalRMessage.sendMessage($"Success: added {deviceCompliancePolicyResponse4.ODataType} '{deviceCompliancePolicyResponse4.DisplayName}'");
+                                await graphIntune.AddDeviceCompliancePolicyAsync(deviceCompliancePolicy);
                             }
                             break;
                     }
@@ -104,8 +107,6 @@ namespace ModernWorkplaceConcierge.Helpers
 
                     string temp = JsonConvert.SerializeObject(deviceConfiguration);
 
-                    
-
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && deviceConfigurations == null)
                     {
                         deviceConfigurations = await graphIntune.GetDeviceConfigurationsAsync();
@@ -114,20 +115,25 @@ namespace ModernWorkplaceConcierge.Helpers
                     switch (overwriteBehaviour)
                     {
                         case OverwriteBehaviour.DISCARD:
-                            if (!deviceConfigurations.Any(p => p.Id.Contains(deviceConfiguration.Id)))
+                            if (deviceConfigurations.All(p => !p.Id.Contains(deviceConfiguration.Id)) && deviceConfigurations.All(p => !p.DisplayName.Contains(deviceConfiguration.DisplayName)))
                             {
-                                var response = await graphIntune.AddDeviceConfigurationAsync(deviceConfiguration);
-                                signalRMessage.sendMessage($"Success: added {response.ODataType} '{response.DisplayName}'");
+                                await graphIntune.AddDeviceConfigurationAsync(deviceConfiguration);
                             }
                             else
                             {
-                                signalRMessage.sendMessage($"Discarding Policy '{deviceConfiguration.DisplayName}' ({deviceConfiguration.DisplayName}) already exists!");
+                                if (deviceConfigurations.Any(p => p.Id.Contains(deviceConfiguration.Id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{deviceConfiguration.DisplayName}' ({deviceConfiguration.Id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{deviceConfiguration.DisplayName}' - configuration with this name already exists!");
+                                }
                             }
                             break;
 
                         case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
-                            var deviceCompliancePolicyResponse2 = await graphIntune.AddDeviceConfigurationAsync(deviceConfiguration);
-                            signalRMessage.sendMessage($"Success: added {deviceCompliancePolicyResponse2.ODataType} '{deviceCompliancePolicyResponse2.DisplayName}'");
+                            await graphIntune.AddDeviceConfigurationAsync(deviceConfiguration);
                             break;
 
                         case OverwriteBehaviour.OVERWRITE_BY_ID:
@@ -140,8 +146,7 @@ namespace ModernWorkplaceConcierge.Helpers
                             // Create a new policy
                             else
                             {
-                                var deviceCompliancePolicyResponse3 = await graphIntune.AddDeviceConfigurationAsync(deviceConfiguration);
-                                signalRMessage.sendMessage($"Success: added {deviceCompliancePolicyResponse3.ODataType} '{deviceCompliancePolicyResponse3.DisplayName}'");
+                                await graphIntune.AddDeviceConfigurationAsync(deviceConfiguration);
                             }
                             break;
 
@@ -154,8 +159,7 @@ namespace ModernWorkplaceConcierge.Helpers
                             }
                             else
                             {
-                                var deviceCompliancePolicyResponse4 = await graphIntune.AddDeviceConfigurationAsync(deviceConfiguration);
-                                signalRMessage.sendMessage($"Success: added {deviceCompliancePolicyResponse4.ODataType} '{deviceCompliancePolicyResponse4.DisplayName}'");
+                                await graphIntune.AddDeviceConfigurationAsync(deviceConfiguration);
                             }
                             break;
                     }
@@ -163,32 +167,252 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 case string odataValue when odataValue.Contains("deviceManagementScripts"):
                     DeviceManagementScript deviceManagementScript = JsonConvert.DeserializeObject<DeviceManagementScript>(result);
-                    // remove id - otherwise request fails
-                    deviceManagementScript.Id = "";
-                    var response2 = await graphIntune.AddDeviceManagementScriptsAsync(deviceManagementScript);
-                    signalRMessage.sendMessage($"Success: added {response2.ODataType} '{response2.DisplayName}'");
+                    IEnumerable<DeviceManagementScript> deviceManagementScipts = await graphIntune.GetDeviceManagementScriptsAsync();
+
+                    switch (overwriteBehaviour)
+                    {
+                        case OverwriteBehaviour.DISCARD:
+                            if (deviceManagementScipts.All(p => !p.Id.Contains(deviceManagementScript.Id)) && deviceManagementScipts.All(p => !p.DisplayName.Contains(deviceManagementScript.DisplayName)))
+                            {
+                                await graphIntune.AddDeviceManagementScriptAsync(deviceManagementScript);
+                            }
+                            else
+                            {
+                                if (deviceManagementScipts.Any(p => p.Id.Contains(deviceManagementScript.Id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{deviceManagementScript.DisplayName}' ({deviceManagementScript.Id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{deviceManagementScript.DisplayName}' - configuration with this name already exists!");
+                                }
+                            }
+                            break;
+
+                        case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
+                            await graphIntune.AddDeviceManagementScriptAsync(deviceManagementScript);
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_ID:
+
+                            // match by object ID
+                            if (deviceManagementScipts.Any(p => p.Id.Contains(deviceManagementScript.Id)))
+                            {
+                                await graphIntune.PatchDeviceManagementScriptAsync(deviceManagementScript);
+                            }
+                            // Create a new policy
+                            else
+                            {
+                                await graphIntune.AddDeviceManagementScriptAsync(deviceManagementScript);
+                            }
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                            if (deviceManagementScipts.Any(policy => policy.DisplayName.Equals(deviceManagementScript.DisplayName)))
+                            {
+                                string replaceObjectId = deviceManagementScipts.Where(policy => policy.DisplayName.Equals(deviceManagementScript.DisplayName)).Select(policy => policy.Id).First();
+                                deviceManagementScript.Id = replaceObjectId;
+                                await graphIntune.PatchDeviceManagementScriptAsync(deviceManagementScript);
+                            }
+                            else
+                            {
+                                await graphIntune.AddDeviceManagementScriptAsync(deviceManagementScript);
+                            }
+                            break;
+                    }
                     break;
 
                 case string odataValue when odataValue.Contains("WindowsAutopilotDeploymentProfile"):
                     WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = JsonConvert.DeserializeObject<WindowsAutopilotDeploymentProfile>(result);
-                    var response3 = await graphIntune.AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
-                    signalRMessage.sendMessage($"Success: added {response3.ODataType} '{response3.DisplayName}'");
+                    IEnumerable<WindowsAutopilotDeploymentProfile> windowsAutopilotDeploymentProfiles = await graphIntune.GetWindowsAutopilotDeploymentProfiles();
+
+                    switch (overwriteBehaviour)
+                    {
+                        case OverwriteBehaviour.DISCARD:
+                            if (windowsAutopilotDeploymentProfiles.All(p => !p.Id.Contains(windowsAutopilotDeploymentProfile.Id)) && windowsAutopilotDeploymentProfiles.All(p => !p.DisplayName.Contains(windowsAutopilotDeploymentProfile.DisplayName)))
+                            {
+                                await graphIntune.AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
+                            }
+                            else
+                            {
+                                if (windowsAutopilotDeploymentProfiles.Any(p => p.Id.Contains(windowsAutopilotDeploymentProfile.Id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{windowsAutopilotDeploymentProfile.DisplayName}' ({windowsAutopilotDeploymentProfile.Id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{windowsAutopilotDeploymentProfile.DisplayName}' - configuration with this name already exists!");
+                                }
+                            }
+                            break;
+
+                        case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
+                            await graphIntune.AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_ID:
+
+                            // match by object ID
+                            if (windowsAutopilotDeploymentProfiles.Any(p => p.Id.Contains(windowsAutopilotDeploymentProfile.Id)))
+                            {
+                                await graphIntune.PatchWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
+                            }
+                            // Create a new policy
+                            else
+                            {
+                                await graphIntune.AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
+                            }
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                            if (windowsAutopilotDeploymentProfiles.Any(policy => policy.DisplayName.Equals(windowsAutopilotDeploymentProfile.DisplayName)))
+                            {
+                                string replaceObjectId = windowsAutopilotDeploymentProfiles.Where(policy => policy.DisplayName.Equals(windowsAutopilotDeploymentProfile.DisplayName)).Select(policy => policy.Id).First();
+                                windowsAutopilotDeploymentProfile.Id = replaceObjectId;
+                                await graphIntune.PatchWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
+                            }
+                            else
+                            {
+                                await graphIntune.AddWindowsAutopilotDeploymentProfile(windowsAutopilotDeploymentProfile);
+                            }
+                            break;
+                    }
                     break;
 
                 case string odataValue when odataValue.Contains("#microsoft.graph.iosManagedAppProtection"):
-                    var response4 = await graphIntune.ImportIosManagedAppProtectionAsync(result);
-                    signalRMessage.sendMessage($"Success: added {response4.ODataType} '{response4.DisplayName}'");
+                    IosManagedAppProtection iosManagedAppProtection = JsonConvert.DeserializeObject<IosManagedAppProtection>(result);
+                    IEnumerable<IosManagedAppProtection> iosManagedAppProtections = await graphIntune.GetIosManagedAppProtectionsAsync();
+
+                    switch (overwriteBehaviour)
+                    {
+                        case OverwriteBehaviour.DISCARD:
+                            if (iosManagedAppProtections.All(p => !p.Id.Contains(iosManagedAppProtection.Id)) && iosManagedAppProtections.All(p => !p.DisplayName.Contains(iosManagedAppProtection.DisplayName)))
+                            {
+                                await graphIntune.ImportIosManagedAppProtectionAsync(result);
+                            }
+                            else
+                            {
+                                if (iosManagedAppProtections.Any(p => p.Id.Contains(iosManagedAppProtection.Id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{iosManagedAppProtection.DisplayName}' ({iosManagedAppProtection.Id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{iosManagedAppProtection.DisplayName}' - configuration with this name already exists!");
+                                }
+                            }
+                            break;
+
+                        case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
+                            await graphIntune.ImportIosManagedAppProtectionAsync(result);
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_ID:
+
+                            // match by object ID
+                            if (iosManagedAppProtections.Any(p => p.Id.Contains(iosManagedAppProtection.Id)))
+                            {
+                                await graphIntune.ImportPatchIosManagedAppProtectionAsync(result);
+                            }
+                            // Create a new policy
+                            else
+                            {
+                                await graphIntune.ImportIosManagedAppProtectionAsync(result);
+                            }
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                            if (iosManagedAppProtections.Any(policy => policy.DisplayName.Equals(iosManagedAppProtection.DisplayName)))
+                            {
+                                string replaceObjectId = iosManagedAppProtections.Where(policy => policy.DisplayName.Equals(iosManagedAppProtection.DisplayName)).Select(policy => policy.Id).First();
+                                // Replace id in json file
+                                JObject jObject = JObject.Parse(result);
+                                jObject.SelectToken("id").Replace(replaceObjectId);
+
+                                await graphIntune.ImportPatchIosManagedAppProtectionAsync(jObject.ToString());
+                            }
+                            else
+                            {
+                                await graphIntune.ImportIosManagedAppProtectionAsync(result);
+                            }
+                            break;
+                    }
+
                     break;
 
                 case string odataValue when odataValue.Contains("#microsoft.graph.androidManagedAppProtection"):
-                    var response5 = await graphIntune.ImportAndroidManagedAppProtectionAsync(result);
-                    signalRMessage.sendMessage($"Success: added {response5.ODataType} '{response5.DisplayName}'");
+
+                    AndroidManagedAppProtection androidManagedAppProtection = JsonConvert.DeserializeObject<AndroidManagedAppProtection>(result);
+                    IEnumerable<AndroidManagedAppProtection> androidManagedAppProtections = await graphIntune.GetAndroidManagedAppProtectionsAsync();
+
+                    switch (overwriteBehaviour)
+                    {
+                        case OverwriteBehaviour.DISCARD:
+                            if (androidManagedAppProtections.All(p => !p.Id.Contains(androidManagedAppProtection.Id)) && androidManagedAppProtections.All(p => !p.DisplayName.Contains(androidManagedAppProtection.DisplayName)))
+                            {
+                                await graphIntune.ImportAndroidManagedAppProtectionAsync(result);
+                            }
+                            else
+                            {
+                                if (androidManagedAppProtections.Any(p => p.Id.Contains(androidManagedAppProtection.Id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{androidManagedAppProtection.DisplayName}' ({androidManagedAppProtection.Id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{androidManagedAppProtection.DisplayName}' - configuration with this name already exists!");
+                                }
+                            }
+                            break;
+
+                        case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
+                            await graphIntune.ImportAndroidManagedAppProtectionAsync(result);
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_ID:
+
+                            // match by object ID
+                            if (androidManagedAppProtections.Any(p => p.Id.Contains(androidManagedAppProtection.Id)))
+                            {
+                                await graphIntune.ImportPatchAndroidManagedAppProtectionAsync(result);
+                            }
+                            // Create a new policy
+                            else
+                            {
+                                await graphIntune.ImportAndroidManagedAppProtectionAsync(result);
+                            }
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                            if (androidManagedAppProtections.Any(policy => policy.DisplayName.Equals(androidManagedAppProtection.DisplayName)))
+                            {
+                                string replaceObjectId = androidManagedAppProtections.Where(policy => policy.DisplayName.Equals(androidManagedAppProtection.DisplayName)).Select(policy => policy.Id).First();
+                                // Replace id in json file
+                                JObject jObject = JObject.Parse(result);
+                                jObject.SelectToken("id").Replace(replaceObjectId);
+
+                                await graphIntune.ImportPatchAndroidManagedAppProtectionAsync(jObject.ToString());
+                            }
+                            else
+                            {
+                                await graphIntune.ImportAndroidManagedAppProtectionAsync(result);
+                            }
+                            break;
+                    }
                     break;
 
-                case string odataValue when odataValue.Contains("#microsoft.graph.targetedManagedAppConfiguration"):
-                    var response6 = await graphIntune.ImportWindowsManagedAppProtectionAsync(result);
-                    signalRMessage.sendMessage($"Success: added {response6.ODataType} '{response6.DisplayName}'");
+                case string odataValue when odataValue.Contains("#microsoft.graph.mdmWindowsInformationProtectionPolicy"):
+                    MdmWindowsInformationProtectionPolicy windowsInformationProtection = JsonConvert.DeserializeObject<MdmWindowsInformationProtectionPolicy>(result);
+                    await graphIntune.AddMdmWindowsInformationProtectionsAsync(windowsInformationProtection);
                     break;
+
+                case string odataValue when odataValue.Contains("#microsoft.graph.windowsInformationProtectionPolicy"):
+                    WindowsInformationProtectionPolicy windowsInformationProtectionUnmanaged = JsonConvert.DeserializeObject<WindowsInformationProtectionPolicy>(result);
+                    await graphIntune.AddWindowsInformationProtectionsAsync(windowsInformationProtectionUnmanaged);
+                    break;
+
+                default:
+                    throw new System.Exception($"Unsupported configuration type {json.OdataValue}");
             }
         }
     }

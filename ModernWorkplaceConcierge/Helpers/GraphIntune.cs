@@ -48,27 +48,12 @@ namespace ModernWorkplaceConcierge.Helpers
             return response;
         }
 
-        public async Task<AndroidManagedAppProtection> PatchAndroidManagedAppProtectionAsync(AndroidManagedAppProtection managedAppProtection)
-        {
-            var resource = graphServiceClient.DeviceAppManagement.AndroidManagedAppProtections[managedAppProtection.Id].Request();
-            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
-            var response = await resource.UpdateAsync(managedAppProtection);
-            return response;
-        }
-
         public async Task<DeviceCompliancePolicy> AddDeviceCompliancePolicyAsync(DeviceCompliancePolicy deviceCompliancePolicy)
         {
             var resource = graphServiceClient.DeviceManagement.DeviceCompliancePolicies.Request();
             signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
             var result = await resource.AddAsync(deviceCompliancePolicy);
-            return result;
-        }
-
-        public async Task<DeviceCompliancePolicy> PatchDeviceCompliancePolicyAsync(DeviceCompliancePolicy deviceCompliancePolicy)
-        {
-            var resource = graphServiceClient.DeviceManagement.DeviceCompliancePolicies[deviceCompliancePolicy.Id].Request();
-            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
-            var result = await resource.UpdateAsync(deviceCompliancePolicy);
+            signalRMessage.sendMessage($"Success: added {result.ODataType} '{result.DisplayName}'");
             return result;
         }
 
@@ -77,53 +62,17 @@ namespace ModernWorkplaceConcierge.Helpers
             var resource = graphServiceClient.DeviceManagement.DeviceConfigurations.Request();
             signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
             var result = await resource.AddAsync(deviceConfiguration);
+            signalRMessage.sendMessage($"Success: added {result.ODataType} '{result.DisplayName}'");
             return result;
         }
 
-        public async Task<DeviceConfiguration> PatchDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration)
+        public async Task<DeviceManagementScript> AddDeviceManagementScriptAsync(DeviceManagementScript deviceManagementScript)
         {
-            deviceConfiguration.SupportsScopeTags = null;
-            deviceConfiguration.RoleScopeTagIds = null;
-
-            if (!deviceConfiguration.ODataType.Equals("#microsoft.graph.windowsUpdateForBusinessConfiguration"))
-            {
-                string requestUrl = $"{graphEndpoint}/deviceManagement/deviceConfigurations/{deviceConfiguration.Id}";
-                HttpRequestMessage hrm = new HttpRequestMessage(new HttpMethod("PATCH"), requestUrl)
-                {
-                    Content = new StringContent(JsonConvert.SerializeObject(deviceConfiguration, new JsonSerializerSettings()
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                    }), Encoding.UTF8, "application/json")
-                };
-
-                // Authenticate (add access token) our HttpRequestMessage
-                await this.graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
-                signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
-
-                // Send the request and get the response.
-                HttpResponseMessage response = await graphServiceClient.HttpProvider.SendAsync(hrm);
-            }
-            else
-            {
-                await AddDeviceConfigurationAsync(deviceConfiguration);
-            }
-
-            return deviceConfiguration;
-        }
-
-        public async Task<DeviceManagementScript> AddDeviceManagementScriptsAsync(DeviceManagementScript deviceManagementScript)
-        {
+            deviceManagementScript.Id = null;
             var resource = graphServiceClient.DeviceManagement.DeviceManagementScripts.Request();
             signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
             var response = await resource.AddAsync(deviceManagementScript);
-            return response;
-        }
-
-        public async Task<DeviceManagementScript> PatchDeviceManagementScriptsAsync(DeviceManagementScript deviceManagementScript)
-        {
-            var resource = graphServiceClient.DeviceManagement.DeviceManagementScripts[deviceManagementScript.Id].Request();
-            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
-            var response = await resource.UpdateAsync(deviceManagementScript);
+            signalRMessage.sendMessage($"Success: added {response.ODataType} '{response.DisplayName}'");
             return response;
         }
 
@@ -135,14 +84,6 @@ namespace ModernWorkplaceConcierge.Helpers
             return response;
         }
 
-        public async Task<IosManagedAppProtection> PatchIosManagedAppProtectionAsync(IosManagedAppProtection managedAppProtection)
-        {
-            var resource = graphServiceClient.DeviceAppManagement.IosManagedAppProtections[managedAppProtection.Id].Request();
-            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
-            var response = await resource.UpdateAsync(managedAppProtection);
-            return response;
-        }
-
         public async Task<TargetedManagedAppConfiguration> AddManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration)
         {
             var resource = graphServiceClient.DeviceAppManagement.TargetedManagedAppConfigurations.Request();
@@ -151,12 +92,13 @@ namespace ModernWorkplaceConcierge.Helpers
             return response;
         }
 
-        public async Task<TargetedManagedAppConfiguration> PatchManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration)
+        public async Task<WindowsInformationProtection> AddMdmWindowsInformationProtectionsAsync(MdmWindowsInformationProtectionPolicy mdmWindowsInformationProtectionPolicy)
         {
-            var resource = graphServiceClient.DeviceAppManagement.TargetedManagedAppConfigurations[managedAppConfiguration.Id].Request();
-            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
-            var response = await resource.UpdateAsync(managedAppConfiguration);
-            return response;
+            var resource = graphServiceClient.DeviceAppManagement.MdmWindowsInformationProtectionPolicies.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var mdmWindowsInformationProtection = await resource.AddAsync(mdmWindowsInformationProtectionPolicy);
+            signalRMessage.sendMessage($"Success: added {mdmWindowsInformationProtection.ODataType} '{mdmWindowsInformationProtection.DisplayName}'");
+            return mdmWindowsInformationProtection;
         }
 
         public async Task<WindowsAutopilotDeploymentProfile> AddWindowsAutopilotDeploymentProfile(WindowsAutopilotDeploymentProfile autopilotDeploymentProfile)
@@ -164,15 +106,49 @@ namespace ModernWorkplaceConcierge.Helpers
             var resource = graphServiceClient.DeviceManagement.WindowsAutopilotDeploymentProfiles.Request();
             signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
             var response = await resource.AddAsync(autopilotDeploymentProfile);
+            signalRMessage.sendMessage($"Success: added {response.ODataType} '{response.DisplayName}'");
             return response;
         }
 
-        public async Task<WindowsAutopilotDeploymentProfile> PatchWindowsAutopilotDeploymentProfile(WindowsAutopilotDeploymentProfile autopilotDeploymentProfile)
+        public async Task<WindowsInformationProtection> AddWindowsInformationProtectionsAsync(WindowsInformationProtectionPolicy windowsInformationProtectionPolicy)
         {
-            var resource = graphServiceClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[autopilotDeploymentProfile.Id].Request();
-            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
-            var response = await resource.UpdateAsync(autopilotDeploymentProfile);
-            return response;
+            var resource = graphServiceClient.DeviceAppManagement.WindowsInformationProtectionPolicies.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var windowsInformationProtection = await resource.AddAsync(windowsInformationProtectionPolicy);
+            signalRMessage.sendMessage($"Success: added {windowsInformationProtection.ODataType} '{windowsInformationProtection.DisplayName}'");
+            return windowsInformationProtectionPolicy;
+        }
+
+        public async Task<IEnumerable<GroupPolicyConfiguration>> GetGroupPolicyConfigurationsAsync()
+        {
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var groupPolicyConfigurations = await resource.GetAsync();
+            return groupPolicyConfigurations.CurrentPage;
+        }
+
+        public async Task<IEnumerable<GroupPolicyDefinitionValue>> GetGroupPolicyDefinitionValuesAsync(string id)
+        {
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations[id].DefinitionValues.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var groupPolicyConfigurations = await resource.GetAsync();
+            return groupPolicyConfigurations.CurrentPage;
+        }
+
+        public async Task<IEnumerable<GroupPolicyPresentation>> GetGroupPolicyPresentationValuesAsync(string id)
+        {
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyDefinitions[id].Presentations.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var groupPolicyPresentations = await resource.GetAsync();
+            return groupPolicyPresentations.CurrentPage;
+        }
+
+        public async Task<IEnumerable<AndroidManagedAppProtection>> GetAndroidManagedAppProtectionsAsync()
+        {
+            var resource = graphServiceClient.DeviceAppManagement.AndroidManagedAppProtections.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var androidManagedAppProtection = await resource.GetAsync();
+            return androidManagedAppProtection.CurrentPage;
         }
 
         public async Task<IEnumerable<DeviceCompliancePolicy>> GetDeviceCompliancePoliciesAsync()
@@ -232,6 +208,14 @@ namespace ModernWorkplaceConcierge.Helpers
             return result.CurrentPage;
         }
 
+        public async Task<IEnumerable<IosManagedAppProtection>> GetIosManagedAppProtectionsAsync()
+        {
+            var resource = graphServiceClient.DeviceAppManagement.IosManagedAppProtections.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var iosManagedAppProtection = await resource.GetAsync();
+            return iosManagedAppProtection.CurrentPage;
+        }
+
         public async Task<IEnumerable<ManagedMobileApp>> GetManagedAppProtectionAssignmentAsync(string Id)
         {
             var resource = graphServiceClient.DeviceAppManagement.DefaultManagedAppProtections[Id].Apps.Request();
@@ -254,6 +238,14 @@ namespace ModernWorkplaceConcierge.Helpers
             signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
             var managedAppProtection = await resource.GetAsync();
             return managedAppProtection;
+        }
+
+        public async Task<IEnumerable<WindowsInformationProtection>> GetMdmWindowsInformationProtectionsAsync()
+        {
+            var resource = graphServiceClient.DeviceAppManagement.MdmWindowsInformationProtectionPolicies.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var mdmWindowsInformationProtectionPolicies = await resource.GetAsync();
+            return mdmWindowsInformationProtectionPolicies.CurrentPage;
         }
 
         public async Task<IEnumerable<DeviceAndAppManagementRoleAssignment>> GetRoleAssignmentsAsync()
@@ -314,27 +306,7 @@ namespace ModernWorkplaceConcierge.Helpers
             signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
             // Send the request and get the response.
             await graphServiceClient.HttpProvider.SendAsync(hrm);
-            return response;
-        }
-
-        public async Task<AndroidManagedAppProtection> ImportPatchAndroidManagedAppProtectionAsync(string androidManagedAppProtection)
-        {
-            AndroidManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<AndroidManagedAppProtection>(androidManagedAppProtection);
-            var response = await PatchAndroidManagedAppProtectionAsync(managedAppProtection);
-            string requestUrl = graphEndpoint + "/deviceAppManagement/androidManagedAppProtections/" + response.Id + "/targetApps";
-
-            // Restore assignment of app protection policy
-            string requestBody = ConvertToApppProtectionAssignment(androidManagedAppProtection);
-            HttpRequestMessage hrm = new HttpRequestMessage(new HttpMethod("PATCH"), requestUrl)
-            {
-                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
-            };
-
-            // Authenticate (add access token) our HttpRequestMessage
-            await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
-            signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
-            // Send the request and get the response.
-            await graphServiceClient.HttpProvider.SendAsync(hrm);
+            signalRMessage.sendMessage($"Success: added {response.ODataType} '{response.DisplayName}'");
             return response;
         }
 
@@ -356,18 +328,20 @@ namespace ModernWorkplaceConcierge.Helpers
             signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
             // Send the request and get the response.
             await graphServiceClient.HttpProvider.SendAsync(hrm);
+
+            signalRMessage.sendMessage($"Success: added {response.ODataType} '{response.DisplayName}'");
             return response;
         }
 
-        public async Task<IosManagedAppProtection> ImportPatchIosManagedAppProtectionAsync(string iosManagedAppProtection)
+        public async Task<AndroidManagedAppProtection> ImportPatchAndroidManagedAppProtectionAsync(string androidManagedAppProtection)
         {
-            IosManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<IosManagedAppProtection>(iosManagedAppProtection);
-            var response = await PatchIosManagedAppProtectionAsync(managedAppProtection);
-            string requestUrl = graphEndpoint + "/deviceAppManagement/iosManagedAppProtections/" + response.Id + "/targetApps";
+            AndroidManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<AndroidManagedAppProtection>(androidManagedAppProtection);
+            await PatchAndroidManagedAppProtectionAsync(managedAppProtection);
+            string requestUrl = graphEndpoint + "/deviceAppManagement/androidManagedAppProtections/" + managedAppProtection.Id + "/targetApps";
 
             // Restore assignment of app protection policy
-            string requestBody = ConvertToApppProtectionAssignment(iosManagedAppProtection);
-            HttpRequestMessage hrm = new HttpRequestMessage(new HttpMethod("PATCH"), requestUrl)
+            string requestBody = ConvertToApppProtectionAssignment(androidManagedAppProtection);
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {
                 Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
             };
@@ -376,8 +350,68 @@ namespace ModernWorkplaceConcierge.Helpers
             await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
             signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
             // Send the request and get the response.
-            await graphServiceClient.HttpProvider.SendAsync(hrm);
-            return response;
+            var response = await graphServiceClient.HttpProvider.SendAsync(hrm);
+
+            if (response.IsSuccessStatusCode)
+            {
+                signalRMessage.sendMessage($"Success: updated {managedAppProtection.ODataType} ({managedAppProtection.DisplayName})");
+            }
+
+            return managedAppProtection;
+        }
+
+        public async Task<IosManagedAppProtection> ImportPatchIosManagedAppProtectionAsync(string iosManagedAppProtection)
+        {
+            IosManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<IosManagedAppProtection>(iosManagedAppProtection);
+            await PatchIosManagedAppProtectionAsync(managedAppProtection);
+            string requestUrl = graphEndpoint + "/deviceAppManagement/iosManagedAppProtections/" + managedAppProtection.Id + "/targetApps";
+
+            // Restore assignment of app protection policy
+            string requestBody = ConvertToApppProtectionAssignment(iosManagedAppProtection);
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+            {
+                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+            };
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+            signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
+            // Send the request and get the response.
+            var response = await graphServiceClient.HttpProvider.SendAsync(hrm);
+
+            if (response.IsSuccessStatusCode)
+            {
+                signalRMessage.sendMessage($"Success: updated {managedAppProtection.ODataType} ({managedAppProtection.DisplayName})");
+            }
+
+            return managedAppProtection;
+        }
+
+        public async Task<TargetedManagedAppConfiguration> ImportPatchWindowsManagedAppProtectionAsync(string targetedManagedAppConfiguration)
+        {
+            TargetedManagedAppConfiguration managedAppProtection = JsonConvert.DeserializeObject<TargetedManagedAppConfiguration>(targetedManagedAppConfiguration);
+            await PatchManagedAppConfigurationAsync(managedAppProtection);
+            string requestUrl = graphEndpoint + "/deviceAppManagement/targetedManagedAppConfigurations/" + managedAppProtection.Id + "/targetApps";
+
+            // Restore assignment of app protection policy
+            string requestBody = ConvertToApppProtectionAssignment(targetedManagedAppConfiguration);
+            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+            {
+                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+            };
+
+            // Authenticate (add access token) our HttpRequestMessage
+            await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+            signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
+            // Send the request and get the response.
+            var response = await graphServiceClient.HttpProvider.SendAsync(hrm);
+
+            if (response.IsSuccessStatusCode)
+            {
+                signalRMessage.sendMessage($"Success: updated {managedAppProtection.ODataType} ({managedAppProtection.DisplayName})");
+            }
+
+            return managedAppProtection;
         }
 
         public async Task<TargetedManagedAppConfiguration> ImportWindowsManagedAppProtectionAsync(string targetedManagedAppConfiguration)
@@ -398,27 +432,88 @@ namespace ModernWorkplaceConcierge.Helpers
             signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
             // Send the request and get the response.
             await graphServiceClient.HttpProvider.SendAsync(hrm);
+            signalRMessage.sendMessage($"Success: added {response.ODataType} '{response.DisplayName}'");
             return response;
         }
 
-        public async Task<TargetedManagedAppConfiguration> ImportPatchWindowsManagedAppProtectionAsync(string targetedManagedAppConfiguration)
+        public async Task<AndroidManagedAppProtection> PatchAndroidManagedAppProtectionAsync(AndroidManagedAppProtection managedAppProtection)
         {
-            TargetedManagedAppConfiguration managedAppProtection = JsonConvert.DeserializeObject<TargetedManagedAppConfiguration>(targetedManagedAppConfiguration);
-            var response = await PatchManagedAppConfigurationAsync(managedAppProtection);
-            string requestUrl = graphEndpoint + "/deviceAppManagement/targetedManagedAppConfigurations/" + response.Id + "/targetApps";
+            var resource = graphServiceClient.DeviceAppManagement.AndroidManagedAppProtections[managedAppProtection.Id].Request();
+            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
+            var response = await resource.UpdateAsync(managedAppProtection);
+            return response;
+        }
+        public async Task<DeviceCompliancePolicy> PatchDeviceCompliancePolicyAsync(DeviceCompliancePolicy deviceCompliancePolicy)
+        {
+            var resource = graphServiceClient.DeviceManagement.DeviceCompliancePolicies[deviceCompliancePolicy.Id].Request();
+            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
+            await resource.UpdateAsync(deviceCompliancePolicy);
+            signalRMessage.sendMessage($"Success: updated {deviceCompliancePolicy.ODataType} '{deviceCompliancePolicy.DisplayName}'");
+            return deviceCompliancePolicy;
+        }
+        public async Task<DeviceConfiguration> PatchDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration)
+        {
+            deviceConfiguration.SupportsScopeTags = null;
+            deviceConfiguration.RoleScopeTagIds = null;
 
-            // Restore assignment of app protection policy
-            string requestBody = ConvertToApppProtectionAssignment(targetedManagedAppConfiguration);
-            HttpRequestMessage hrm = new HttpRequestMessage(new HttpMethod("PATCH"), requestUrl)
+            if (!deviceConfiguration.ODataType.Equals("#microsoft.graph.windowsUpdateForBusinessConfiguration"))
             {
-                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
-            };
+                string requestUrl = $"{graphEndpoint}/deviceManagement/deviceConfigurations/{deviceConfiguration.Id}";
+                HttpRequestMessage hrm = new HttpRequestMessage(new HttpMethod("PATCH"), requestUrl)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(deviceConfiguration, new JsonSerializerSettings()
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                    }), Encoding.UTF8, "application/json")
+                };
 
-            // Authenticate (add access token) our HttpRequestMessage
-            await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
-            signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
-            // Send the request and get the response.
-            await graphServiceClient.HttpProvider.SendAsync(hrm);
+                // Authenticate (add access token) our HttpRequestMessage
+                await this.graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+                signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
+
+                // Send the request and get the response.
+                HttpResponseMessage response = await graphServiceClient.HttpProvider.SendAsync(hrm);
+            }
+            else
+            {
+                await AddDeviceConfigurationAsync(deviceConfiguration);
+            }
+
+            signalRMessage.sendMessage($"Success: updated {deviceConfiguration.ODataType} '{deviceConfiguration.DisplayName}'");
+            return deviceConfiguration;
+        }
+        public async Task<DeviceManagementScript> PatchDeviceManagementScriptAsync(DeviceManagementScript deviceManagementScript)
+        {
+            deviceManagementScript.LastModifiedDateTime = null;
+            deviceManagementScript.CreatedDateTime = null;
+            var resource = graphServiceClient.DeviceManagement.DeviceManagementScripts[deviceManagementScript.Id].Request();
+            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
+            var response = await resource.UpdateAsync(deviceManagementScript);
+            signalRMessage.sendMessage($"Success: updated {response.ODataType} '{response.DisplayName}'");
+            return response;
+        }
+        public async Task<IosManagedAppProtection> PatchIosManagedAppProtectionAsync(IosManagedAppProtection managedAppProtection)
+        {
+            var resource = graphServiceClient.DeviceAppManagement.IosManagedAppProtections[managedAppProtection.Id].Request();
+            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
+            var response = await resource.UpdateAsync(managedAppProtection);
+            signalRMessage.sendMessage($"Success: updated {managedAppProtection.ODataType} '{managedAppProtection.DisplayName}'");
+            return response;
+        }
+        public async Task<TargetedManagedAppConfiguration> PatchManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration)
+        {
+            var resource = graphServiceClient.DeviceAppManagement.TargetedManagedAppConfigurations[managedAppConfiguration.Id].Request();
+            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
+            var response = await resource.UpdateAsync(managedAppConfiguration);
+            signalRMessage.sendMessage($"Success: updated {managedAppConfiguration.ODataType} '{managedAppConfiguration.DisplayName}'");
+            return response;
+        }
+        public async Task<WindowsAutopilotDeploymentProfile> PatchWindowsAutopilotDeploymentProfile(WindowsAutopilotDeploymentProfile autopilotDeploymentProfile)
+        {
+            var resource = graphServiceClient.DeviceManagement.WindowsAutopilotDeploymentProfiles[autopilotDeploymentProfile.Id].Request();
+            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
+            var response = await resource.UpdateAsync(autopilotDeploymentProfile);
+            signalRMessage.sendMessage($"Success: updated {autopilotDeploymentProfile.ODataType} '{autopilotDeploymentProfile.DisplayName}'");
             return response;
         }
     }

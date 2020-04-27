@@ -271,7 +271,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                 displayName = displayName.Replace(illegalChar, '-');
                             }
 
-                            var zipArchiveEntry = archive.CreateEntry(displayName + "_" + item.id + ".json", CompressionLevel.Fastest);
+                            var zipArchiveEntry = archive.CreateEntry(displayName + "_" + item.id.Substring(0,8) + ".json", CompressionLevel.Fastest);
 
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
