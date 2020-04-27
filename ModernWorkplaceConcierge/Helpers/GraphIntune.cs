@@ -232,6 +232,14 @@ namespace ModernWorkplaceConcierge.Helpers
             return managedAppProtection.CurrentPage;
         }
 
+        public async Task<IEnumerable<TargetedManagedAppConfiguration>> GetTargetedManagedAppConfigurationsAsync()
+        {
+            var resource = graphServiceClient.DeviceAppManagement.TargetedManagedAppConfigurations.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var targetedManagedAppConfig = await resource.GetAsync();
+            return targetedManagedAppConfig.CurrentPage;
+        }
+
         public async Task<ManagedAppPolicy> GetManagedAppProtectionAsync(string Id)
         {
             var resource = graphServiceClient.DeviceAppManagement.IosManagedAppProtections[Id].Request();
@@ -387,7 +395,7 @@ namespace ModernWorkplaceConcierge.Helpers
             return managedAppProtection;
         }
 
-        public async Task<TargetedManagedAppConfiguration> ImportPatchWindowsManagedAppProtectionAsync(string targetedManagedAppConfiguration)
+        public async Task<TargetedManagedAppConfiguration> ImportPatchTargetedManagedAppConfigurationAsync(string targetedManagedAppConfiguration)
         {
             TargetedManagedAppConfiguration managedAppProtection = JsonConvert.DeserializeObject<TargetedManagedAppConfiguration>(targetedManagedAppConfiguration);
             await PatchManagedAppConfigurationAsync(managedAppProtection);
@@ -414,11 +422,11 @@ namespace ModernWorkplaceConcierge.Helpers
             return managedAppProtection;
         }
 
-        public async Task<TargetedManagedAppConfiguration> ImportWindowsManagedAppProtectionAsync(string targetedManagedAppConfiguration)
+        public async Task<TargetedManagedAppConfiguration> ImportTargetedManagedAppConfigurationAsync(string targetedManagedAppConfiguration)
         {
             TargetedManagedAppConfiguration managedAppProtection = JsonConvert.DeserializeObject<TargetedManagedAppConfiguration>(targetedManagedAppConfiguration);
             var response = await AddManagedAppConfigurationAsync(managedAppProtection);
-            string requestUrl = graphEndpoint + "/deviceAppManagement/targetedManagedAppConfigurations/" + response.Id + "/targetApps";
+            string requestUrl = graphEndpoint + "/deviceAppManagement/targetedManagedAppConfigurations/" + managedAppProtection.Id + "/targetApps";
 
             // Restore assignment of app protection policy
             string requestBody = ConvertToApppProtectionAssignment(targetedManagedAppConfiguration);
@@ -497,7 +505,6 @@ namespace ModernWorkplaceConcierge.Helpers
             var resource = graphServiceClient.DeviceAppManagement.IosManagedAppProtections[managedAppProtection.Id].Request();
             signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
             var response = await resource.UpdateAsync(managedAppProtection);
-            signalRMessage.sendMessage($"Success: updated {managedAppProtection.ODataType} '{managedAppProtection.DisplayName}'");
             return response;
         }
         public async Task<TargetedManagedAppConfiguration> PatchManagedAppConfigurationAsync(TargetedManagedAppConfiguration managedAppConfiguration)
@@ -505,7 +512,6 @@ namespace ModernWorkplaceConcierge.Helpers
             var resource = graphServiceClient.DeviceAppManagement.TargetedManagedAppConfigurations[managedAppConfiguration.Id].Request();
             signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
             var response = await resource.UpdateAsync(managedAppConfiguration);
-            signalRMessage.sendMessage($"Success: updated {managedAppConfiguration.ODataType} '{managedAppConfiguration.DisplayName}'");
             return response;
         }
         public async Task<WindowsAutopilotDeploymentProfile> PatchWindowsAutopilotDeploymentProfile(WindowsAutopilotDeploymentProfile autopilotDeploymentProfile)
