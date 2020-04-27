@@ -426,7 +426,7 @@ namespace ModernWorkplaceConcierge.Helpers
         {
             TargetedManagedAppConfiguration managedAppProtection = JsonConvert.DeserializeObject<TargetedManagedAppConfiguration>(targetedManagedAppConfiguration);
             var response = await AddManagedAppConfigurationAsync(managedAppProtection);
-            string requestUrl = graphEndpoint + "/deviceAppManagement/targetedManagedAppConfigurations/" + managedAppProtection.Id + "/targetApps";
+            string requestUrl = graphEndpoint + "/deviceAppManagement/targetedManagedAppConfigurations/" + response.Id + "/targetApps";
 
             // Restore assignment of app protection policy
             string requestBody = ConvertToApppProtectionAssignment(targetedManagedAppConfiguration);
