@@ -401,6 +401,66 @@ namespace ModernWorkplaceConcierge.Helpers
                     }
                     break;
 
+                case string odataValue when odataValue.Contains("#microsoft.graph.targetedManagedAppConfiguration"):
+                    TargetedManagedAppConfiguration targetedManagedAppConfiguration = JsonConvert.DeserializeObject<TargetedManagedAppConfiguration>(result);
+                    IEnumerable<TargetedManagedAppConfiguration> targetedManagedAppConfigurations = await graphIntune.GetTargetedManagedAppConfigurationsAsync();
+
+                    switch (overwriteBehaviour)
+                    {
+                        case OverwriteBehaviour.DISCARD:
+                            if (targetedManagedAppConfigurations.All(p => !p.Id.Contains(targetedManagedAppConfiguration.Id)) && targetedManagedAppConfigurations.All(p => !p.DisplayName.Contains(targetedManagedAppConfiguration.DisplayName)))
+                            {
+                                await graphIntune.ImportTargetedManagedAppConfigurationAsync(result);
+                            }
+                            else
+                            {
+                                if (targetedManagedAppConfigurations.Any(p => p.Id.Contains(targetedManagedAppConfiguration.Id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{targetedManagedAppConfiguration.DisplayName}' ({targetedManagedAppConfiguration.Id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{targetedManagedAppConfiguration.DisplayName}' - configuration with this name already exists!");
+                                }
+                            }
+                            break;
+
+                        case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
+                            await graphIntune.ImportTargetedManagedAppConfigurationAsync(result);
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_ID:
+
+                            // match by object ID
+                            if (targetedManagedAppConfigurations.Any(p => p.Id.Contains(targetedManagedAppConfiguration.Id)))
+                            {
+                                await graphIntune.ImportPatchTargetedManagedAppConfigurationAsync(result);
+                            }
+                            // Create a new policy
+                            else
+                            {
+                                await graphIntune.ImportTargetedManagedAppConfigurationAsync(result);
+                            }
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                            if (targetedManagedAppConfigurations.Any(policy => policy.DisplayName.Equals(targetedManagedAppConfiguration.DisplayName)))
+                            {
+                                string replaceObjectId = targetedManagedAppConfigurations.Where(policy => policy.DisplayName.Equals(targetedManagedAppConfiguration.DisplayName)).Select(policy => policy.Id).First();
+                                // Replace id in json file
+                                JObject jObject = JObject.Parse(result);
+                                jObject.SelectToken("id").Replace(replaceObjectId);
+
+                                await graphIntune.ImportPatchTargetedManagedAppConfigurationAsync(jObject.ToString());
+                            }
+                            else
+                            {
+                                await graphIntune.ImportTargetedManagedAppConfigurationAsync(result);
+                            }
+                            break;
+                    }
+                    break;
+
                 case string odataValue when odataValue.Contains("#microsoft.graph.mdmWindowsInformationProtectionPolicy"):
                     MdmWindowsInformationProtectionPolicy windowsInformationProtection = JsonConvert.DeserializeObject<MdmWindowsInformationProtectionPolicy>(result);
                     await graphIntune.AddMdmWindowsInformationProtectionsAsync(windowsInformationProtection);
