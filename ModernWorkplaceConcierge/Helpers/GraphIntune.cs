@@ -296,6 +296,32 @@ namespace ModernWorkplaceConcierge.Helpers
             return windowsAutopilotDeploymentProfiles.CurrentPage;
         }
 
+        public async Task<IEnumerable<ManagedDeviceMobileAppConfiguration>> GetManagedDeviceMobileAppConfigurationsAsync()
+        {
+            var resource = graphServiceClient.DeviceAppManagement.MobileAppConfigurations.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var managedApps = await resource.GetAsync();
+            return managedApps.CurrentPage;
+        }
+
+        public async Task<ManagedDeviceMobileAppConfiguration> AddManagedDeviceMobileAppConfigurationAsync(ManagedDeviceMobileAppConfiguration managedDeviceMobileAppConfiguration)
+        {
+            var resource = graphServiceClient.DeviceAppManagement.MobileAppConfigurations.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            await resource.AddAsync(managedDeviceMobileAppConfiguration);
+            signalRMessage.sendMessage($"Success: added {managedDeviceMobileAppConfiguration.ODataType} '{managedDeviceMobileAppConfiguration.DisplayName}'");
+            return managedDeviceMobileAppConfiguration;
+        }
+
+        public async Task<ManagedDeviceMobileAppConfiguration> PatchManagedDeviceMobileAppConfigurationAsync(ManagedDeviceMobileAppConfiguration managedDeviceMobileAppConfiguration)
+        {
+            var resource = graphServiceClient.DeviceAppManagement.MobileAppConfigurations[managedDeviceMobileAppConfiguration.Id].Request();
+            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
+            var managedApps = await resource.UpdateAsync(managedDeviceMobileAppConfiguration);
+            signalRMessage.sendMessage($"Success: updated {managedDeviceMobileAppConfiguration.ODataType} ({managedDeviceMobileAppConfiguration.DisplayName})");
+            return managedDeviceMobileAppConfiguration;
+        }
+
         public async Task<AndroidManagedAppProtection> ImportAndroidManagedAppProtectionAsync(string androidManagedAppProtection)
         {
             AndroidManagedAppProtection managedAppProtection = JsonConvert.DeserializeObject<AndroidManagedAppProtection>(androidManagedAppProtection);

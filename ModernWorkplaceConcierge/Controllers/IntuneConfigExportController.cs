@@ -24,6 +24,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 var deviceCompliancePolicies = await graphIntune.GetDeviceCompliancePoliciesAsync();
                 var deviceConfigurations = await graphIntune.GetDeviceConfigurationsAsync();
                 var managedAppProtection = await graphIntune.GetManagedAppProtectionAsync();
+                var managedAppConfiguration = await graphIntune.GetManagedDeviceMobileAppConfigurationsAsync();
                 var windowsAutopilotDeploymentProfiles = await graphIntune.GetWindowsAutopilotDeploymentProfiles();
                 var deviceManagementScripts = await graphIntune.GetDeviceManagementScriptsAsync();
                 var deviceEnrollmentConfig = await graphIntune.GetDeviceEnrollmentConfigurationsAsync();
@@ -69,6 +70,14 @@ namespace ModernWorkplaceConcierge.Controllers
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
                             string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
                             var zipArchiveEntry = archive.CreateEntry("DeviceCompliancePolicy\\" + fileName + "_" + item.Id.Substring(0, 8) + ".json", CompressionLevel.Fastest);
+                            using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                        }
+
+                        foreach (ManagedDeviceMobileAppConfiguration item in managedAppConfiguration)
+                        {
+                            byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
+                            string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
+                            var zipArchiveEntry = archive.CreateEntry("ManagedAppPolicy\\" + fileName + "_" + item.Id.Substring(0, 8) + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
 

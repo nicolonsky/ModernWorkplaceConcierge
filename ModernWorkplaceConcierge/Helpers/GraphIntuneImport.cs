@@ -12,6 +12,12 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         private IEnumerable<DeviceCompliancePolicy> compliancePolicies;
         private IEnumerable<DeviceConfiguration> deviceConfigurations;
+        private IEnumerable<DeviceManagementScript> deviceManagementScipts;
+        private IEnumerable<WindowsAutopilotDeploymentProfile> windowsAutopilotDeploymentProfiles;
+        private IEnumerable<IosManagedAppProtection> iosManagedAppProtections;
+        private IEnumerable<AndroidManagedAppProtection> androidManagedAppProtections;
+        private IEnumerable<TargetedManagedAppConfiguration> targetedManagedAppConfigurations;
+        private IEnumerable<ManagedDeviceMobileAppConfiguration> managedDeviceMobileAppConfigurations;
         private GraphIntune graphIntune;
         private OverwriteBehaviour overwriteBehaviour;
         private SignalRMessage signalRMessage;
@@ -167,7 +173,12 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 case string odataValue when odataValue.Contains("deviceManagementScripts"):
                     DeviceManagementScript deviceManagementScript = JsonConvert.DeserializeObject<DeviceManagementScript>(result);
-                    IEnumerable<DeviceManagementScript> deviceManagementScipts = await graphIntune.GetDeviceManagementScriptsAsync();
+                   
+
+                    if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && deviceManagementScipts == null)
+                    {
+                        deviceManagementScipts =  await graphIntune.GetDeviceManagementScriptsAsync();
+                    }
 
                     switch (overwriteBehaviour)
                     {
@@ -224,7 +235,11 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 case string odataValue when odataValue.Contains("WindowsAutopilotDeploymentProfile"):
                     WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = JsonConvert.DeserializeObject<WindowsAutopilotDeploymentProfile>(result);
-                    IEnumerable<WindowsAutopilotDeploymentProfile> windowsAutopilotDeploymentProfiles = await graphIntune.GetWindowsAutopilotDeploymentProfiles();
+
+                    if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && windowsAutopilotDeploymentProfiles == null)
+                    {
+                        windowsAutopilotDeploymentProfiles = await graphIntune.GetWindowsAutopilotDeploymentProfiles();
+                    }
 
                     switch (overwriteBehaviour)
                     {
@@ -281,7 +296,11 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 case string odataValue when odataValue.Contains("#microsoft.graph.iosManagedAppProtection"):
                     IosManagedAppProtection iosManagedAppProtection = JsonConvert.DeserializeObject<IosManagedAppProtection>(result);
-                    IEnumerable<IosManagedAppProtection> iosManagedAppProtections = await graphIntune.GetIosManagedAppProtectionsAsync();
+
+                    if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && iosManagedAppProtections == null)
+                    {
+                        iosManagedAppProtections = await graphIntune.GetIosManagedAppProtectionsAsync();
+                    }
 
                     switch (overwriteBehaviour)
                     {
@@ -343,7 +362,11 @@ namespace ModernWorkplaceConcierge.Helpers
                 case string odataValue when odataValue.Contains("#microsoft.graph.androidManagedAppProtection"):
 
                     AndroidManagedAppProtection androidManagedAppProtection = JsonConvert.DeserializeObject<AndroidManagedAppProtection>(result);
-                    IEnumerable<AndroidManagedAppProtection> androidManagedAppProtections = await graphIntune.GetAndroidManagedAppProtectionsAsync();
+
+                    if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && androidManagedAppProtections == null)
+                    {
+                        androidManagedAppProtections = await graphIntune.GetAndroidManagedAppProtectionsAsync();
+                    }
 
                     switch (overwriteBehaviour)
                     {
@@ -403,7 +426,13 @@ namespace ModernWorkplaceConcierge.Helpers
 
                 case string odataValue when odataValue.Contains("#microsoft.graph.targetedManagedAppConfiguration"):
                     TargetedManagedAppConfiguration targetedManagedAppConfiguration = JsonConvert.DeserializeObject<TargetedManagedAppConfiguration>(result);
-                    IEnumerable<TargetedManagedAppConfiguration> targetedManagedAppConfigurations = await graphIntune.GetTargetedManagedAppConfigurationsAsync();
+
+
+                    if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && targetedManagedAppConfigurations == null)
+                    {
+                        targetedManagedAppConfigurations =  await graphIntune.GetTargetedManagedAppConfigurationsAsync();
+                    }
+
 
                     switch (overwriteBehaviour)
                     {
@@ -461,6 +490,66 @@ namespace ModernWorkplaceConcierge.Helpers
                     }
                     break;
 
+                case string odataValue when odataValue.Contains("MobileAppConfiguration"):
+                    ManagedDeviceMobileAppConfiguration managedDeviceMobileAppConfiguration = JsonConvert.DeserializeObject<ManagedDeviceMobileAppConfiguration>(result);
+
+                    if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && managedDeviceMobileAppConfigurations == null)
+                    {
+                        managedDeviceMobileAppConfigurations = await graphIntune.GetManagedDeviceMobileAppConfigurationsAsync();
+                    }
+
+                    switch (overwriteBehaviour)
+                    {
+                        case OverwriteBehaviour.DISCARD:
+                            if (managedDeviceMobileAppConfigurations.All(p => !p.Id.Contains(managedDeviceMobileAppConfiguration.Id)) && managedDeviceMobileAppConfigurations.All(p => !p.DisplayName.Contains(managedDeviceMobileAppConfiguration.DisplayName)))
+                            {
+                                await graphIntune.AddManagedDeviceMobileAppConfigurationAsync(managedDeviceMobileAppConfiguration);
+                            }
+                            else
+                            {
+                                if (managedDeviceMobileAppConfigurations.Any(p => p.Id.Contains(managedDeviceMobileAppConfiguration.Id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{managedDeviceMobileAppConfiguration.DisplayName}' ({managedDeviceMobileAppConfiguration.Id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{managedDeviceMobileAppConfiguration.DisplayName}' - configuration with this name already exists!");
+                                }
+                            }
+                            break;
+
+                        case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
+                            await graphIntune.AddManagedDeviceMobileAppConfigurationAsync(managedDeviceMobileAppConfiguration);
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_ID:
+
+                            // match by object ID
+                            if (managedDeviceMobileAppConfigurations.Any(p => p.Id.Contains(managedDeviceMobileAppConfiguration.Id)))
+                            {
+                                await graphIntune.PatchManagedDeviceMobileAppConfigurationAsync(managedDeviceMobileAppConfiguration);
+                            }
+                            // Create a new policy
+                            else
+                            {
+                                await graphIntune.AddManagedDeviceMobileAppConfigurationAsync(managedDeviceMobileAppConfiguration);
+                            }
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                            if (managedDeviceMobileAppConfigurations.Any(policy => policy.DisplayName.Equals(managedDeviceMobileAppConfiguration.DisplayName)))
+                            {
+                                string replaceObjectId = managedDeviceMobileAppConfigurations.Where(policy => policy.DisplayName.Equals(managedDeviceMobileAppConfiguration.DisplayName)).Select(policy => policy.Id).First();
+                                managedDeviceMobileAppConfiguration.Id = replaceObjectId;
+                                await graphIntune.PatchManagedDeviceMobileAppConfigurationAsync(managedDeviceMobileAppConfiguration);
+                            }
+                            else
+                            {
+                                await graphIntune.AddManagedDeviceMobileAppConfigurationAsync(managedDeviceMobileAppConfiguration);
+                            }
+                            break;
+                    }
+                    break;
                 case string odataValue when odataValue.Contains("#microsoft.graph.mdmWindowsInformationProtectionPolicy"):
                     MdmWindowsInformationProtectionPolicy windowsInformationProtection = JsonConvert.DeserializeObject<MdmWindowsInformationProtectionPolicy>(result);
                     await graphIntune.AddMdmWindowsInformationProtectionsAsync(windowsInformationProtection);
