@@ -1,0 +1,111 @@
+﻿@model IEnumerable<Microsoft.Graph.Win32LobApp>
+
+@{
+    ViewBag.Current = "IntuneWin32AppDetectionScripts";
+}
+
+<script src="~/Content/Prismjs/prism.js"></script>
+<link rel="stylesheet" href="~/Content/Prismjs/prism.css">
+
+<div class="jumbotron">
+    <h1>Win32 App Custom Detection Scripts</h1>
+    <p>View and download custom PowerShell detection scripts of your Win32 apps.</p>
+</div>
+
+<table class="table table-borderless">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.DisplayName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Publisher)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LastModifiedDateTime)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        if (item.DisplayName != null)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DisplayName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Publisher)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastModifiedDateTime)
+                </td>
+                <td>
+                    <a href="javascript:void(0);" class="anchorDetail btn btn-outline-light" data-id="@item.Id">Preview</a>
+                    @Html.ActionLink("Download", "DownloadDetectionScript", new { Id = item.Id }, new { @class = "btn btn-outline-light" })
+                </td>
+            </tr>
+        }
+        else
+        {
+            <caption> Could not fetch DeviceManagementScript.</caption>
+        }
+    }
+</table>
+
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="myModal" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="border:none; color: black;">
+                <h5 class="modal-title">PowerShell Preview</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <pre class="line-numbers">
+            <code id="myModalContent" class="language-powershell"></code>
+            </pre>
+            <div class="modal-footer" style="border:none">
+                <button type="button" id="closbtn" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var URL = '/Intune/Win32AppPsDetectionScriptContent';
+    Prism.plugins.NormalizeWhitespace.setDefaults({
+        'remove-trailing': true,
+        'remove-indent': true,
+        'left-trim': true,
+        'right-trim': true,
+        'remove-initial-line-feed': true,
+    });
+    $(function () {
+        $(".anchorDetail").click(function () {
+            debugger;
+            var $buttonClicked = $(this);
+            var id = $buttonClicked.attr('data-id');
+
+            $.ajax({
+                type: "GET",
+                url: URL,
+                contentType: "text/plain; charset=utf-8",
+                data: { "Id": id },
+                datatype: "text/html",
+                success: function (data) {
+                    debugger;
+                    $('#myModalContent').html(data.trim());
+                    $('#myModal').modal('show');
+                    Prism.highlightAll();
+                },
+                error: function () {
+                    alert("Dynamic content load failed.");
+                }
+            });
+        });
+    });
+</script>
+
+
+

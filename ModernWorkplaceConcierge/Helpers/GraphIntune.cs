@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -157,6 +158,42 @@ namespace ModernWorkplaceConcierge.Helpers
             signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
             var deviceCompliancePolicies = await resource.GetAsync();
             return deviceCompliancePolicies.CurrentPage;
+        }
+
+        public async Task<IEnumerable<MobileApp>> GetMobileAppsAsync()
+        {
+            var resource = graphServiceClient.DeviceAppManagement.MobileApps.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var deviceConfigurations = await resource.GetAsync();
+            return deviceConfigurations.CurrentPage;
+        }
+
+        public async Task<Win32LobAppPowerShellScriptDetection> GetWin32MobileAppPowerShellDetectionRuleAsync(string id)
+        {
+            var resource = graphServiceClient.DeviceAppManagement.MobileApps[id].Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            Win32LobApp app = (Win32LobApp) await resource.GetAsync();
+
+            Win32LobAppPowerShellScriptDetection powerShellScriptDetection = app.DetectionRules.Where(rule => rule.ODataType.Equals("#microsoft.graph.win32LobAppPowerShellScriptDetection")).Cast<Win32LobAppPowerShellScriptDetection>().First();
+            signalRMessage.sendMessage(JsonConvert.SerializeObject(powerShellScriptDetection));
+            return powerShellScriptDetection;
+        }
+
+        public async Task<Win32LobApp> GetWin32MobileAppAsync(string id)
+        {
+            var resource = graphServiceClient.DeviceAppManagement.MobileApps[id].Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            Win32LobApp app = (Win32LobApp)await resource.GetAsync();
+            return app;
+        }
+
+        public async Task<IEnumerable<Win32LobApp>> GetWin32MobileAppsAsync()
+        {
+            var resource = graphServiceClient.DeviceAppManagement.MobileApps.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var apps = await resource.Filter("isOf('microsoft.graph.win32LobApp')").GetAsync();
+
+            return apps.Cast<Win32LobApp>();
         }
 
         public async Task<IEnumerable<DeviceConfiguration>> GetDeviceConfigurationsAsync()

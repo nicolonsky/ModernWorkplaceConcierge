@@ -62,6 +62,9 @@
                                 @Html.ActionLink("PowerShell Scripts", "DeviceManagementScripts", "Intune", new { area = "" },
                                 new { @class = ViewBag.Current == "IntuneDeviceManagementScripts" ? "dropdown-item active" : "dropdown-item" })
 
+                                @Html.ActionLink("Win32 App Detection Scripts", "Win32AppDetectionScripts", "Intune", new { area = "" },
+                                new { @class = ViewBag.Current == "IntuneWin32AppDetectionScripts" ? "dropdown-item active" : "dropdown-item" })
+
                                 @Html.ActionLink("Offline Autopilot Profiles", "Index", "AutoPilotConfiguration", new { area = "" },
                                new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
                             </div>
