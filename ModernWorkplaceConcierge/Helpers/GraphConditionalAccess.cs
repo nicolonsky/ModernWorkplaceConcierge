@@ -27,7 +27,7 @@ namespace ModernWorkplaceConcierge.Helpers
             return namedLocations.CurrentPage;
         }
 
-        public async Task<ConditionalAccessPolicy> AddConditionalAccessPolicyAsync(ConditionalAccessPolicy conditionalAccessPolicy, string clientId = null)
+        public async Task<ConditionalAccessPolicy> AddConditionalAccessPolicyAsync(ConditionalAccessPolicy conditionalAccessPolicy)
         {
             // Following properties need to be disabled for successful POST
             conditionalAccessPolicy.id = null;
@@ -44,11 +44,6 @@ namespace ModernWorkplaceConcierge.Helpers
                     Formatting = Formatting.Indented
                 }), Encoding.UTF8, "application/json")
             };
-
-            if (conditionalAccessPolicy.conditions.deviceStates != null)
-            {
-                signalRMessage.sendMessage("Warning device states are currently not imported by the Graph API, you need to enable them manually on the policy!");
-            }
 
             if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.applicationEnforcedRestrictions != null)
             {
