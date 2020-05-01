@@ -2,8 +2,10 @@
 using ModernWorkplaceConcierge.Helpers;
 using ModernWorkplaceConcierge.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -126,6 +128,59 @@ namespace ModernWorkplaceConcierge.Controllers
                 Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
                 return View();
             }
+        }
+
+        public async System.Threading.Tasks.Task<ViewResult> Win32AppDetectionScripts()
+        {
+            try
+            {
+                GraphIntune graphIntune = new GraphIntune(null);
+                var apps = await graphIntune.GetWin32MobileAppsAsync();
+
+                List<Win32LobApp> win32LobApps = new List<Win32LobApp>();
+
+                foreach (Win32LobApp app in apps)
+                {
+                    var details = await graphIntune.GetWin32MobileAppAsync(app.Id);
+
+                    if (details.DetectionRules.Any(d => d is Win32LobAppPowerShellScriptDetection))
+                    {
+                        win32LobApps.Add(details);
+                    }
+                }
+
+                return View(win32LobApps);
+            }
+            catch (Exception e)
+            {
+                Flash("Error " + e.Message.ToString());
+                return View();
+            }
+        }
+
+        public async System.Threading.Tasks.Task<PartialViewResult> Win32AppPsDetectionScriptContent(string Id)
+        {
+            try
+            {
+                GraphIntune graphIntune = new GraphIntune(null);
+                var script = await graphIntune.GetWin32MobileAppPowerShellDetectionRuleAsync(Id);
+                string powerShellCode = Encoding.UTF8.GetString(Convert.FromBase64String(script.ScriptContent));
+                return PartialView("_PowerShellDetectionScriptContent", powerShellCode);
+            }
+            catch (Exception e)
+            {
+                Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
+                return PartialView();
+            }
+        }
+
+        public async System.Threading.Tasks.Task<FileResult> DownloadDetectionScript(string Id)
+        {
+            GraphIntune graphIntune = new GraphIntune(null);
+            Win32LobApp win32LobApp = await graphIntune.GetWin32MobileAppAsync(Id);
+            Win32LobAppPowerShellScriptDetection script = await graphIntune.GetWin32MobileAppPowerShellDetectionRuleAsync(Id);
+            string fileName = $"{FilenameHelper.ProcessFileName(win32LobApp.DisplayName)}_detect.ps1";
+            return File(Convert.FromBase64String(script.ScriptContent), "text/plain", fileName);
         }
 
         public async System.Threading.Tasks.Task<PartialViewResult> PowerShellScriptContent(string Id)

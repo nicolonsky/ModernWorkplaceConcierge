@@ -80,63 +80,64 @@ namespace ModernWorkplaceConcierge.Controllers
                     {
                         signalRMessage.sendMessage("Error: " + e.Message);
                     }
+                }
 
-                    foreach (string uploadedPolicy in uploadedConditionalAccessPolicies)
+                foreach (string uploadedPolicy in uploadedConditionalAccessPolicies)
+                {
+                    ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(uploadedPolicy);
+
+                    switch (overwriteBehaviour)
                     {
-                        ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(uploadedPolicy);
-
-                        switch (overwriteBehaviour)
-                        {
-                            case OverwriteBehaviour.DISCARD:
-                                // Check for any policy with same name or id
-                                if (conditionalAccessPolicies.All(p => !p.id.Contains(conditionalAccessPolicy.id) && conditionalAccessPolicies.All(policy => !policy.displayName.Equals(conditionalAccessPolicy.displayName))))
+                        case OverwriteBehaviour.DISCARD:
+                            // Check for any policy with same name or id
+                            if (conditionalAccessPolicies.All(p => !p.id.Contains(conditionalAccessPolicy.id) && conditionalAccessPolicies.All(policy => !policy.displayName.Equals(conditionalAccessPolicy.displayName))))
+                            {
+                                var response = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
+                            else
+                            {
+                                if (conditionalAccessPolicies.Any(p => p.id.Contains(conditionalAccessPolicy.id)))
                                 {
-                                    var response = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                                    signalRMessage.sendMessage($"Discarding Policy '{conditionalAccessPolicy.displayName}' ({conditionalAccessPolicy.id}) already exists!");
                                 }
                                 else
                                 {
-                                    if (conditionalAccessPolicies.Any(p => p.id.Contains(conditionalAccessPolicy.id))){
-                                        signalRMessage.sendMessage($"Discarding Policy '{conditionalAccessPolicy.displayName}' ({conditionalAccessPolicy.id}) already exists!");
-                                    }
-                                    else
-                                    {
-                                        signalRMessage.sendMessage($"Discarding Policy '{conditionalAccessPolicy.displayName}' - policy with this name already exists!");
-                                    }  
+                                    signalRMessage.sendMessage($"Discarding Policy '{conditionalAccessPolicy.displayName}' - policy with this name already exists!");
                                 }
-                                break;
+                            }
+                            break;
 
-                            case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
-                                await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
-                                break;
+                        case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
+                            await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            break;
 
-                            case OverwriteBehaviour.OVERWRITE_BY_ID:
+                        case OverwriteBehaviour.OVERWRITE_BY_ID:
 
-                                // match by object ID
-                                if (conditionalAccessPolicies.Any(policy => policy.id.Equals(conditionalAccessPolicy.id)))
-                                {
-                                    await graphConditionalAccess.PatchConditionalAccessPolicyAsync(conditionalAccessPolicy);
-                                }
-                                // Create a new policy
-                                else
-                                {
-                                    var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
-                                }
-                                break;
+                            // match by object ID
+                            if (conditionalAccessPolicies.Any(policy => policy.id.Equals(conditionalAccessPolicy.id)))
+                            {
+                                await graphConditionalAccess.PatchConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
+                            // Create a new policy
+                            else
+                            {
+                                var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
+                            break;
 
-                            case OverwriteBehaviour.OVERWRITE_BY_NAME:
-                                if (conditionalAccessPolicies.Any(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)))
-                                {
-                                    string replaceObjectId = conditionalAccessPolicies.Where(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)).Select(policy => policy.id).First();
-                                    conditionalAccessPolicy.id = replaceObjectId;
-                                    await graphConditionalAccess.PatchConditionalAccessPolicyAsync(conditionalAccessPolicy);
-                                }
-                                else
-                                {
-                                    var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
-                                }
+                        case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                            if (conditionalAccessPolicies.Any(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)))
+                            {
+                                string replaceObjectId = conditionalAccessPolicies.Where(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)).Select(policy => policy.id).First();
+                                conditionalAccessPolicy.id = replaceObjectId;
+                                await graphConditionalAccess.PatchConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
+                            else
+                            {
+                                var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
 
-                                break;
-                        }
+                            break;
                     }
                 }
             }
@@ -190,6 +191,9 @@ namespace ModernWorkplaceConcierge.Controllers
                                 // Modify properties on template
                                 ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(textCaPolicy);
                                 conditionalAccessPolicy.conditions.users.excludeGroups = groupsCreated.ToArray();
+                                string placeholder = "<RING> -";
+                                int startDisplayName = conditionalAccessPolicy.displayName.IndexOf(placeholder) + placeholder.Length;
+                                conditionalAccessPolicy.displayName = conditionalAccessPolicy.displayName.Substring(startDisplayName, conditionalAccessPolicy.displayName.Length - startDisplayName);
                                 conditionalAccessPolicy.displayName = conditionalAccessPolicy.displayName.Insert(0, policyPrefix).Replace("<PREFIX> -", "").Trim();
 
                                 // Check for legacy auth exclusion group
@@ -390,14 +394,14 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     row["ClientAppTypes"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.clientAppTypes)}\"";
 
-                    if (conditionalAccessPolicy.conditions.deviceStates != null && conditionalAccessPolicy.conditions.deviceStates.includeStates != null)
+                    if (conditionalAccessPolicy.conditions.devices != null && conditionalAccessPolicy.conditions.devices.includeDeviceStates != null)
                     {
-                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.deviceStates.includeStates)}\"";
+                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.devices.includeDeviceStates)}\"";
                     }
 
-                    if (conditionalAccessPolicy.conditions.deviceStates != null && conditionalAccessPolicy.conditions.deviceStates.excludeStates != null)
+                    if (conditionalAccessPolicy.conditions.devices != null && conditionalAccessPolicy.conditions.devices.excludeDeviceStates != null)
                     {
-                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.deviceStates.excludeStates)}\"";
+                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.devices.excludeDeviceStates)}\"";
                     }
 
                     if (conditionalAccessPolicy.grantControls != null && conditionalAccessPolicy.grantControls.builtInControls != null)

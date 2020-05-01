@@ -548,6 +548,8 @@
     <Content Include="Views\ConditionalAccess\Documentation.cshtml" />
     <Content Include="Views\About\Terms.cshtml" />
     <Content Include="Views\About\Index.cshtml" />
+    <Content Include="Views\Intune\Win32AppDetectionScripts.cshtml" />
+    <Content Include="Views\Intune\_PowerShellDetectionScriptContent.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
