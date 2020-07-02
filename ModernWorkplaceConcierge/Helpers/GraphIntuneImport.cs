@@ -21,6 +21,8 @@ namespace ModernWorkplaceConcierge.Helpers
         private GraphIntune graphIntune;
         private OverwriteBehaviour overwriteBehaviour;
         private SignalRMessage signalRMessage;
+        private List<string> supportedDeviceConfigurations = new List<string>();
+
 
         public GraphIntuneImport(string clientId, OverwriteBehaviour overwriteBehaviour)
         {
@@ -31,6 +33,18 @@ namespace ModernWorkplaceConcierge.Helpers
 
         public async Task AddIntuneConfig(string result)
         {
+            supportedDeviceConfigurations.Add("#microsoft.graph.windows10GeneralConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerGeneralDeviceConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsUpdateForBusinessConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windows10EndpointProtectionConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windows10CustomConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosGeneralDeviceConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidWorkProfileGeneralDeviceConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosEnterpriseWiFiConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerEnterpriseWiFiConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerWiFiConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsDeliveryOptimizationConfiguration");
+
             GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
 
             switch (json.OdataValue)
@@ -104,7 +118,7 @@ namespace ModernWorkplaceConcierge.Helpers
                     }
                     break;
 
-                case string odataValue when odataValue.Contains("Configuration") && odataValue.Contains("windows"):
+                case string odataValue when supportedDeviceConfigurations.Contains(odataValue):
 
                     DeviceConfiguration deviceConfiguration = JsonConvert.DeserializeObject<DeviceConfiguration>(result);
                     // request fails when true
