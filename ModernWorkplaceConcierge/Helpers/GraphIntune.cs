@@ -23,6 +23,15 @@ namespace ModernWorkplaceConcierge.Helpers
             this.graphServiceClient = GetAuthenticatedClient();
         }
 
+        public async Task ClearDeviceConfigurations()
+        {
+            var deviceConfigurations = await graphServiceClient.DeviceManagement.DeviceConfigurations.Request().GetAsync();
+            foreach (DeviceConfiguration deviceConfiguration in deviceConfigurations)
+            {
+                await graphServiceClient.DeviceManagement.DeviceConfigurations[deviceConfiguration.Id].Request().DeleteAsync();
+            }
+        }
+
         public static string ConvertToApppProtectionAssignment(string AppProtectionPolicy)
         {
             // Get assigned apps
