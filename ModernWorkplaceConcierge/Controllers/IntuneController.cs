@@ -16,6 +16,8 @@ namespace ModernWorkplaceConcierge.Controllers
     [System.Web.Mvc.Authorize]
     public class IntuneController : BaseController
     {
+        private List<string> supportedFolders = new List<string>();
+
         public ActionResult Import()
         {
             return View();
@@ -25,6 +27,14 @@ namespace ModernWorkplaceConcierge.Controllers
         public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files, OverwriteBehaviour overwriteBehaviour, string clientId)
         {
             SignalRMessage signalR = new SignalRMessage(clientId);
+
+            supportedFolders.Add("WindowsAutopilotDeploymentProfile");
+            supportedFolders.Add("DeviceConfiguration");
+            supportedFolders.Add("DeviceCompliancePolicy");
+            supportedFolders.Add("DeviceManagementScript");
+            supportedFolders.Add("ManagedAppPolicy");
+            supportedFolders.Add("RoleScopeTags");
+
             try
             {
                 GraphIntuneImport graphIntuneImport = new GraphIntuneImport(clientId, overwriteBehaviour);
@@ -64,7 +74,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                     {
                                         if (entry != null)
                                         {
-                                            if (entry.FullName.Contains("WindowsAutopilotDeploymentProfile") || entry.FullName.Contains("DeviceConfiguration") || entry.FullName.Contains("DeviceCompliancePolicy") || entry.FullName.Contains("DeviceManagementScript") || entry.FullName.Contains("ManagedAppPolicy") || entry.FullName.Contains("RoleScopeTags"))
+                                            if (supportedFolders.Contains(entry.FullName))
                                             {
                                                 using (var unzippedEntryStream = entry.Open())
                                                 {
