@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -205,5 +206,15 @@ namespace ModernWorkplaceConcierge.Controllers
             DeviceManagementScript script = await graphIntune.GetDeviceManagementScriptAsync(Id);
             return File(script.ScriptContent, "text/plain", script.FileName);
         }
+
+        //public async Task<ActionResult> ClearAll(bool confirm = false)
+        //{
+        //    GraphIntune graphIntune = new GraphIntune(null);
+        //    if (confirm)
+        //    {
+        //        await graphIntune.ClearDeviceConfigurations();
+        //    }
+        //    return new HttpStatusCodeResult(204);
+        //}
     }
 }

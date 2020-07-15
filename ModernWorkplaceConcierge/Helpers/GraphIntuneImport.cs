@@ -33,17 +33,56 @@ namespace ModernWorkplaceConcierge.Helpers
 
         public async Task AddIntuneConfig(string result)
         {
+            // Supported device configuration types need to be declared to distinguish from other intune items
+
+            // Windows 10
             supportedDeviceConfigurations.Add("#microsoft.graph.windows10GeneralConfiguration");
-            supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerGeneralDeviceConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsDeliveryOptimizationConfiguration");
             supportedDeviceConfigurations.Add("#microsoft.graph.windowsUpdateForBusinessConfiguration");
             supportedDeviceConfigurations.Add("#microsoft.graph.windows10EndpointProtectionConfiguration");
             supportedDeviceConfigurations.Add("#microsoft.graph.windows10CustomConfiguration");
-            supportedDeviceConfigurations.Add("#microsoft.graph.iosGeneralDeviceConfiguration");
-            supportedDeviceConfigurations.Add("#microsoft.graph.androidWorkProfileGeneralDeviceConfiguration");
-            supportedDeviceConfigurations.Add("#microsoft.graph.iosEnterpriseWiFiConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsKioskConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsDefenderAdvancedThreatProtectionConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windows10PkcsCertificateProfile");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsHealthMonitoringConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windows10TeamGeneralConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsDomainJoinConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.editionUpgradeConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windows10EasEmailProfileConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsIdentityProtectionConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windows10NetworkBoundaryConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.sharedPCConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsWifiConfiguration");
+
+
+            // Android Enterprise Device Owner
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerGeneralDeviceConfiguration");
             supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerEnterpriseWiFiConfiguration");
             supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerWiFiConfiguration");
-            supportedDeviceConfigurations.Add("#microsoft.graph.windowsDeliveryOptimizationConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerTrustedRootCertificate");
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerImportedPFXCertificateProfile");
+
+            // Android Enterprise Work Profile
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidWorkProfileGeneralDeviceConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidWorkProfileCustomConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidWorkProfileNineWorkEasConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.androidWorkProfileTrustedRootCertificate");
+
+            // iOS
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosTrustedRootCertificate");
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosPkcsCertificateProfile");
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosWiFiConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosCustomConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosGeneralDeviceConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosEasEmailProfileConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosDeviceFeaturesConfiguration");            
+            supportedDeviceConfigurations.Add("#microsoft.graph.iosEnterpriseWiFiConfiguration");
+
+            // macOS
+            supportedDeviceConfigurations.Add("#microsoft.graph.macOSWiFiConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.macOSEndpointProtectionConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.macOSGeneralDeviceConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.macOSDeviceFeaturesConfiguration");
 
             GraphJson json = JsonConvert.DeserializeObject<GraphJson>(result);
 
