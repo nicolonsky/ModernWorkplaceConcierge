@@ -64,7 +64,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                     {
                                         if (entry != null)
                                         {
-                                            if (entry.FullName.Contains("WindowsAutopilotDeploymentProfile") || entry.FullName.Contains("DeviceConfiguration") || entry.FullName.Contains("DeviceCompliancePolicy") || entry.FullName.Contains("DeviceManagementScript") || entry.FullName.Contains("ManagedAppPolicy"))
+                                            if (entry.FullName.Contains("WindowsAutopilotDeploymentProfile") || entry.FullName.Contains("DeviceConfiguration") || entry.FullName.Contains("DeviceCompliancePolicy") || entry.FullName.Contains("DeviceManagementScript") || entry.FullName.Contains("ManagedAppPolicy") || entry.FullName.Contains("RoleScopeTags"))
                                             {
                                                 using (var unzippedEntryStream = entry.Open())
                                                 {

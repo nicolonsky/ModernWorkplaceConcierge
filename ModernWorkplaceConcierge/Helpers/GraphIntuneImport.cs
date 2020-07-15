@@ -18,6 +18,7 @@ namespace ModernWorkplaceConcierge.Helpers
         private IEnumerable<AndroidManagedAppProtection> androidManagedAppProtections;
         private IEnumerable<TargetedManagedAppConfiguration> targetedManagedAppConfigurations;
         private IEnumerable<ManagedDeviceMobileAppConfiguration> managedDeviceMobileAppConfigurations;
+        private IEnumerable<RoleScopeTag> scopeTags;
         private GraphIntune graphIntune;
         private OverwriteBehaviour overwriteBehaviour;
         private SignalRMessage signalRMessage;
@@ -611,6 +612,33 @@ namespace ModernWorkplaceConcierge.Helpers
                 case string odataValue when odataValue.Contains("#microsoft.graph.windowsInformationProtectionPolicy"):
                     WindowsInformationProtectionPolicy windowsInformationProtectionUnmanaged = JsonConvert.DeserializeObject<WindowsInformationProtectionPolicy>(result);
                     await graphIntune.AddWindowsInformationProtectionsAsync(windowsInformationProtectionUnmanaged);
+                    break;
+
+                case string odataValue when odataValue.Contains("microsoft.graph.roleScopeTag"):
+
+                    if (scopeTags == null)
+                    {
+                        this.scopeTags = await graphIntune.GetRoleScopeTagsAsync();
+                    }
+
+                    RoleScopeTag scopeTag = JsonConvert.DeserializeObject<RoleScopeTag>(result);
+                    
+                    // Check if scope tag already exists
+                    if (! scopeTags.Any(s => s.DisplayName.Equals(scopeTag.DisplayName)))
+                    {
+                        // Don't import the default scope tag with id 0
+                        if (scopeTag.IsBuiltIn.HasValue && !scopeTag.IsBuiltIn.Value)
+                        {
+                            scopeTag.Id = null;
+                            scopeTag.IsBuiltIn = null;
+                            await graphIntune.AddRoleScopeTagAsync(scopeTag);
+                        }
+                    }
+                    else
+                    {
+                        signalRMessage.sendMessage($"Discarding configuration '{scopeTag.DisplayName}' - scope tag with this name already exists!");
+                    }
+
                     break;
 
                 default:
