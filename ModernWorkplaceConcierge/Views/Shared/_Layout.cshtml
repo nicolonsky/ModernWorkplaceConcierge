@@ -62,6 +62,9 @@
                                 @Html.ActionLink("PowerShell Scripts", "DeviceManagementScripts", "Intune", new { area = "" },
                                 new { @class = ViewBag.Current == "IntuneDeviceManagementScripts" ? "dropdown-item active" : "dropdown-item" })
 
+                                @Html.ActionLink("Win32 App Detection Scripts", "Win32AppDetectionScripts", "Intune", new { area = "" },
+                                new { @class = ViewBag.Current == "IntuneWin32AppDetectionScripts" ? "dropdown-item active" : "dropdown-item" })
+
                                 @Html.ActionLink("Offline Autopilot Profiles", "Index", "AutoPilotConfiguration", new { area = "" },
                                new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
                             </div>
@@ -93,6 +96,16 @@
                             </div>
                         </li>
                     }
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-toggle @((ViewBag.Current.StartsWith("About") ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">About</a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @Html.ActionLink("Info", "Index", "About", new { area = "" },
+                            new { @class = ViewBag.Current == "AboutIndex" ? "dropdown-item active" : "dropdown-item" })
+                            @Html.ActionLink("Terms & Conditions", "Terms", "About", new { area = "" },
+                            new { @class = ViewBag.Current == "AboutTerms" ? "dropdown-item active" : "dropdown-item" })
+
+                        </div>
+                    </li>
                 </ul>
                 <ul class="navbar-nav justify-content-end">
                     <li class="nav-item">
@@ -105,9 +118,9 @@
                     {
                         <li class="nav-item dropdown">
                             <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                @if (!string.IsNullOrEmpty(ViewBag.User.Avatar))
+                                @if (! string.IsNullOrEmpty(ViewBag.User.Avatar))
                                 {
-                                    <img src="@ViewBag.User.Avatar" class="rounded-circle align-self-center mr-2" style="width: 32px;">
+                                    <img src="@ViewBag.User.Avatar" class="rounded-circle align-self-center mr-2" style="width: 24px;">
                                 }
                                 else
                                 {

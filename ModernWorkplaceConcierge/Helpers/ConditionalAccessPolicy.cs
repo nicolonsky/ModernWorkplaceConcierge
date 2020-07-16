@@ -7,6 +7,7 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         [JsonProperty("@odata.context")]
         public String OdataContext { get; set; }
+
         [JsonProperty("value")]
         public ConditionalAccessPolicy[] Value { get; set; }
 
@@ -33,6 +34,7 @@ namespace ModernWorkplaceConcierge.Helpers
     {
         [JsonProperty("operator")]
         public string op { get; set; }
+
         public string[] builtInControls { get; set; }
         public object[] customAuthenticationFactors { get; set; }
         public object[] termsOfUse { get; set; }
@@ -44,7 +46,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public object[] clientAppTypes { get; set; }
         public Platforms platforms { get; set; }
         public Locations locations { get; set; }
-        public DeviceStates deviceStates { get; set; }
+        public Devices devices { get; set; }
         public Applications applications { get; set; }
         public Users users { get; set; }
     }
@@ -61,10 +63,10 @@ namespace ModernWorkplaceConcierge.Helpers
         public string[] excludeLocations { get; set; }
     }
 
-    public class DeviceStates
+    public class Devices
     {
-        public string[] includeStates { get; set; }
-        public string[] excludeStates { get; set; }
+        public string[] includeDeviceStates { get; set; }
+        public string[] excludeDeviceStates { get; set; }
     }
 
     public class Applications

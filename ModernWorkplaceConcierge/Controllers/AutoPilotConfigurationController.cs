@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web;
-using System.Web.Mvc;
-using ModernWorkplaceConcierge.Helpers;
-using Microsoft.Graph;
+﻿using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
+using System;
+using System.Text;
+using System.Web.Mvc;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -17,21 +13,22 @@ namespace ModernWorkplaceConcierge.Controllers
         // GET: AutoPilotConfigurationJSON
         public async System.Threading.Tasks.Task<ActionResult> Index()
         {
-            var AutopilotProfiles = await GraphHelper.GetWindowsAutopilotDeploymentProfiles();
-
+            GraphIntune graphIntune = new GraphIntune(null);
+            var AutopilotProfiles = await graphIntune.GetWindowsAutopilotDeploymentProfiles();
             return View(AutopilotProfiles);
         }
 
         public async System.Threading.Tasks.Task<ActionResult> Detail(String Id)
         {
-            var AutopilotProfile = await GraphHelper.GetWindowsAutopilotDeploymentProfile(Id);
-
+            GraphIntune graphIntune = new GraphIntune(null);
+            var AutopilotProfile = await graphIntune.GetWindowsAutopilotDeploymentProfile(Id);
             return View(AutopilotProfile);
         }
 
         public async System.Threading.Tasks.Task<FileResult> DownloadAutopilotConfigurationJSON(string Id)
         {
-            var profile =  await GraphHelper.GetWindowsAutopilotDeploymentProfile(Id);
+            GraphIntune graphIntune = new GraphIntune(null);
+            var profile = await graphIntune.GetWindowsAutopilotDeploymentProfile(Id);
             var org = await GraphHelper.GetOrgDetailsAsync();
 
             AutopilotConfiguration windowsAutopilotDeploymentProfile = new AutopilotConfiguration(profile, org);

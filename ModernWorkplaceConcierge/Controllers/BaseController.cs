@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+using Microsoft.Owin.Security.Cookies;
 using ModernWorkplaceConcierge.Models;
 using ModernWorkplaceConcierge.TokenStorage;
-using Microsoft.Owin.Security.Cookies;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Web;
@@ -48,7 +48,7 @@ namespace ModernWorkplaceConcierge.Controllers
             if (Request.IsAuthenticated)
             {
                 // Get the user's token cache
-                var tokenStore = new SessionTokenStore(null, 
+                var tokenStore = new SessionTokenStore(null,
                     System.Web.HttpContext.Current, ClaimsPrincipal.Current);
 
                 if (tokenStore.HasData())

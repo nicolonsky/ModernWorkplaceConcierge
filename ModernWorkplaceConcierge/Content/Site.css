@@ -12,13 +12,20 @@ a {
 a:hover {
     color: #17a2b8;
 }
+
+    a.card-link:hover {
+        text-decoration: underline;
+    }
+
 .dropdown-item.active, .dropdown-item:active {
     background-color: #17a2b8;
 }
+
 .dropdown-item:hover a {
     background-color: #17a2b8;
     color: white;
 }
+
 .dropdown-item:hover {
     background-color: #17a2b8;
     color: white;

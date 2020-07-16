@@ -1,48 +1,42 @@
 ﻿using ModernWorkplaceConcierge.Helpers;
+using ModernWorkplaceConcierge.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web;
-using System.Web.Mvc;
+using System.Data;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using System.Data;
+using System.Web;
+using System.Web.Mvc;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
-
     [Authorize]
     public class ConditionalAccessController : BaseController
     {
-        public readonly string TEMPLATE_CA_POLICY_FOLDER_PATH = "~/Content/PolicySets/";
+        private readonly string TEMPLATE_CA_POLICY_FOLDER_PATH = "~/Content/PolicySets/";
 
         [HttpPost]
-        public async Task<ActionResult> Upload(HttpPostedFileBase[] files, string clientId)
+        public async Task<ActionResult> Upload(HttpPostedFileBase[] files, OverwriteBehaviour overwriteBehaviour, string clientId)
         {
-            SignalRMessage signalR = new SignalRMessage();
-            signalR.clientId = clientId;
+            SignalRMessage signalRMessage = new SignalRMessage(clientId);
+
             try
             {
+                GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(clientId);
+                IEnumerable<ConditionalAccessPolicy> conditionalAccessPolicies = await graphConditionalAccess.GetConditionalAccessPoliciesAsync();
+                List<string> uploadedConditionalAccessPolicies = new List<string>();
+
                 if (files.Length > 0 && files[0].FileName.Contains(".json"))
                 {
                     foreach (HttpPostedFileBase file in files)
                     {
-
-                        try
-                        {
-                            BinaryReader b = new BinaryReader(file.InputStream);
-                            byte[] binData = b.ReadBytes(file.ContentLength);
-                            string result = Encoding.UTF8.GetString(binData);
-
-                            var success = await GraphHelper.ImportCaConfig(result, clientId);
-                        }
-                        catch (Exception e)
-                        {
-                            signalR.sendMessage("Error: " + e.Message);
-                        }
+                        BinaryReader binaryReader = new BinaryReader(file.InputStream);
+                        byte[] binData = binaryReader.ReadBytes(file.ContentLength);
+                        uploadedConditionalAccessPolicies.Add(Encoding.UTF8.GetString(binData));
                     }
                 }
                 else if (files.Length > 0 && files[0].FileName.Contains(".zip"))
@@ -69,16 +63,14 @@ namespace ModernWorkplaceConcierge.Controllers
                                                 {
                                                     unzippedEntryStream.CopyTo(ms);
                                                     var unzippedArray = ms.ToArray();
-                                                    string result = Encoding.UTF8.GetString(unzippedArray);
-
-                                                    var success = await GraphHelper.ImportCaConfig(result, clientId);
+                                                    uploadedConditionalAccessPolicies.Add(Encoding.UTF8.GetString(unzippedArray));
                                                 }
                                             }
                                         }
                                     }
                                     catch (Exception e)
                                     {
-                                        signalR.sendMessage("Error: " + e.Message);
+                                        signalRMessage.sendMessage("Error: " + e.Message);
                                     }
                                 }
                             }
@@ -86,30 +78,83 @@ namespace ModernWorkplaceConcierge.Controllers
                     }
                     catch (Exception e)
                     {
-                        signalR.sendMessage("Error: " + e.Message);
+                        signalRMessage.sendMessage("Error: " + e.Message);
                     }
                 }
-                else if (files.Length > 0)
+
+                foreach (string uploadedPolicy in uploadedConditionalAccessPolicies)
                 {
-                    signalR.sendMessage("Error: unsupported file type" + files[0].FileName);
+                    ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(uploadedPolicy);
+
+                    switch (overwriteBehaviour)
+                    {
+                        case OverwriteBehaviour.DISCARD:
+                            // Check for any policy with same name or id
+                            if (conditionalAccessPolicies.All(p => !p.id.Contains(conditionalAccessPolicy.id) && conditionalAccessPolicies.All(policy => !policy.displayName.Equals(conditionalAccessPolicy.displayName))))
+                            {
+                                var response = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
+                            else
+                            {
+                                if (conditionalAccessPolicies.Any(p => p.id.Contains(conditionalAccessPolicy.id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding Policy '{conditionalAccessPolicy.displayName}' ({conditionalAccessPolicy.id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding Policy '{conditionalAccessPolicy.displayName}' - policy with this name already exists!");
+                                }
+                            }
+                            break;
+
+                        case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
+                            await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_ID:
+
+                            // match by object ID
+                            if (conditionalAccessPolicies.Any(policy => policy.id.Equals(conditionalAccessPolicy.id)))
+                            {
+                                await graphConditionalAccess.PatchConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
+                            // Create a new policy
+                            else
+                            {
+                                var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                            if (conditionalAccessPolicies.Any(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)))
+                            {
+                                string replaceObjectId = conditionalAccessPolicies.Where(policy => policy.displayName.Equals(conditionalAccessPolicy.displayName)).Select(policy => policy.id).First();
+                                conditionalAccessPolicy.id = replaceObjectId;
+                                await graphConditionalAccess.PatchConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
+                            else
+                            {
+                                var result = await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
+                            }
+
+                            break;
+                    }
                 }
             }
             catch (Exception e)
             {
-                signalR.sendMessage("Error: " + e.Message);
+                signalRMessage.sendMessage("Error: " + e.Message);
             }
 
-            signalR.sendMessage("Done#!");
+            signalRMessage.sendMessage("Done#!");
             return new HttpStatusCodeResult(204);
         }
 
         [HttpPost]
         public async Task<ActionResult> DeployBaseline(string displayName, string selectedBaseline, string policyPrefix, string allowLegacyAuth, string clientId = null)
         {
-            SignalRMessage signalR = new SignalRMessage
-            {
-                clientId = clientId
-            };
+            SignalRMessage signalR = new SignalRMessage(clientId);
+            GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(clientId);
 
             signalR.sendMessage("Selected baseline: " + selectedBaseline);
 
@@ -123,7 +168,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 };
 
                 // Load CA policies for policy set
-                string[] filePaths = Directory.GetFiles(Server.MapPath(TEMPLATE_CA_POLICY_FOLDER_PATH + selectedBaseline),"*.json");
+                string[] filePaths = Directory.GetFiles(Server.MapPath(TEMPLATE_CA_POLICY_FOLDER_PATH + selectedBaseline), "*.json");
 
                 if (filePaths.Length == 0)
                 {
@@ -146,6 +191,9 @@ namespace ModernWorkplaceConcierge.Controllers
                                 // Modify properties on template
                                 ConditionalAccessPolicy conditionalAccessPolicy = JsonConvert.DeserializeObject<ConditionalAccessPolicy>(textCaPolicy);
                                 conditionalAccessPolicy.conditions.users.excludeGroups = groupsCreated.ToArray();
+                                string placeholder = "<RING> -";
+                                int startDisplayName = conditionalAccessPolicy.displayName.IndexOf(placeholder) + placeholder.Length;
+                                conditionalAccessPolicy.displayName = conditionalAccessPolicy.displayName.Substring(startDisplayName, conditionalAccessPolicy.displayName.Length - startDisplayName);
                                 conditionalAccessPolicy.displayName = conditionalAccessPolicy.displayName.Insert(0, policyPrefix).Replace("<PREFIX> -", "").Trim();
 
                                 // Check for legacy auth exclusion group
@@ -159,7 +207,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                 }
 
                                 // Create the policy
-                                await GraphHelper.ImportCaConfig(JsonConvert.SerializeObject(conditionalAccessPolicy), clientId);
+                                await graphConditionalAccess.TryAddConditionalAccessPolicyAsync(conditionalAccessPolicy);
                             }
                         }
                     }
@@ -173,7 +221,7 @@ namespace ModernWorkplaceConcierge.Controllers
             {
                 signalR.sendMessage("Error: " + e.Message);
             }
-            
+
             signalR.sendMessage("Done#!");
             return new HttpStatusCodeResult(204);
         }
@@ -203,47 +251,43 @@ namespace ModernWorkplaceConcierge.Controllers
 
         public async Task<ActionResult> DownloadAll(string clientId = null)
         {
-            SignalRMessage signalR = new SignalRMessage
-            {
-                clientId = clientId
-            };
-            try {
-                string ca = await GraphHelper.GetConditionalAccessPoliciesAsync(clientId);
+            SignalRMessage signalR = new SignalRMessage(clientId);
 
-                ConditionalAccessPolicies conditionalAccessPolicies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
+            try
+            {
+                GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(clientId);
+                IEnumerable<ConditionalAccessPolicy> conditionalAccessPolicies = await graphConditionalAccess.GetConditionalAccessPoliciesAsync();
 
                 using (MemoryStream ms = new MemoryStream())
                 {
                     using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
                     {
-                        foreach (ConditionalAccessPolicy item in conditionalAccessPolicies.Value)
+                        foreach (ConditionalAccessPolicy item in conditionalAccessPolicies)
                         {
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented).ToString());
 
                             string displayName = item.displayName;
 
                             char[] illegal = Path.GetInvalidFileNameChars();
-                            
+
                             foreach (char illegalChar in illegal)
                             {
                                 displayName = displayName.Replace(illegalChar, '-');
                             }
 
-                            var zipArchiveEntry = archive.CreateEntry(displayName + "_" + item.id + ".json", CompressionLevel.Fastest);
+                            var zipArchiveEntry = archive.CreateEntry(displayName + "_" + item.id.Substring(0,8) + ".json", CompressionLevel.Fastest);
 
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
                     }
 
                     string domainName = await GraphHelper.GetDefaultDomain(clientId);
-
                     return File(ms.ToArray(), "application/zip", "ConditionalAccessConfig_" + domainName + ".zip");
                 }
             }
             catch (Exception e)
             {
                 signalR.sendMessage("Error " + e);
-                
             }
             return new HttpStatusCodeResult(204);
         }
@@ -253,31 +297,23 @@ namespace ModernWorkplaceConcierge.Controllers
             return View();
         }
 
-        public async Task<ActionResult> ClearAll(bool confirm = false)
-        {
-            if (confirm)
-            {
-                await GraphHelper.ClearConditonalAccessPolicies();
-            }
-            return new HttpStatusCodeResult(204);
-        }
+        //public async Task<ActionResult> ClearAll(bool confirm = false)
+        //{
+        //    GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(null);
+        //    if (confirm)
+        //    {
+        //        await graphConditionalAccess.ClearConditonalAccessPolicies();
+        //    }
+        //    return new HttpStatusCodeResult(204);
+        //}
 
         public async Task<FileResult> CreateDocumentation(string clientId = null)
         {
+            GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(clientId);
+            SignalRMessage signalR = new SignalRMessage(clientId);
+            signalR.sendMessage("Building report....");
 
-            SignalRMessage signalR = new SignalRMessage
-            {
-                clientId = clientId
-            };
-
-            if (!string.IsNullOrEmpty(clientId))
-            {
-                signalR.sendMessage("Building report....");
-            }
-
-            string ca = await GraphHelper.GetConditionalAccessPoliciesAsync(clientId);
-
-            ConditionalAccessPolicies conditionalAccessPolicies = JsonConvert.DeserializeObject<ConditionalAccessPolicies>(ca);
+            IEnumerable<ConditionalAccessPolicy> conditionalAccessPolicies = await graphConditionalAccess.GetConditionalAccessPoliciesAsync();
 
             DataTable dataTable = new DataTable();
 
@@ -286,17 +322,16 @@ namespace ModernWorkplaceConcierge.Controllers
             dataTable.Columns.Add("State");
 
             // Assignments: first include then exclude
-            dataTable.Columns.Add("IncludedUsers");
-            dataTable.Columns.Add("IncludedGroups");
-            dataTable.Columns.Add("IncludedRoles");
+            dataTable.Columns.Add("IncludeUsers");
+            dataTable.Columns.Add("IncludeGroups");
+            dataTable.Columns.Add("IncludeRoles");
 
-            dataTable.Columns.Add("ExcludedUsers");
-            dataTable.Columns.Add("ExcludedGroups");
-            dataTable.Columns.Add("ExcludedRoles");
+            dataTable.Columns.Add("ExcludeUsers");
+            dataTable.Columns.Add("ExcludeGroups");
+            dataTable.Columns.Add("ExcludeRoles");
 
-
-            dataTable.Columns.Add("IncludedApps");
-            dataTable.Columns.Add("ExcludedApps");
+            dataTable.Columns.Add("IncludeApps");
+            dataTable.Columns.Add("ExcludeApps");
             dataTable.Columns.Add("IncludeUserActions");
             dataTable.Columns.Add("ClientAppTypes");
             dataTable.Columns.Add("IncludePlatforms");
@@ -315,7 +350,7 @@ namespace ModernWorkplaceConcierge.Controllers
             // Init cache for AAD Object ID's in CA policies
             AzureADIDCache azureADIDCache = new AzureADIDCache(clientId);
 
-            foreach (ConditionalAccessPolicy conditionalAccessPolicy in conditionalAccessPolicies.Value)
+            foreach (ConditionalAccessPolicy conditionalAccessPolicy in conditionalAccessPolicies)
             {
                 try
                 {
@@ -325,19 +360,17 @@ namespace ModernWorkplaceConcierge.Controllers
                     row["Name"] = conditionalAccessPolicy.displayName;
                     row["State"] = conditionalAccessPolicy.state;
 
-                    row["IncludedUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeUsers))}\"";
-                    row["ExcludedUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeUsers))}\"";
-                    row["IncludedGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeGroups))}\"";
-                    row["ExcludedGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeGroups))}\"";
-                    row["IncludedRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeRoles))}\"";
-                    row["ExcludedRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeRoles))}\"";
+                    row["IncludeUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeUsers))}\"";
+                    row["ExcludeUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeUsers))}\"";
+                    row["IncludeGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeGroups))}\"";
+                    row["ExcludeGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeGroups))}\"";
+                    row["IncludeRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeRoles))}\"";
+                    row["ExcludeRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeRoles))}\"";
 
-                    row["IncludedApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.includeApplications))}\"";
-                    row["ExcludedApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.excludeApplications))}\"";
-
+                    row["IncludeApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.includeApplications))}\"";
+                    row["ExcludeApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.excludeApplications))}\"";
 
                     row["IncludeUserActions"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.includeUserActions))}\"";
-
 
                     if (conditionalAccessPolicy.conditions.platforms != null && conditionalAccessPolicy.conditions.platforms.includePlatforms != null)
                     {
@@ -351,24 +384,24 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     if (conditionalAccessPolicy.conditions.locations != null && conditionalAccessPolicy.conditions.locations.includeLocations != null)
                     {
-                        row["IncludeLocations"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.locations.includeLocations)}\"";
+                        row["IncludeLocations"] = $"\"{String.Join("\n", await azureADIDCache.getNamedLocationDisplayNamesAsync(conditionalAccessPolicy.conditions.locations.includeLocations))}\"";
                     }
 
                     if (conditionalAccessPolicy.conditions.locations != null && conditionalAccessPolicy.conditions.locations.excludeLocations != null)
                     {
-                        row["ExcludeLocations"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.locations.excludeLocations)}\"";
+                        row["ExcludeLocations"] = $"\"{String.Join("\n", await azureADIDCache.getNamedLocationDisplayNamesAsync(conditionalAccessPolicy.conditions.locations.excludeLocations))}\"";
                     }
 
                     row["ClientAppTypes"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.clientAppTypes)}\"";
 
-                    if (conditionalAccessPolicy.conditions.deviceStates != null && conditionalAccessPolicy.conditions.deviceStates.includeStates != null)
+                    if (conditionalAccessPolicy.conditions.devices != null && conditionalAccessPolicy.conditions.devices.includeDeviceStates != null)
                     {
-                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.deviceStates.includeStates)}\"";
+                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.devices.includeDeviceStates)}\"";
                     }
 
-                    if (conditionalAccessPolicy.conditions.deviceStates != null && conditionalAccessPolicy.conditions.deviceStates.excludeStates != null)
+                    if (conditionalAccessPolicy.conditions.devices != null && conditionalAccessPolicy.conditions.devices.excludeDeviceStates != null)
                     {
-                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.deviceStates.excludeStates)}\"";
+                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.devices.excludeDeviceStates)}\"";
                     }
 
                     if (conditionalAccessPolicy.grantControls != null && conditionalAccessPolicy.grantControls.builtInControls != null)
@@ -389,13 +422,12 @@ namespace ModernWorkplaceConcierge.Controllers
 
                     if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.persistentBrowser != null)
                     {
-                        row["PersistentBrowser"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.persistentBrowser.mode)}\"";
+                        row["PersistentBrowser"] = conditionalAccessPolicy.sessionControls.persistentBrowser.mode;
                     }
 
                     if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.signInFrequency != null)
                     {
-                        row["SignInFrequency"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.signInFrequency.isEnabled)}\"";
-                        row["SignInFrequency"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.signInFrequency.type)}\"";
+                        row["SignInFrequency"] = conditionalAccessPolicy.sessionControls.signInFrequency.value + " " + conditionalAccessPolicy.sessionControls.signInFrequency.type;
                     }
 
                     // Add new row to table
@@ -426,7 +458,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 signalR.sendMessage("Success: Report generated");
             }
 
-            return File(Encoding.ASCII.GetBytes(sb.ToString()), "text/csvt", "ConditionalAccessReport_" + domainName +".csv");
+            return File(Encoding.ASCII.GetBytes(sb.ToString()), "text/csvt", "ConditionalAccessReport_" + domainName + ".csv");
         }
-    }   
+    }
 }

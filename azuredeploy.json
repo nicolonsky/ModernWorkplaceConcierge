@@ -83,6 +83,10 @@
             {
               "name": "RedirectUri",
               "value": "{WebsiteURL}"
+            },
+            {
+              "name": "MSBUILD_PATH",
+              "value": "%MSBUILD_15_DIR%\\msbuild.exe"
             }
           ]
         }

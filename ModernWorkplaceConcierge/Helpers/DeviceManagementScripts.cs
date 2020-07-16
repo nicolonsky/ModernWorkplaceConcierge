@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Microsoft.Graph;
 using Newtonsoft.Json;
-using Microsoft.Graph;
-
 
 namespace IntuneConcierge.Helpers
 {
@@ -9,6 +7,7 @@ namespace IntuneConcierge.Helpers
     {
         [JsonProperty("@odata.context")]
         public string odatacontext { get; set; }
+
         [JsonProperty("value")]
         public DeviceManagementScript[] value { get; set; }
     }

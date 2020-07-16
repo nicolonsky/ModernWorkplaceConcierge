@@ -1,16 +1,15 @@
-﻿using ModernWorkplaceConcierge.Helpers;
+﻿using Microsoft.Graph;
+using ModernWorkplaceConcierge.Helpers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
+using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using Newtonsoft.Json;
-using Microsoft.Graph;
-using System.Text;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Collections;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -23,7 +22,8 @@ namespace ModernWorkplaceConcierge.Controllers
             try
             {
                 // Get all plans
-                var plans = await GraphHelper.GetplannerPlans();
+                GraphPlanner graphPlanner = new GraphPlanner(null);
+                var plans = await graphPlanner.GetplannerPlansAsync();
 
                 return View(plans);
             }
@@ -36,14 +36,13 @@ namespace ModernWorkplaceConcierge.Controllers
         [HttpPost]
         public async System.Threading.Tasks.Task<ActionResult> Import(HttpPostedFileBase file, string PlannerPlan, string clientId)
         {
-            SignalRMessage signalR = new SignalRMessage();
-            signalR.clientId = clientId;
-
-            try {
-
+            SignalRMessage signalR = new SignalRMessage(clientId);
+            GraphPlanner graphPlanner = new GraphPlanner(clientId);
+            try
+            {
                 // Get current planner object
-                var planner = await GraphHelper.GetplannerPlan(PlannerPlan);
-                
+                var planner = await graphPlanner.GetplannerPlanAsync(PlannerPlan);
+
                 // Count imported tasks
                 int importedTasksCounter = 0;
 
@@ -53,7 +52,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 string result = Encoding.UTF8.GetString(binData);
 
                 JsonReader reader = new JsonTextReader(new StringReader(result));
-                // Do not parse datetime values 
+                // Do not parse datetime values
                 reader.DateParseHandling = DateParseHandling.None;
                 reader.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
                 JObject trelloBoard = JObject.Load(reader);
@@ -74,7 +73,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 }
 
                 // Get existing planner buckets
-                IEnumerable<PlannerBucket> plannerBuckets = await GraphHelper.GetPlannerBuckets(PlannerPlan, clientId);
+                IEnumerable<PlannerBucket> plannerBuckets = await graphPlanner.GetPlannerBucketsAsync(PlannerPlan);
 
                 // Create planner bucket if not exists
                 foreach (string bucket in bucketsToCreate)
@@ -89,7 +88,7 @@ namespace ModernWorkplaceConcierge.Controllers
                                 PlanId = PlannerPlan
                             };
 
-                            var reponse = await GraphHelper.AddPlannerBucket(plannerBucket, clientId);
+                            var reponse = await graphPlanner.AddPlannerBucketAsync(plannerBucket);
                         }
                     }
                     catch
@@ -98,7 +97,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 }
 
                 // Get available planner buckets
-                plannerBuckets = await GraphHelper.GetPlannerBuckets(PlannerPlan, clientId);
+                plannerBuckets = await graphPlanner.GetPlannerBucketsAsync(PlannerPlan);
 
                 // create tasks
                 foreach (JToken task in trelloBoard.SelectToken("cards"))
@@ -119,7 +118,7 @@ namespace ModernWorkplaceConcierge.Controllers
 
                         if (isInArchivedList)
                         {
-                            signalR.sendMessage("Discarding task because stored in an archived list: '" + plannerTask.Title+"'");
+                            signalR.sendMessage("Discarding task because stored in an archived list: '" + plannerTask.Title + "'");
                         }
                         else
                         {
@@ -165,7 +164,6 @@ namespace ModernWorkplaceConcierge.Controllers
                                         User user = await GraphHelper.GetUser(assignedToname);
 
                                         plannerTask.Assignments.AddAssignee(user.Id);
-
                                     }
                                 }
                             }
@@ -174,7 +172,7 @@ namespace ModernWorkplaceConcierge.Controllers
                             }
 
                             // Add the task
-                            var request = await GraphHelper.AddPlannerTask(plannerTask, clientId);
+                            var request = await graphPlanner.AddPlannerTaskAsync(plannerTask);
 
                             signalR.sendMessage("Successfully imported task '" + request.Title + "'");
 
@@ -191,7 +189,6 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                 if (!string.IsNullOrEmpty(taskDescription))
                                 {
-
                                     plannerTaskDetails.Description = taskDescription;
                                 }
 
@@ -228,7 +225,6 @@ namespace ModernWorkplaceConcierge.Controllers
 
                                         foreach (JToken checklistItem in checklistItems)
                                         {
-
                                             string checklistItemName = (string)checklistItem;
 
                                             // truncate string because checklist items are limited to 100 characters
@@ -256,11 +252,9 @@ namespace ModernWorkplaceConcierge.Controllers
                                     signalR.sendMessage("Error: " + e.Message);
                                 }
 
-                                var response = await GraphHelper.AddPlannerTaskDetails(plannerTaskDetails, request.Id, clientId);
+                                var response = await graphPlanner.AddPlannerTaskDetailsAsync(plannerTaskDetails, request.Id);
                             }
-
                         }
-                    
                     }
                     catch (Exception e)
                     {
