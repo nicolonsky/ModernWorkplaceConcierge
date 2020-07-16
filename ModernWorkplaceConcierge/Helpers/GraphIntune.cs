@@ -543,7 +543,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public async Task<DeviceConfiguration> PatchDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration)
         {
             deviceConfiguration.SupportsScopeTags = null;
-            deviceConfiguration.RoleScopeTagIds = null;
+            //deviceConfiguration.RoleScopeTagIds = null;
 
             if (!deviceConfiguration.ODataType.Equals("#microsoft.graph.windowsUpdateForBusinessConfiguration"))
             {
