@@ -2,6 +2,7 @@
 using ModernWorkplaceConcierge.Helpers;
 using ModernWorkplaceConcierge.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -16,15 +17,26 @@ namespace ModernWorkplaceConcierge.Controllers
     [System.Web.Mvc.Authorize]
     public class IntuneController : BaseController
     {
+        private List<string> supportedFolders = new List<string>();
+
         public ActionResult Import()
         {
             return View();
         }
 
         [HttpPost]
-        public async System.Threading.Tasks.Task<ActionResult> Upload(HttpPostedFileBase[] files, OverwriteBehaviour overwriteBehaviour, string clientId)
+        public async Task<ActionResult> Upload(HttpPostedFileBase[] files, OverwriteBehaviour overwriteBehaviour, string clientId)
         {
             SignalRMessage signalR = new SignalRMessage(clientId);
+
+            supportedFolders.Add("WindowsAutopilotDeploymentProfile");
+            supportedFolders.Add("DeviceConfiguration");
+            supportedFolders.Add("DeviceCompliancePolicy");
+            supportedFolders.Add("DeviceManagementScript");
+            supportedFolders.Add("ManagedAppPolicy");
+            // Scope Tags are handled before any other imports because multiple intune objects rely on them
+            //supportedFolders.Add("RoleScopeTags");
+
             try
             {
                 GraphIntuneImport graphIntuneImport = new GraphIntuneImport(clientId, overwriteBehaviour);
@@ -50,6 +62,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 {
                     try
                     {
+                        Dictionary<string, string> importFiles = new Dictionary<string, string>();
                         MemoryStream target = new MemoryStream();
                         files[0].InputStream.CopyTo(target);
                         byte[] data = target.ToArray();
@@ -64,19 +77,26 @@ namespace ModernWorkplaceConcierge.Controllers
                                     {
                                         if (entry != null)
                                         {
-                                            if (entry.FullName.Contains("WindowsAutopilotDeploymentProfile") || entry.FullName.Contains("DeviceConfiguration") || entry.FullName.Contains("DeviceCompliancePolicy") || entry.FullName.Contains("DeviceManagementScript") || entry.FullName.Contains("ManagedAppPolicy"))
+                                            using (var unzippedEntryStream = entry.Open())
                                             {
-                                                using (var unzippedEntryStream = entry.Open())
+                                                using (var ms = new MemoryStream())
                                                 {
-                                                    using (var ms = new MemoryStream())
-                                                    {
-                                                        unzippedEntryStream.CopyTo(ms);
-                                                        var unzippedArray = ms.ToArray();
-                                                        string result = Encoding.UTF8.GetString(unzippedArray);
+                                                    unzippedEntryStream.CopyTo(ms);
+                                                    var unzippedArray = ms.ToArray();
+                                                    string result = Encoding.UTF8.GetString(unzippedArray);
 
-                                                        if (!string.IsNullOrEmpty(result))
+                                                    if (!string.IsNullOrEmpty(result))
+                                                    {
+                                                        // Check if key exists 
+                                                        // Only the case because of enrollment restrictions coming with no value
+                                                        if (importFiles.ContainsKey(entry.FullName))
                                                         {
-                                                            await graphIntuneImport.AddIntuneConfig(result);
+                                                            Random r = new Random();
+                                                            importFiles.Add(entry.FullName + r.Next(), result);
+                                                        }
+                                                        else
+                                                        {
+                                                            importFiles.Add(entry.FullName, result);
                                                         }
                                                     }
                                                 }
@@ -88,6 +108,25 @@ namespace ModernWorkplaceConcierge.Controllers
                                         signalR.sendMessage("Error: " + e.Message);
                                     }
                                 }
+                            }
+                        }
+
+                        // First create all scope tags
+                        foreach (KeyValuePair<string, string> entry in importFiles)
+                        {
+                            if (entry.Key.Contains("RoleScopeTags"))
+                            {
+                                await graphIntuneImport.AddIntuneScopeTag(entry.Value);
+                            }
+                        }
+
+                        // Process all remaining intune objects
+                        foreach (KeyValuePair<string, string> entry in importFiles)
+                        {
+                            // Verify folder name
+                            if (supportedFolders.Contains(entry.Key.Split('\\')[0]))
+                            {
+                                await graphIntuneImport.AddIntuneConfig(entry.Value);
                             }
                         }
                     }

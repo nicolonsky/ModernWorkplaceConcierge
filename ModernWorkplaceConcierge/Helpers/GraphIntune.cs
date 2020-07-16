@@ -310,6 +310,15 @@ namespace ModernWorkplaceConcierge.Helpers
             return response;
         }
 
+        public async Task<RoleScopeTag> AddRoleScopeTagAsync(RoleScopeTag scopeTag)
+        {
+            var resource = graphServiceClient.DeviceManagement.RoleScopeTags.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var response = await resource.AddAsync(scopeTag);
+            signalRMessage.sendMessage($"Success: added {response.ODataType} '{response.DisplayName}'");
+            return response;
+        }
+
         public async Task<IEnumerable<RoleScopeTag>> GetRoleScopeTagsAsync()
         {
             var resource = graphServiceClient.DeviceManagement.RoleScopeTags.Request();
@@ -534,7 +543,7 @@ namespace ModernWorkplaceConcierge.Helpers
         public async Task<DeviceConfiguration> PatchDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration)
         {
             deviceConfiguration.SupportsScopeTags = null;
-            deviceConfiguration.RoleScopeTagIds = null;
+            //deviceConfiguration.RoleScopeTagIds = null;
 
             if (!deviceConfiguration.ODataType.Equals("#microsoft.graph.windowsUpdateForBusinessConfiguration"))
             {

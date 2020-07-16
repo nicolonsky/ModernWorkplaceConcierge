@@ -53,7 +53,7 @@ namespace ModernWorkplaceConcierge.Controllers
                         foreach (DeviceEnrollmentConfiguration item in deviceEnrollmentConfig)
                         {
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
-                            var zipArchiveEntry = archive.CreateEntry("DeviceEnrollmentConfiguration\\" + ".json", CompressionLevel.Fastest);
+                            var zipArchiveEntry = archive.CreateEntry("DeviceEnrollmentConfiguration\\" + item.Id + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
 
