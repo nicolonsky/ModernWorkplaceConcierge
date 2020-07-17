@@ -145,12 +145,12 @@ namespace ModernWorkplaceConcierge.Helpers
             return groupPolicyConfigurations.CurrentPage;
         }
 
-        public async Task<IEnumerable<GroupPolicyPresentation>> GetGroupPolicyPresentationValuesAsync(string id)
+        public async Task<IEnumerable<GroupPolicyPresentationValue>> GetGroupPolicyPresentationValuesAsync(string groupPolicyDefinitionId, string Id)
         {
-            var resource = graphServiceClient.DeviceManagement.GroupPolicyDefinitions[id].Presentations.Request();
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations[groupPolicyDefinitionId].DefinitionValues[Id].PresentationValues.Request();
             signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var groupPolicyPresentations = await resource.GetAsync();
-            return groupPolicyPresentations.CurrentPage;
+            var groupPolicyPresentation = await resource.GetAsync();
+            return groupPolicyPresentation.CurrentPage;
         }
 
         public async Task<IEnumerable<AndroidManagedAppProtection>> GetAndroidManagedAppProtectionsAsync()

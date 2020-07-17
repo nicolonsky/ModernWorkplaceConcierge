@@ -22,7 +22,7 @@
 
     <link rel="stylesheet" href="~/Content/Site.css" />
 
-    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/jquery-3.5.1.min.js"></script>
     <script src="~/Scripts/umd/popper.min.js"></script>
 
     <script type="text/javascript">
@@ -118,7 +118,7 @@
                     {
                         <li class="nav-item dropdown">
                             <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                @if (! string.IsNullOrEmpty(ViewBag.User.Avatar))
+                                @if (!string.IsNullOrEmpty(ViewBag.User.Avatar))
                                 {
                                     <img src="@ViewBag.User.Avatar" class="rounded-circle align-self-center mr-2" style="width: 24px;">
                                 }
@@ -127,12 +127,11 @@
                                     <i class="far fa-user-circle fa-lg rounded-circle align-self-center mr-2" style="width: 32px;"></i>
                                 }
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <h5 class="dropdown-item-text mb-0">@ViewBag.User.DisplayName</h5>
-                                <p class="dropdown-item-text text-muted mb-0">@ViewBag.User.Email</p>
-                                <p class="dropdown-item-text text-muted mb-0">Build: @typeof(ModernWorkplaceConcierge.BundleConfig).Assembly.GetName().Version</p>
+                            <div class="dropdown-menu dropdown-menu-right bg-dark">
+                                <h5 class="dropdown-item-text mb-0 text-white">@ViewBag.User.DisplayName</h5>
+                                <p class="dropdown-item-text text-muted mb-0 text-white">@ViewBag.User.Email</p>
                                 <div class="dropdown-divider"></div>
-                                @Html.ActionLink("Sign Out", "SignOut", "Account", new { area = "" }, new { @class = "dropdown-item" })
+                                @Html.ActionLink("Sign Out", "SignOut", "Account", new { area = "" }, new { @class = "dropdown-item text-white" })
                             </div>
                         </li>
                     }
@@ -185,17 +184,33 @@
     <br />
     <br />
     <div class="container">
-        <img src="/Content/Images/concierge.svg" class="fixed-bottom float-md-right" style="width: 10%;margin: 1.5em;">
+
+        @if (Request.IsAuthenticated)
+        {
+            <img src="/Content/Images/concierge.svg" class="fixed-bottom float-md-right" style="width: 10%;margin: 1.5em;" data-toggle="tooltip" id="tenant" data-placement="right" title="Connected to Tenant: @ViewBag.User.TenantID">
+        }
+        else
+        {
+            <img src="/Content/Images/concierge.svg" class="fixed-bottom float-md-right" style="width: 10%;margin: 1.5em;">
+        }
+
+
     </div>
 
-        <footer class="footer mt-auto fixed-bottom py-2">
-            <div class="container">
-                <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span>
-                <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
-            </div>
-        </footer>
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
-        @RenderSection("scripts", required: false)
+    <footer class="footer mt-auto fixed-bottom py-2">
+        <div class="container">
+            <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span>
+            <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
+        </div>
+    </footer>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    <script>
+        $(function () {
+            $('#tenant').tooltip()
+        })
+    </script>
 </body>
 </html>

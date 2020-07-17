@@ -111,6 +111,7 @@ namespace ModernWorkplaceConcierge
                 {
                     DisplayName = userDetails.DisplayName,
                     Email = userDetails.UserPrincipalName,
+                    TenantID = result.TenantId,
                     Avatar = profilePhoto
                 };
 

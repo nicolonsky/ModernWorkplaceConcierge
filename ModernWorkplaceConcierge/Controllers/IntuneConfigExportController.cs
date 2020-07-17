@@ -3,6 +3,7 @@ using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -31,20 +32,37 @@ namespace ModernWorkplaceConcierge.Controllers
                 var scopeTags = await graphIntune.GetRoleScopeTagsAsync();
                 var roleAssignments = await graphIntune.GetRoleAssignmentsAsync();
 
-                //var gpos = await graphIntune.GetGroupPolicyConfigurationsAsync();
-                //foreach (GroupPolicyConfiguration gpo in gpos)
-                //{
-                //    var values = await graphIntune.GetGroupPolicyDefinitionValuesAsync(gpo.Id);
-                //    signalRMessage.sendMessage(JsonConvert.SerializeObject(gpo, Formatting.Indented) + JsonConvert.SerializeObject(values, Formatting.Indented));
+                // 1. GPO
+                var gpos = await graphIntune.GetGroupPolicyConfigurationsAsync();
 
-                //    foreach (GroupPolicyDefinitionValue value in values)
-                //    {
-                //        var res = await graphIntune.GetGroupPolicyPresentationValuesAsync(value.Id);
+                foreach (GroupPolicyConfiguration gpo in gpos)
+                {
+                    // 2. Configured settings
+                    var values = await graphIntune.GetGroupPolicyDefinitionValuesAsync(gpo.Id);
 
-                //        signalRMessage.sendMessage(JsonConvert.SerializeObject(res, Formatting.Indented));
+                    JObject o1 = JObject.FromObject(gpo);
+                    JArray o2 = JArray.FromObject(values);
 
-                //    }
-                //}
+                    // Add assigned apps to export
+                    //o1.Add("definitionValues", o2);
+
+                    signalRMessage.sendMessage(JsonConvert.SerializeObject(o1, Formatting.Indented));
+
+                    // 3. Configured Values
+                    foreach (GroupPolicyDefinitionValue value in values)
+                    {
+                        var res = await graphIntune.GetGroupPolicyPresentationValuesAsync(gpo.Id, value.Id);
+                        JObject definition = JObject.FromObject(value);
+                        JArray gpoValues = JArray.FromObject(res);
+
+                        definition.Add("values", gpoValues);
+
+                        o1.Add(value.Id, definition);
+                    }
+
+                    signalRMessage.sendMessage(JsonConvert.SerializeObject(o1, Formatting.Indented));
+
+                }
 
                 using (MemoryStream ms = new MemoryStream())
                 {
