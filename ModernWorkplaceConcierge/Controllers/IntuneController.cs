@@ -155,7 +155,7 @@ namespace ModernWorkplaceConcierge.Controllers
             return View();
         }
 
-        public async System.Threading.Tasks.Task<ViewResult> DeviceManagementScripts()
+        public async Task<ActionResult> DeviceManagementScripts()
         {
             try
             {
@@ -163,14 +163,14 @@ namespace ModernWorkplaceConcierge.Controllers
                 var scripts = await graphIntune.GetDeviceManagementScriptsAsync();
                 return View(scripts);
             }
-            catch (Exception e)
+            catch (ServiceException e)
             {
-                Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
-                return View();
+                Flash(e.Error.Message);
+                return RedirectToAction("Index", "Home");
             }
         }
 
-        public async System.Threading.Tasks.Task<ViewResult> Win32AppDetectionScripts()
+        public async Task<ActionResult> Win32AppDetectionScripts()
         {
             try
             {
@@ -191,14 +191,14 @@ namespace ModernWorkplaceConcierge.Controllers
 
                 return View(win32LobApps);
             }
-            catch (Exception e)
+            catch (ServiceException e)
             {
-                Flash("Error " + e.Message.ToString());
-                return View();
+                Flash(e.Error.Message);
+                return RedirectToAction("Index", "Home");
             }
         }
 
-        public async System.Threading.Tasks.Task<PartialViewResult> Win32AppPsDetectionScriptContent(string Id)
+        public async Task<ActionResult> Win32AppPsDetectionScriptContent(string Id)
         {
             try
             {
@@ -207,23 +207,31 @@ namespace ModernWorkplaceConcierge.Controllers
                 string powerShellCode = Encoding.UTF8.GetString(Convert.FromBase64String(script.ScriptContent));
                 return PartialView("_PowerShellDetectionScriptContent", powerShellCode);
             }
-            catch (Exception e)
+            catch (ServiceException e)
             {
-                Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
-                return PartialView();
+                Flash(e.Error.Message);
+                return RedirectToAction("Index", "Home");
             }
         }
 
-        public async System.Threading.Tasks.Task<FileResult> DownloadDetectionScript(string Id)
+        public async Task<ActionResult> DownloadDetectionScript(string Id)
         {
-            GraphIntune graphIntune = new GraphIntune(null);
-            Win32LobApp win32LobApp = await graphIntune.GetWin32MobileAppAsync(Id);
-            Win32LobAppPowerShellScriptDetection script = await graphIntune.GetWin32MobileAppPowerShellDetectionRuleAsync(Id);
-            string fileName = $"{FilenameHelper.ProcessFileName(win32LobApp.DisplayName)}_detect.ps1";
-            return File(Convert.FromBase64String(script.ScriptContent), "text/plain", fileName);
+            try
+            {
+                GraphIntune graphIntune = new GraphIntune(null);
+                Win32LobApp win32LobApp = await graphIntune.GetWin32MobileAppAsync(Id);
+                Win32LobAppPowerShellScriptDetection script = await graphIntune.GetWin32MobileAppPowerShellDetectionRuleAsync(Id);
+                string fileName = $"{FilenameHelper.ProcessFileName(win32LobApp.DisplayName)}_detect.ps1";
+                return File(Convert.FromBase64String(script.ScriptContent), "text/plain", fileName);
+            }
+            catch (ServiceException e)
+            {
+                Flash(e.Error.Message);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
-        public async System.Threading.Tasks.Task<PartialViewResult> PowerShellScriptContent(string Id)
+        public async Task<ActionResult> PowerShellScriptContent(string Id)
         {
             try
             {
@@ -232,28 +240,36 @@ namespace ModernWorkplaceConcierge.Controllers
                 string powerShellCode = Encoding.UTF8.GetString(scripts.ScriptContent);
                 return PartialView("_PowerShellScriptContent", powerShellCode);
             }
-            catch (Exception e)
+            catch (ServiceException e)
             {
-                Flash("Error getting DeviceManagementScripts" + e.Message.ToString());
-                return PartialView();
+                Flash(e.Error.Message);
+                return RedirectToAction("Index", "Home");
             }
         }
 
-        public async System.Threading.Tasks.Task<FileResult> DownloadDeviceManagementScript(String Id)
+        public async Task<ActionResult> DownloadDeviceManagementScript(String Id)
         {
-            GraphIntune graphIntune = new GraphIntune(null);
-            DeviceManagementScript script = await graphIntune.GetDeviceManagementScriptAsync(Id);
-            return File(script.ScriptContent, "text/plain", script.FileName);
+            try
+            {
+                GraphIntune graphIntune = new GraphIntune(null);
+                DeviceManagementScript script = await graphIntune.GetDeviceManagementScriptAsync(Id);
+                return File(script.ScriptContent, "text/plain", script.FileName);
+            }
+            catch (ServiceException e)
+            {
+                Flash(e.Error.Message);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
-        public async Task<ActionResult> ClearAll(bool confirm = false)
-        {
-            GraphIntune graphIntune = new GraphIntune(null);
-            if (confirm)
-            {
-                await graphIntune.ClearDeviceConfigurations();
-            }
-            return new HttpStatusCodeResult(204);
-        }
+        //public async Task<ActionResult> ClearAll(bool confirm = false)
+        //{
+        //    GraphIntune graphIntune = new GraphIntune(null);
+        //    if (confirm)
+        //    {
+        //        await graphIntune.ClearDeviceConfigurations();
+        //    }
+        //    return new HttpStatusCodeResult(204);
+        //}
     }
 }

@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using System;
 using System.Text;
 using System.Web.Mvc;
+using System.Threading.Tasks;
+using Microsoft.Graph;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
@@ -11,21 +13,37 @@ namespace ModernWorkplaceConcierge.Controllers
     public class AutoPilotConfigurationController : BaseController
     {
         // GET: AutoPilotConfigurationJSON
-        public async System.Threading.Tasks.Task<ActionResult> Index()
+        public async Task<ActionResult> Index()
         {
-            GraphIntune graphIntune = new GraphIntune(null);
-            var AutopilotProfiles = await graphIntune.GetWindowsAutopilotDeploymentProfiles();
-            return View(AutopilotProfiles);
+            try
+            {
+                GraphIntune graphIntune = new GraphIntune(null);
+                var AutopilotProfiles = await graphIntune.GetWindowsAutopilotDeploymentProfiles();
+                return View(AutopilotProfiles);
+            }
+            catch (ServiceException e)
+            {
+                Flash(e.Error.Message);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
-        public async System.Threading.Tasks.Task<ActionResult> Detail(String Id)
+        public async Task<ActionResult> Detail(String Id)
         {
-            GraphIntune graphIntune = new GraphIntune(null);
-            var AutopilotProfile = await graphIntune.GetWindowsAutopilotDeploymentProfile(Id);
-            return View(AutopilotProfile);
+            try
+            {
+                GraphIntune graphIntune = new GraphIntune(null);
+                var AutopilotProfile = await graphIntune.GetWindowsAutopilotDeploymentProfile(Id);
+                return View(AutopilotProfile);
+            }
+            catch (ServiceException e)
+            {
+                Flash(e.Error.Message);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
-        public async System.Threading.Tasks.Task<FileResult> DownloadAutopilotConfigurationJSON(string Id)
+        public async Task<FileResult> DownloadAutopilotConfigurationJSON(string Id)
         {
             GraphIntune graphIntune = new GraphIntune(null);
             var profile = await graphIntune.GetWindowsAutopilotDeploymentProfile(Id);
