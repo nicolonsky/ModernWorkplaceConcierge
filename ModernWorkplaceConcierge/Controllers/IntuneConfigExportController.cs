@@ -1,4 +1,5 @@
-﻿using Microsoft.Graph;
+﻿using Microsoft.Ajax.Utilities;
+using Microsoft.Graph;
 using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 
@@ -22,6 +24,9 @@ namespace ModernWorkplaceConcierge.Controllers
 
             try
             {
+
+                AdministrativeTemplateExport templateExport = new AdministrativeTemplateExport(graphIntune);
+
                 var deviceCompliancePolicies = await graphIntune.GetDeviceCompliancePoliciesAsync();
                 var deviceConfigurations = await graphIntune.GetDeviceConfigurationsAsync();
                 var managedAppProtection = await graphIntune.GetManagedAppProtectionAsync();
@@ -31,38 +36,8 @@ namespace ModernWorkplaceConcierge.Controllers
                 var deviceEnrollmentConfig = await graphIntune.GetDeviceEnrollmentConfigurationsAsync();
                 var scopeTags = await graphIntune.GetRoleScopeTagsAsync();
                 var roleAssignments = await graphIntune.GetRoleAssignmentsAsync();
+                List<JObject> administrativeTemplates = await templateExport.GetExportableGroupPolicies();
 
-                // 1. GPO
-                var gpos = await graphIntune.GetGroupPolicyConfigurationsAsync();
-
-                foreach (GroupPolicyConfiguration gpo in gpos)
-                {
-                    // 2. Configured settings
-                    var values = await graphIntune.GetGroupPolicyDefinitionValuesAsync(gpo.Id);
-
-                    JObject o1 = JObject.FromObject(gpo);
-                    JArray o2 = JArray.FromObject(values);
-
-                    // Add assigned apps to export
-                    //o1.Add("definitionValues", o2);
-
-                    signalRMessage.sendMessage(JsonConvert.SerializeObject(o1, Formatting.Indented));
-
-                    // 3. Configured Values
-                    foreach (GroupPolicyDefinitionValue value in values)
-                    {
-                        var res = await graphIntune.GetGroupPolicyPresentationValuesAsync(gpo.Id, value.Id);
-                        JObject definition = JObject.FromObject(value);
-                        JArray gpoValues = JArray.FromObject(res);
-
-                        definition.Add("values", gpoValues);
-
-                        o1.Add(value.Id, definition);
-                    }
-
-                    signalRMessage.sendMessage(JsonConvert.SerializeObject(o1, Formatting.Indented));
-
-                }
 
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -72,6 +47,14 @@ namespace ModernWorkplaceConcierge.Controllers
                         {
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
                             var zipArchiveEntry = archive.CreateEntry("DeviceEnrollmentConfiguration\\" + item.Id + ".json", CompressionLevel.Fastest);
+                            using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                        }
+
+                        foreach (JObject item in administrativeTemplates)
+                        {
+                            byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
+                            string fileName = FilenameHelper.ProcessFileName((string)item.SelectToken("displayName"));
+                            var zipArchiveEntry = archive.CreateEntry("DeviceConfiguration\\" + fileName + "_" + ((string)item.SelectToken("id")).Substring(0, 8) + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
 

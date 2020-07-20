@@ -1,4 +1,5 @@
-﻿using Microsoft.Graph;
+﻿using Microsoft.Ajax.Utilities;
+using Microsoft.Graph;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections;
@@ -145,9 +146,17 @@ namespace ModernWorkplaceConcierge.Helpers
             return groupPolicyConfigurations.CurrentPage;
         }
 
+        public async Task<GroupPolicyDefinition> GetGroupPolicyDefinitionValueAsync(string id, string id2)
+        {
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations[id].DefinitionValues[id2].Definition.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var groupPolicyConfigurations = await resource.GetAsync();
+            return groupPolicyConfigurations;
+        }
+
         public async Task<IEnumerable<GroupPolicyPresentationValue>> GetGroupPolicyPresentationValuesAsync(string groupPolicyDefinitionId, string Id)
         {
-            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations[groupPolicyDefinitionId].DefinitionValues[Id].PresentationValues.Request();
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations[groupPolicyDefinitionId].DefinitionValues[Id].PresentationValues.Request().Expand("presentation");
             signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
             var groupPolicyPresentation = await resource.GetAsync();
             return groupPolicyPresentation.CurrentPage;
