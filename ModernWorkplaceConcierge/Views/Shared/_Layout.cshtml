@@ -170,7 +170,14 @@
                         <button class="btn collapsed" data-toggle="collapse" data-target="#liveMessages" aria-expanded="false" aria-controls="collapseOne">
                             Notifications <span class="badge badge-success" id="notificationCount">1</span>
                         </button>
+
+                        
+
+                        <a id="downloadLogs" href="" class="align-middle float-right" download="ModernWorkplaceConcierge.log">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                        </a>
                     </h5>
+                    
                 </div>
                 <div id="liveMessages" class="collapse hide" aria-labelledby="headingOne" data-parent="#signalRLiveMessages">
                     <div class="card-body">
@@ -212,10 +219,25 @@
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 
-    <script>
-        $(function () {
-            $('#tenant').tooltip()
-        })
+<script>
+    $(function () {
+        $('#tenant').tooltip()
+    })
+
+
+    // log download
+    $('#downloadLogs').click(function () {
+
+        var logs = "";
+
+        $('#messages li').each(function (index, obj) {
+            var line = $(this).text()
+            var output = line + "\n"
+            logs += output;
+        });
+
+        this.href = "data:text/plain;charset=UTF-8," + logs;
+    });
     </script>
 </body>
 </html>

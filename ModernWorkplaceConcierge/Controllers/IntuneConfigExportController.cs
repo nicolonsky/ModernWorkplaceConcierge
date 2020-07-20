@@ -35,7 +35,7 @@ namespace ModernWorkplaceConcierge.Controllers
                 var deviceManagementScripts = await graphIntune.GetDeviceManagementScriptsAsync();
                 var deviceEnrollmentConfig = await graphIntune.GetDeviceEnrollmentConfigurationsAsync();
                 var scopeTags = await graphIntune.GetRoleScopeTagsAsync();
-                var roleAssignments = await graphIntune.GetRoleAssignmentsAsync();
+                var roleDefinitions = await graphIntune.GetRoleDefinitionsAsync();
                 List<JObject> administrativeTemplates = await templateExport.GetExportableGroupPolicies();
 
 
@@ -150,11 +150,11 @@ namespace ModernWorkplaceConcierge.Controllers
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
 
-                        foreach (DeviceAndAppManagementRoleAssignment item in roleAssignments)
+                        foreach (RoleDefinition item in roleDefinitions)
                         {
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
                             string fileName = FilenameHelper.ProcessFileName(item.DisplayName);
-                            var zipArchiveEntry = archive.CreateEntry("RoleAssignments\\" + fileName + ".json", CompressionLevel.Fastest);
+                            var zipArchiveEntry = archive.CreateEntry("RoleDefinition\\" + fileName + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
                     }

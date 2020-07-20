@@ -352,11 +352,51 @@ namespace ModernWorkplaceConcierge.Helpers
             return mdmWindowsInformationProtectionPolicies.CurrentPage;
         }
 
-        public async Task<IEnumerable<DeviceAndAppManagementRoleAssignment>> GetRoleAssignmentsAsync()
+        public async Task<IEnumerable<RoleDefinition>> GetRoleDefinitionsAsync()
         {
-            var resource = graphServiceClient.DeviceManagement.RoleAssignments.Request();
+            var resource = graphServiceClient.DeviceManagement.RoleDefinitions.Request();
             signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
             var response = await resource.GetAsync();
+            // Only get non built-in roles
+            return response.CurrentPage.Where(role => (role.IsBuiltIn.HasValue && !role.IsBuiltIn.Value));
+        }
+
+        public async Task<RoleDefinition> AddRoleDefinitionAsync(RoleDefinition roleDefinition)
+        {
+
+
+            // immutable properties
+            roleDefinition.Id = null;
+            roleDefinition.IsBuiltIn = null;
+            roleDefinition.IsBuiltInRoleDefinition = null;
+
+            // Check if role already exists (duplicate names not allowed)
+            var existingRoleDefinitions = await GetRoleDefinitionsAsync();
+
+            if (existingRoleDefinitions.Any(rd => rd.DisplayName.Equals(roleDefinition.DisplayName)))
+            {
+                string oldname = roleDefinition.DisplayName;
+                roleDefinition.DisplayName += " copy";
+                signalRMessage.sendMessage($"Warning {roleDefinition.ODataType} '{oldname}' already exists changing display name to '{roleDefinition.DisplayName}'");
+            }
+
+            var resource = graphServiceClient.DeviceManagement.RoleDefinitions.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var response = await resource.AddAsync(roleDefinition);
+            signalRMessage.sendMessage($"Success: added {response.ODataType} '{response.DisplayName}'");
+            return response;
+        }
+
+        public async Task<RoleDefinition> PatchRoleDefinitionAsync(RoleDefinition roleDefinition)
+        {
+            // immutable properties
+            roleDefinition.IsBuiltIn = null;
+            roleDefinition.IsBuiltInRoleDefinition = null;
+
+            var resource = graphServiceClient.DeviceManagement.RoleDefinitions[roleDefinition.Id].Request();
+            signalRMessage.sendMessage($"PATCH: {resource.RequestUrl}");
+            var response = await resource.UpdateAsync(roleDefinition);
+            signalRMessage.sendMessage($"Success: updated {response.ODataType} '{response.DisplayName}'");
             return response;
         }
 
@@ -593,7 +633,6 @@ namespace ModernWorkplaceConcierge.Helpers
         public async Task<DeviceConfiguration> PatchDeviceConfigurationAsync(DeviceConfiguration deviceConfiguration)
         {
             deviceConfiguration.SupportsScopeTags = null;
-            //deviceConfiguration.RoleScopeTagIds = null;
 
             if (!deviceConfiguration.ODataType.Equals("#microsoft.graph.windowsUpdateForBusinessConfiguration"))
             {
