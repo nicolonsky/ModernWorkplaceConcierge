@@ -352,12 +352,13 @@ namespace ModernWorkplaceConcierge.Helpers
             return mdmWindowsInformationProtectionPolicies.CurrentPage;
         }
 
-        public async Task<IEnumerable<DeviceAndAppManagementRoleAssignment>> GetRoleAssignmentsAsync()
+        public async Task<IEnumerable<RoleDefinition>> GetRoleDefinitionsAsync()
         {
-            var resource = graphServiceClient.DeviceManagement.RoleAssignments.Request();
+            var resource = graphServiceClient.DeviceManagement.RoleDefinitions.Request();
             signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
             var response = await resource.GetAsync();
-            return response;
+            // Only get non built-in roles
+            return response.CurrentPage.Where(role => (role.IsBuiltIn.HasValue && !role.IsBuiltIn.Value));
         }
 
         public async Task<RoleScopeTag> AddRoleScopeTagAsync(RoleScopeTag scopeTag)
