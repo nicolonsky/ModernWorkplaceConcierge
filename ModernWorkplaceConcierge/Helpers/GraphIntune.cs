@@ -130,6 +130,47 @@ namespace ModernWorkplaceConcierge.Helpers
             return windowsInformationProtectionPolicy;
         }
 
+        public async Task<GroupPolicyConfiguration> AddGroupPolicyConfigurationAsync(GroupPolicyConfiguration groupPolicy)
+        {
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var groupPolicyConfiguration = await resource.AddAsync(groupPolicy);
+            signalRMessage.sendMessage($"Success: added {groupPolicyConfiguration.ODataType} '{groupPolicyConfiguration.DisplayName}'");
+            return groupPolicyConfiguration;
+        }
+
+
+
+
+        public async Task AddExportedGroupPolicyConfigurationValuesAsync(string groupPolicy, string refObjectId)
+        {
+            
+            JObject groupPolicyJsonObject = JObject.Parse(groupPolicy);
+
+            JArray configuredSettings = (JArray)groupPolicyJsonObject.SelectToken("configuredSettings");
+            
+            // Add each setting back to the gpo configuration
+            foreach (JObject setting in configuredSettings)
+            {
+                string requestUrl = graphEndpoint + $"/deviceManagement/groupPolicyConfigurations/{refObjectId}/definitionValues";
+
+                HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(setting, new JsonSerializerSettings()
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                    }), Encoding.UTF8, "application/json")
+                };
+
+                // Authenticate (add access token) our HttpRequestMessage
+                await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+                signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
+
+                // Send the request and get the response.
+                HttpResponseMessage response = await graphServiceClient.HttpProvider.SendAsync(hrm);
+            }
+        }
+
         public async Task<IEnumerable<GroupPolicyConfiguration>> GetGroupPolicyConfigurationsAsync()
         {
             var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations.Request();

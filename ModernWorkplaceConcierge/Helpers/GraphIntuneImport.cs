@@ -61,6 +61,9 @@ namespace ModernWorkplaceConcierge.Helpers
             supportedDeviceConfigurations.Add("#microsoft.graph.windowsWifiConfiguration");
             supportedDeviceConfigurations.Add("#microsoft.graph.windows81TrustedRootCertificate");
             supportedDeviceConfigurations.Add("#microsoft.graph.windows81SCEPCertificateProfile");
+            supportedDeviceConfigurations.Add("microsoft.graph.groupPolicyConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.groupPolicyConfiguration");
+            supportedDeviceConfigurations.Add("#microsoft.graph.windowsHealthMonitoringConfiguration");
 
             // Android Enterprise Device Owner
             supportedDeviceConfigurations.Add("#microsoft.graph.androidDeviceOwnerGeneralDeviceConfiguration");
@@ -95,6 +98,40 @@ namespace ModernWorkplaceConcierge.Helpers
 
             switch (json.OdataValue)
             {
+                case string odataValue when odataValue.Contains("microsoft.graph.groupPolicyConfiguration"):
+
+                    JObject groupPolicyJsonObject = JObject.Parse(result);
+                    // drop custom json payload
+                    groupPolicyJsonObject.Remove("configuredSettings");
+
+                    GroupPolicyConfiguration groupPolicy = groupPolicyJsonObject.ToObject<GroupPolicyConfiguration>();
+
+
+                    // Translate scope tag with table
+                    List<string> groupPolicyScopeTagMapping = new List<string>();
+
+                    foreach (string roleScopeTagId in groupPolicy.RoleScopeTagIds)
+                    {
+                        try
+                        {
+                            groupPolicyScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
+                        }
+                        catch
+                        {
+                            groupPolicyScopeTagMapping.Add("0");
+                        }
+                    }
+
+                    groupPolicy.RoleScopeTagIds = groupPolicyScopeTagMapping;
+
+                    GroupPolicyConfiguration createdGroupPolicy = await graphIntune.AddGroupPolicyConfigurationAsync(groupPolicy);
+
+                    // add configured values to gpo
+                    await graphIntune.AddExportedGroupPolicyConfigurationValuesAsync(result, createdGroupPolicy.Id);
+
+                    break;        
+                    
+
                 case string odataValue when odataValue.Contains("CompliancePolicy"):
 
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && compliancePolicies == null)
