@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Text;
 using System.Web.Mvc;
 
@@ -17,7 +17,7 @@ namespace ModernWorkplaceConcierge.Controllers
     public class IntuneConfigExportController : BaseController
     {
         [HttpPost]
-        public async System.Threading.Tasks.Task<FileResult> DownloadAsync(string clientId)
+        public async Task<ActionResult> DownloadAsync(string clientId)
         {
             GraphIntune graphIntune = new GraphIntune(clientId);
             SignalRMessage signalRMessage = new SignalRMessage(clientId);
@@ -167,8 +167,8 @@ namespace ModernWorkplaceConcierge.Controllers
             catch (Exception e)
             {
                 signalRMessage.sendMessage($"Error {e.Message}");
-                return File(new MemoryStream(), "application/zip", "IntuneConfig_.zip");
             }
+            return new HttpStatusCodeResult(204);
         }
     }
 }

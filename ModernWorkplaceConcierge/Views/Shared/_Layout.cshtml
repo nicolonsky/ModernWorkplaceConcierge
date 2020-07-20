@@ -187,11 +187,16 @@
 
         @if (Request.IsAuthenticated)
         {
-            <img src="/Content/Images/concierge.svg" class="fixed-bottom float-md-right" style="width: 10%;margin: 1.5em;" data-toggle="tooltip" id="tenant" data-placement="right" title="Connected to Tenant: @ViewBag.User.TenantID">
+            <img src="/Content/Images/concierge.svg" class="fixed-bottom float-md-right" style="width: 10%;margin: 1.5em;" data-html="true" data-toggle="tooltip" id="tenant" data-placement="right" title="Hi @ViewBag.User.DisplayName (@ViewBag.User.Email)<br />
+            Tenant: <small>@ViewBag.User.TenantID</small> <br />
+            Find more information about me on <a href='https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki'>GitHub</a>. <br>
+            Cheers,  your Modern Workplace Concierge">
         }
         else
         {
-            <img src="/Content/Images/concierge.svg" class="fixed-bottom float-md-right" style="width: 10%;margin: 1.5em;">
+            <img src="/Content/Images/concierge.svg" class="fixed-bottom float-md-right" style="width: 10%;margin: 1.5em;" data-html="true" data-toggle="tooltip" id="tenant" data-placement="right" title="Hi, <a href='/Account/SignIn'>sign-in</a> with your Microsoft Work account to get started.<br />
+            Find more information about me on <a href='https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki'>GitHub</a>. <br>
+            Cheers,  your Modern Workplace Concierge">
         }
 
 
@@ -209,7 +214,7 @@
 
     <script>
         $(function () {
-            $('#tenant').tooltip()
+            $('#tenant').tooltip('data-html')
         })
     </script>
 </body>
