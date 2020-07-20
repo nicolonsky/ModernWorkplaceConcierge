@@ -1,10 +1,13 @@
-﻿using Microsoft.Graph;
+﻿using Microsoft.Ajax.Utilities;
+using Microsoft.Graph;
 using ModernWorkplaceConcierge.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Threading.Tasks;
 using System.Text;
 using System.Web.Mvc;
 
@@ -14,13 +17,16 @@ namespace ModernWorkplaceConcierge.Controllers
     public class IntuneConfigExportController : BaseController
     {
         [HttpPost]
-        public async System.Threading.Tasks.Task<FileResult> DownloadAsync(string clientId)
+        public async Task<ActionResult> DownloadAsync(string clientId)
         {
             GraphIntune graphIntune = new GraphIntune(clientId);
             SignalRMessage signalRMessage = new SignalRMessage(clientId);
 
             try
             {
+
+                AdministrativeTemplateExport templateExport = new AdministrativeTemplateExport(graphIntune);
+
                 var deviceCompliancePolicies = await graphIntune.GetDeviceCompliancePoliciesAsync();
                 var deviceConfigurations = await graphIntune.GetDeviceConfigurationsAsync();
                 var managedAppProtection = await graphIntune.GetManagedAppProtectionAsync();
@@ -30,21 +36,8 @@ namespace ModernWorkplaceConcierge.Controllers
                 var deviceEnrollmentConfig = await graphIntune.GetDeviceEnrollmentConfigurationsAsync();
                 var scopeTags = await graphIntune.GetRoleScopeTagsAsync();
                 var roleAssignments = await graphIntune.GetRoleAssignmentsAsync();
+                List<JObject> administrativeTemplates = await templateExport.GetExportableGroupPolicies();
 
-                //var gpos = await graphIntune.GetGroupPolicyConfigurationsAsync();
-                //foreach (GroupPolicyConfiguration gpo in gpos)
-                //{
-                //    var values = await graphIntune.GetGroupPolicyDefinitionValuesAsync(gpo.Id);
-                //    signalRMessage.sendMessage(JsonConvert.SerializeObject(gpo, Formatting.Indented) + JsonConvert.SerializeObject(values, Formatting.Indented));
-
-                //    foreach (GroupPolicyDefinitionValue value in values)
-                //    {
-                //        var res = await graphIntune.GetGroupPolicyPresentationValuesAsync(value.Id);
-
-                //        signalRMessage.sendMessage(JsonConvert.SerializeObject(res, Formatting.Indented));
-
-                //    }
-                //}
 
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -54,6 +47,14 @@ namespace ModernWorkplaceConcierge.Controllers
                         {
                             byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
                             var zipArchiveEntry = archive.CreateEntry("DeviceEnrollmentConfiguration\\" + item.Id + ".json", CompressionLevel.Fastest);
+                            using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
+                        }
+
+                        foreach (JObject item in administrativeTemplates)
+                        {
+                            byte[] temp = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, Formatting.Indented));
+                            string fileName = FilenameHelper.ProcessFileName((string)item.SelectToken("displayName"));
+                            var zipArchiveEntry = archive.CreateEntry("DeviceConfiguration\\" + fileName + "_" + ((string)item.SelectToken("id")).Substring(0, 8) + ".json", CompressionLevel.Fastest);
                             using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(temp, 0, temp.Length);
                         }
 
@@ -166,8 +167,8 @@ namespace ModernWorkplaceConcierge.Controllers
             catch (Exception e)
             {
                 signalRMessage.sendMessage($"Error {e.Message}");
-                return File(new MemoryStream(), "application/zip", "IntuneConfig_.zip");
             }
+            return new HttpStatusCodeResult(204);
         }
     }
 }

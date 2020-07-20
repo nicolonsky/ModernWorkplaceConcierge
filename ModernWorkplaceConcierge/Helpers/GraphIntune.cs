@@ -1,4 +1,5 @@
-﻿using Microsoft.Graph;
+﻿using Microsoft.Ajax.Utilities;
+using Microsoft.Graph;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections;
@@ -129,6 +130,47 @@ namespace ModernWorkplaceConcierge.Helpers
             return windowsInformationProtectionPolicy;
         }
 
+        public async Task<GroupPolicyConfiguration> AddGroupPolicyConfigurationAsync(GroupPolicyConfiguration groupPolicy)
+        {
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations.Request();
+            signalRMessage.sendMessage($"POST: {resource.RequestUrl}");
+            var groupPolicyConfiguration = await resource.AddAsync(groupPolicy);
+            signalRMessage.sendMessage($"Success: added {groupPolicyConfiguration.ODataType} '{groupPolicyConfiguration.DisplayName}'");
+            return groupPolicyConfiguration;
+        }
+
+
+
+
+        public async Task AddExportedGroupPolicyConfigurationValuesAsync(string groupPolicy, string refObjectId)
+        {
+            
+            JObject groupPolicyJsonObject = JObject.Parse(groupPolicy);
+
+            JArray configuredSettings = (JArray)groupPolicyJsonObject.SelectToken("configuredSettings");
+            
+            // Add each setting back to the gpo configuration
+            foreach (JObject setting in configuredSettings)
+            {
+                string requestUrl = graphEndpoint + $"/deviceManagement/groupPolicyConfigurations/{refObjectId}/definitionValues";
+
+                HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(setting, new JsonSerializerSettings()
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                    }), Encoding.UTF8, "application/json")
+                };
+
+                // Authenticate (add access token) our HttpRequestMessage
+                await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+                signalRMessage.sendMessage($"{hrm.Method}: {requestUrl}");
+
+                // Send the request and get the response.
+                HttpResponseMessage response = await graphServiceClient.HttpProvider.SendAsync(hrm);
+            }
+        }
+
         public async Task<IEnumerable<GroupPolicyConfiguration>> GetGroupPolicyConfigurationsAsync()
         {
             var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations.Request();
@@ -145,12 +187,20 @@ namespace ModernWorkplaceConcierge.Helpers
             return groupPolicyConfigurations.CurrentPage;
         }
 
-        public async Task<IEnumerable<GroupPolicyPresentation>> GetGroupPolicyPresentationValuesAsync(string id)
+        public async Task<GroupPolicyDefinition> GetGroupPolicyDefinitionValueAsync(string id, string id2)
         {
-            var resource = graphServiceClient.DeviceManagement.GroupPolicyDefinitions[id].Presentations.Request();
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations[id].DefinitionValues[id2].Definition.Request();
             signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
-            var groupPolicyPresentations = await resource.GetAsync();
-            return groupPolicyPresentations.CurrentPage;
+            var groupPolicyConfigurations = await resource.GetAsync();
+            return groupPolicyConfigurations;
+        }
+
+        public async Task<IEnumerable<GroupPolicyPresentationValue>> GetGroupPolicyPresentationValuesAsync(string groupPolicyDefinitionId, string Id)
+        {
+            var resource = graphServiceClient.DeviceManagement.GroupPolicyConfigurations[groupPolicyDefinitionId].DefinitionValues[Id].PresentationValues.Request().Expand("presentation");
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var groupPolicyPresentation = await resource.GetAsync();
+            return groupPolicyPresentation.CurrentPage;
         }
 
         public async Task<IEnumerable<AndroidManagedAppProtection>> GetAndroidManagedAppProtectionsAsync()

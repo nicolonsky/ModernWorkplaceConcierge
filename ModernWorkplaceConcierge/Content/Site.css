@@ -5,6 +5,11 @@
  *    !#23364A;
  */
 
+.tooltip-inner {
+    min-width: 100px;
+    max-width: 100%;
+}
+
 a {
     color: #17a2b8;
 }

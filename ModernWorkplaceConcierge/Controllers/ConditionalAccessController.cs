@@ -307,158 +307,168 @@ namespace ModernWorkplaceConcierge.Controllers
         //    return new HttpStatusCodeResult(204);
         //}
 
-        public async Task<FileResult> CreateDocumentation(string clientId = null)
+        public async Task<ActionResult> CreateDocumentation(string clientId = null)
         {
-            GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(clientId);
+            IEnumerable<ConditionalAccessPolicy> conditionalAccessPolicies = null;
             SignalRMessage signalR = new SignalRMessage(clientId);
-            signalR.sendMessage("Building report....");
-
-            IEnumerable<ConditionalAccessPolicy> conditionalAccessPolicies = await graphConditionalAccess.GetConditionalAccessPoliciesAsync();
-
-            DataTable dataTable = new DataTable();
-
-            dataTable.BeginInit();
-            dataTable.Columns.Add("Name");
-            dataTable.Columns.Add("State");
-
-            // Assignments: first include then exclude
-            dataTable.Columns.Add("IncludeUsers");
-            dataTable.Columns.Add("IncludeGroups");
-            dataTable.Columns.Add("IncludeRoles");
-
-            dataTable.Columns.Add("ExcludeUsers");
-            dataTable.Columns.Add("ExcludeGroups");
-            dataTable.Columns.Add("ExcludeRoles");
-
-            dataTable.Columns.Add("IncludeApps");
-            dataTable.Columns.Add("ExcludeApps");
-            dataTable.Columns.Add("IncludeUserActions");
-            dataTable.Columns.Add("ClientAppTypes");
-            dataTable.Columns.Add("IncludePlatforms");
-            dataTable.Columns.Add("ExcludePlatforms");
-            dataTable.Columns.Add("IncludeLocations");
-            dataTable.Columns.Add("ExcludeLocations");
-            dataTable.Columns.Add("IncludeDeviceStates");
-            dataTable.Columns.Add("ExcludeDeviceStates");
-            dataTable.Columns.Add("GrantControls");
-            dataTable.Columns.Add("GrantControlsOperator");
-            dataTable.Columns.Add("ApplicationEnforcedRestrictions");
-            dataTable.Columns.Add("CloudAppSecurity");
-            dataTable.Columns.Add("PersistentBrowser");
-            dataTable.Columns.Add("SignInFrequency");
-
-            // Init cache for AAD Object ID's in CA policies
-            AzureADIDCache azureADIDCache = new AzureADIDCache(clientId);
-
-            foreach (ConditionalAccessPolicy conditionalAccessPolicy in conditionalAccessPolicies)
+            
+            try
             {
-                try
+                GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(clientId);
+                conditionalAccessPolicies = await graphConditionalAccess.GetConditionalAccessPoliciesAsync();
+
+                DataTable dataTable = new DataTable();
+
+                dataTable.BeginInit();
+                dataTable.Columns.Add("Name");
+                dataTable.Columns.Add("State");
+
+                // Assignments: first include then exclude
+                dataTable.Columns.Add("IncludeUsers");
+                dataTable.Columns.Add("IncludeGroups");
+                dataTable.Columns.Add("IncludeRoles");
+
+                dataTable.Columns.Add("ExcludeUsers");
+                dataTable.Columns.Add("ExcludeGroups");
+                dataTable.Columns.Add("ExcludeRoles");
+
+                dataTable.Columns.Add("IncludeApps");
+                dataTable.Columns.Add("ExcludeApps");
+                dataTable.Columns.Add("IncludeUserActions");
+                dataTable.Columns.Add("ClientAppTypes");
+                dataTable.Columns.Add("IncludePlatforms");
+                dataTable.Columns.Add("ExcludePlatforms");
+                dataTable.Columns.Add("IncludeLocations");
+                dataTable.Columns.Add("ExcludeLocations");
+                dataTable.Columns.Add("IncludeDeviceStates");
+                dataTable.Columns.Add("ExcludeDeviceStates");
+                dataTable.Columns.Add("GrantControls");
+                dataTable.Columns.Add("GrantControlsOperator");
+                dataTable.Columns.Add("ApplicationEnforcedRestrictions");
+                dataTable.Columns.Add("CloudAppSecurity");
+                dataTable.Columns.Add("PersistentBrowser");
+                dataTable.Columns.Add("SignInFrequency");
+
+                // Init cache for AAD Object ID's in CA policies
+                AzureADIDCache azureADIDCache = new AzureADIDCache(clientId);
+
+                foreach (ConditionalAccessPolicy conditionalAccessPolicy in conditionalAccessPolicies)
                 {
-                    // Init a new row
-                    DataRow row = dataTable.NewRow();
-
-                    row["Name"] = conditionalAccessPolicy.displayName;
-                    row["State"] = conditionalAccessPolicy.state;
-
-                    row["IncludeUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeUsers))}\"";
-                    row["ExcludeUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeUsers))}\"";
-                    row["IncludeGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeGroups))}\"";
-                    row["ExcludeGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeGroups))}\"";
-                    row["IncludeRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeRoles))}\"";
-                    row["ExcludeRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeRoles))}\"";
-
-                    row["IncludeApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.includeApplications))}\"";
-                    row["ExcludeApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.excludeApplications))}\"";
-
-                    row["IncludeUserActions"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.includeUserActions))}\"";
-
-                    if (conditionalAccessPolicy.conditions.platforms != null && conditionalAccessPolicy.conditions.platforms.includePlatforms != null)
+                    try
                     {
-                        row["IncludePlatforms"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.platforms.includePlatforms)}\"";
-                    }
+                        // Init a new row
+                        DataRow row = dataTable.NewRow();
 
-                    if (conditionalAccessPolicy.conditions.platforms != null && conditionalAccessPolicy.conditions.platforms.excludePlatforms != null)
+                        row["Name"] = conditionalAccessPolicy.displayName;
+                        row["State"] = conditionalAccessPolicy.state;
+
+                        row["IncludeUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeUsers))}\"";
+                        row["ExcludeUsers"] = $"\"{String.Join("\n", await azureADIDCache.getUserDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeUsers))}\"";
+                        row["IncludeGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeGroups))}\"";
+                        row["ExcludeGroups"] = $"\"{String.Join("\n", await azureADIDCache.getGroupDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeGroups))}\"";
+                        row["IncludeRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.includeRoles))}\"";
+                        row["ExcludeRoles"] = $"\"{String.Join("\n", await azureADIDCache.getRoleDisplayNamesAsync(conditionalAccessPolicy.conditions.users.excludeRoles))}\"";
+
+                        row["IncludeApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.includeApplications))}\"";
+                        row["ExcludeApps"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.excludeApplications))}\"";
+
+                        row["IncludeUserActions"] = $"\"{String.Join("\n", await azureADIDCache.getApplicationDisplayNamesAsync(conditionalAccessPolicy.conditions.applications.includeUserActions))}\"";
+
+                        if (conditionalAccessPolicy.conditions.platforms != null && conditionalAccessPolicy.conditions.platforms.includePlatforms != null)
+                        {
+                            row["IncludePlatforms"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.platforms.includePlatforms)}\"";
+                        }
+
+                        if (conditionalAccessPolicy.conditions.platforms != null && conditionalAccessPolicy.conditions.platforms.excludePlatforms != null)
+                        {
+                            row["ExcludePlatforms"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.platforms.excludePlatforms)}\"";
+                        }
+
+                        if (conditionalAccessPolicy.conditions.locations != null && conditionalAccessPolicy.conditions.locations.includeLocations != null)
+                        {
+                            row["IncludeLocations"] = $"\"{String.Join("\n", await azureADIDCache.getNamedLocationDisplayNamesAsync(conditionalAccessPolicy.conditions.locations.includeLocations))}\"";
+                        }
+
+                        if (conditionalAccessPolicy.conditions.locations != null && conditionalAccessPolicy.conditions.locations.excludeLocations != null)
+                        {
+                            row["ExcludeLocations"] = $"\"{String.Join("\n", await azureADIDCache.getNamedLocationDisplayNamesAsync(conditionalAccessPolicy.conditions.locations.excludeLocations))}\"";
+                        }
+
+                        row["ClientAppTypes"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.clientAppTypes)}\"";
+
+                        if (conditionalAccessPolicy.conditions.devices != null && conditionalAccessPolicy.conditions.devices.includeDeviceStates != null)
+                        {
+                            row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.devices.includeDeviceStates)}\"";
+                        }
+
+                        if (conditionalAccessPolicy.conditions.devices != null && conditionalAccessPolicy.conditions.devices.excludeDeviceStates != null)
+                        {
+                            row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.devices.excludeDeviceStates)}\"";
+                        }
+
+                        if (conditionalAccessPolicy.grantControls != null && conditionalAccessPolicy.grantControls.builtInControls != null)
+                        {
+                            row["GrantControls"] = $"\"{String.Join("\n", conditionalAccessPolicy.grantControls.builtInControls)}\"";
+                            row["GrantControlsOperator"] = $"\"{String.Join("\n", conditionalAccessPolicy.grantControls.op)}\"";
+                        }
+
+                        if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.applicationEnforcedRestrictions != null)
+                        {
+                            row["ApplicationEnforcedRestrictions"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.applicationEnforcedRestrictions.isEnabled)}\"";
+                        }
+
+                        if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.cloudAppSecurity != null)
+                        {
+                            row["CloudAppSecurity"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.cloudAppSecurity)}\"";
+                        }
+
+                        if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.persistentBrowser != null)
+                        {
+                            row["PersistentBrowser"] = conditionalAccessPolicy.sessionControls.persistentBrowser.mode;
+                        }
+
+                        if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.signInFrequency != null)
+                        {
+                            row["SignInFrequency"] = conditionalAccessPolicy.sessionControls.signInFrequency.value + " " + conditionalAccessPolicy.sessionControls.signInFrequency.type;
+                        }
+
+                        // Add new row to table
+                        dataTable.Rows.Add(row);
+                    }
+                    catch (Exception e)
                     {
-                        row["ExcludePlatforms"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.platforms.excludePlatforms)}\"";
+                        signalR.sendMessage("Error: " + e);
                     }
-
-                    if (conditionalAccessPolicy.conditions.locations != null && conditionalAccessPolicy.conditions.locations.includeLocations != null)
-                    {
-                        row["IncludeLocations"] = $"\"{String.Join("\n", await azureADIDCache.getNamedLocationDisplayNamesAsync(conditionalAccessPolicy.conditions.locations.includeLocations))}\"";
-                    }
-
-                    if (conditionalAccessPolicy.conditions.locations != null && conditionalAccessPolicy.conditions.locations.excludeLocations != null)
-                    {
-                        row["ExcludeLocations"] = $"\"{String.Join("\n", await azureADIDCache.getNamedLocationDisplayNamesAsync(conditionalAccessPolicy.conditions.locations.excludeLocations))}\"";
-                    }
-
-                    row["ClientAppTypes"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.clientAppTypes)}\"";
-
-                    if (conditionalAccessPolicy.conditions.devices != null && conditionalAccessPolicy.conditions.devices.includeDeviceStates != null)
-                    {
-                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.devices.includeDeviceStates)}\"";
-                    }
-
-                    if (conditionalAccessPolicy.conditions.devices != null && conditionalAccessPolicy.conditions.devices.excludeDeviceStates != null)
-                    {
-                        row["IncludeDeviceStates"] = $"\"{String.Join("\n", conditionalAccessPolicy.conditions.devices.excludeDeviceStates)}\"";
-                    }
-
-                    if (conditionalAccessPolicy.grantControls != null && conditionalAccessPolicy.grantControls.builtInControls != null)
-                    {
-                        row["GrantControls"] = $"\"{String.Join("\n", conditionalAccessPolicy.grantControls.builtInControls)}\"";
-                        row["GrantControlsOperator"] = $"\"{String.Join("\n", conditionalAccessPolicy.grantControls.op)}\"";
-                    }
-
-                    if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.applicationEnforcedRestrictions != null)
-                    {
-                        row["ApplicationEnforcedRestrictions"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.applicationEnforcedRestrictions.isEnabled)}\"";
-                    }
-
-                    if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.cloudAppSecurity != null)
-                    {
-                        row["CloudAppSecurity"] = $"\"{String.Join("\n", conditionalAccessPolicy.sessionControls.cloudAppSecurity)}\"";
-                    }
-
-                    if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.persistentBrowser != null)
-                    {
-                        row["PersistentBrowser"] = conditionalAccessPolicy.sessionControls.persistentBrowser.mode;
-                    }
-
-                    if (conditionalAccessPolicy.sessionControls != null && conditionalAccessPolicy.sessionControls.signInFrequency != null)
-                    {
-                        row["SignInFrequency"] = conditionalAccessPolicy.sessionControls.signInFrequency.value + " " + conditionalAccessPolicy.sessionControls.signInFrequency.type;
-                    }
-
-                    // Add new row to table
-                    dataTable.Rows.Add(row);
                 }
-                catch (Exception e)
+
+                // Convert datatable to CSV string output
+
+                StringBuilder sb = new StringBuilder();
+                IEnumerable<string> columnNames = dataTable.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
+                sb.AppendLine(string.Join(",", columnNames));
+
+                foreach (DataRow row in dataTable.Rows)
                 {
-                    signalR.sendMessage("Error: " + e);
+                    IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
+                    sb.AppendLine(string.Join(",", fields));
                 }
+
+                string domainName = await GraphHelper.GetDefaultDomain(clientId);
+
+                if (!string.IsNullOrEmpty(clientId))
+                {
+                    signalR.sendMessage("Success: Report generated");
+                }
+
+                return File(Encoding.ASCII.GetBytes(sb.ToString()), "text/csvt", "ConditionalAccessReport_" + domainName + ".csv");
+
             }
-
-            // Convert datatable to CSV string output
-
-            StringBuilder sb = new StringBuilder();
-            IEnumerable<string> columnNames = dataTable.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
-            sb.AppendLine(string.Join(",", columnNames));
-
-            foreach (DataRow row in dataTable.Rows)
+            catch (Exception e)
             {
-                IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
-                sb.AppendLine(string.Join(",", fields));
+                signalR.sendMessage($"Error {e.Message}");
             }
 
-            string domainName = await GraphHelper.GetDefaultDomain(clientId);
-
-            if (!string.IsNullOrEmpty(clientId))
-            {
-                signalR.sendMessage("Success: Report generated");
-            }
-
-            return File(Encoding.ASCII.GetBytes(sb.ToString()), "text/csvt", "ConditionalAccessReport_" + domainName + ".csv");
+            return new HttpStatusCodeResult(204);
         }
     }
 }
