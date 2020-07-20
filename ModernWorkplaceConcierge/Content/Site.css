@@ -5,6 +5,15 @@
  *    !#23364A;
  */
 
+.fa-download:before {
+    color: gray;
+}
+
+.fa-download:hover {
+    color: aqua;
+}
+
+
 .tooltip-inner {
     min-width: 100px;
     max-width: 100%;

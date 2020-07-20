@@ -267,6 +267,7 @@
     <Compile Include="Helpers\GraphJson.cs" />
     <Compile Include="Helpers\GraphPlanner.cs" />
     <Compile Include="Helpers\MwHub.cs" />
+    <Compile Include="Helpers\RoleScopeTagTranslation.cs" />
     <Compile Include="Helpers\SignalRMessage.cs" />
     <Compile Include="Models\Alert.cs" />
     <Compile Include="Models\OverwriteBehaviour.cs" />

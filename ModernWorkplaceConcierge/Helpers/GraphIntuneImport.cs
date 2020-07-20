@@ -107,23 +107,8 @@ namespace ModernWorkplaceConcierge.Helpers
 
                     GroupPolicyConfiguration groupPolicy = groupPolicyJsonObject.ToObject<GroupPolicyConfiguration>();
 
-
-                    // Translate scope tag with table
-                    List<string> groupPolicyScopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in groupPolicy.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            groupPolicyScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            groupPolicyScopeTagMapping.Add("0");
-                        }
-                    }
-
-                    groupPolicy.RoleScopeTagIds = groupPolicyScopeTagMapping;
+                    // Replace assigned scope tags with conversion
+                    groupPolicy.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(groupPolicy.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
                     GroupPolicyConfiguration createdGroupPolicy = await graphIntune.AddGroupPolicyConfigurationAsync(groupPolicy);
 
@@ -147,23 +132,8 @@ namespace ModernWorkplaceConcierge.Helpers
 
                     DeviceCompliancePolicy deviceCompliancePolicy = JsonConvert.DeserializeObject<DeviceCompliancePolicy>(jsonPolicy);
 
-                    // Translate scope tag with table
-                    List<string> compliancePolicyScopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in deviceCompliancePolicy.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            compliancePolicyScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            compliancePolicyScopeTagMapping.Add("0");
-                        }
-                    }
-
                     // Replace assigned scope tags with conversion
-                    deviceCompliancePolicy.RoleScopeTagIds = compliancePolicyScopeTagMapping;
+                    deviceCompliancePolicy.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(deviceCompliancePolicy.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
                     switch (overwriteBehaviour)
                     {
@@ -227,23 +197,8 @@ namespace ModernWorkplaceConcierge.Helpers
                     // request fails when true
                     deviceConfiguration.SupportsScopeTags = null;
 
-                    // Translate scope tag with table
-                    List<string> scopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in deviceConfiguration.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            scopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            scopeTagMapping.Add("0");
-                        }
-                    }
-
                     // Replace assigned scope tags with conversion
-                    deviceConfiguration.RoleScopeTagIds = scopeTagMapping;
+                    deviceConfiguration.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(deviceConfiguration.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && deviceConfigurations == null)
                     {
@@ -307,23 +262,8 @@ namespace ModernWorkplaceConcierge.Helpers
 
                     DeviceManagementScript deviceManagementScript = JsonConvert.DeserializeObject<DeviceManagementScript>(result);
 
-                    // Translate scope tag with table
-                    List<string> deviceManagementScriptScopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in deviceManagementScript.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            deviceManagementScriptScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            deviceManagementScriptScopeTagMapping.Add("0");
-                        }
-                    }
-
                     // Replace assigned scope tags with conversion
-                    deviceManagementScript.RoleScopeTagIds = deviceManagementScriptScopeTagMapping;
+                    deviceManagementScript.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(deviceManagementScript.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
 
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && deviceManagementScipts == null)
@@ -388,23 +328,8 @@ namespace ModernWorkplaceConcierge.Helpers
 
                     WindowsAutopilotDeploymentProfile windowsAutopilotDeploymentProfile = JsonConvert.DeserializeObject<WindowsAutopilotDeploymentProfile>(result);
 
-                    // Translate scope tag with table
-                    List<string> autopilotScopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in windowsAutopilotDeploymentProfile.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            autopilotScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            autopilotScopeTagMapping.Add("0");
-                        }
-                    }
-
                     // Replace assigned scope tags with conversion
-                    windowsAutopilotDeploymentProfile.RoleScopeTagIds = autopilotScopeTagMapping;
+                    windowsAutopilotDeploymentProfile.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(windowsAutopilotDeploymentProfile.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && windowsAutopilotDeploymentProfiles == null)
                     {
@@ -468,23 +393,8 @@ namespace ModernWorkplaceConcierge.Helpers
                     
                     IosManagedAppProtection iosManagedAppProtection = JsonConvert.DeserializeObject<IosManagedAppProtection>(result);
 
-                    // Translate scope tag with table
-                    List<string> iosAppScopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in iosManagedAppProtection.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            iosAppScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            iosAppScopeTagMapping.Add("0");
-                        }
-                    }
-
                     // Replace assigned scope tags with conversion
-                    iosManagedAppProtection.RoleScopeTagIds = iosAppScopeTagMapping;
+                    iosManagedAppProtection.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(iosManagedAppProtection.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && iosManagedAppProtections == null)
                     {
@@ -552,23 +462,8 @@ namespace ModernWorkplaceConcierge.Helpers
 
                     AndroidManagedAppProtection androidManagedAppProtection = JsonConvert.DeserializeObject<AndroidManagedAppProtection>(result);
 
-                    // Translate scope tag with table
-                    List<string> androidAppScopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in androidManagedAppProtection.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            androidAppScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            androidAppScopeTagMapping.Add("0");
-                        }
-                    }
-
                     // Replace assigned scope tags with conversion
-                    androidManagedAppProtection.RoleScopeTagIds = androidAppScopeTagMapping;
+                    androidManagedAppProtection.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(androidManagedAppProtection.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && androidManagedAppProtections == null)
                     {
@@ -635,29 +530,13 @@ namespace ModernWorkplaceConcierge.Helpers
                     
                     TargetedManagedAppConfiguration targetedManagedAppConfiguration = JsonConvert.DeserializeObject<TargetedManagedAppConfiguration>(result);
 
-                    // Translate scope tag with table
-                    List<string> appConfigScopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in targetedManagedAppConfiguration.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            appConfigScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            appConfigScopeTagMapping.Add("0");
-                        }
-                    }
-
                     // Replace assigned scope tags with conversion
-                    targetedManagedAppConfiguration.RoleScopeTagIds = appConfigScopeTagMapping;
+                    targetedManagedAppConfiguration.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(targetedManagedAppConfiguration.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && targetedManagedAppConfigurations == null)
                     {
                         targetedManagedAppConfigurations = await graphIntune.GetTargetedManagedAppConfigurationsAsync();
                     }
-
 
                     switch (overwriteBehaviour)
                     {
@@ -719,23 +598,8 @@ namespace ModernWorkplaceConcierge.Helpers
 
                     ManagedDeviceMobileAppConfiguration managedDeviceMobileAppConfiguration = JsonConvert.DeserializeObject<ManagedDeviceMobileAppConfiguration>(result);
 
-                    // Translate scope tag with table
-                    List<string> managedAppScopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in managedDeviceMobileAppConfiguration.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            managedAppScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            managedAppScopeTagMapping.Add("0");
-                        }
-                    }
-
                     // Replace assigned scope tags with conversion
-                    managedDeviceMobileAppConfiguration.RoleScopeTagIds = managedAppScopeTagMapping;
+                    managedDeviceMobileAppConfiguration.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(managedDeviceMobileAppConfiguration.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && managedDeviceMobileAppConfigurations == null)
                     {
@@ -808,23 +672,8 @@ namespace ModernWorkplaceConcierge.Helpers
 
                     RoleDefinition roleDefinition = JsonConvert.DeserializeObject<RoleDefinition>(result);
 
-                    // Translate scope tag with table
-                    List<string> roleDefinitionScopeTagMapping = new List<string>();
-
-                    foreach (string roleScopeTagId in roleDefinition.RoleScopeTagIds)
-                    {
-                        try
-                        {
-                            roleDefinitionScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
-                        }
-                        catch
-                        {
-                            roleDefinitionScopeTagMapping.Add("0");
-                        }
-                    }
-
                     // Replace assigned scope tags with conversion
-                    roleDefinition.RoleScopeTagIds = roleDefinitionScopeTagMapping;
+                    roleDefinition.RoleScopeTagIds = RoleScopeTagTranslation.TranslateRoleScopeTags(roleDefinition.RoleScopeTagIds.ToArray(), scopeTagMigrationTable);
 
                     if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && roleDefinitions == null)
                     {
