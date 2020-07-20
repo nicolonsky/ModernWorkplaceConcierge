@@ -34,8 +34,7 @@ namespace ModernWorkplaceConcierge.Controllers
             supportedFolders.Add("DeviceCompliancePolicy");
             supportedFolders.Add("DeviceManagementScript");
             supportedFolders.Add("ManagedAppPolicy");
-            // Scope Tags are handled before any other imports because multiple intune objects rely on them
-            //supportedFolders.Add("RoleScopeTags");
+            supportedFolders.Add("RoleDefinition");
 
             try
             {

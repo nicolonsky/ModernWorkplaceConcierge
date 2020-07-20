@@ -23,6 +23,7 @@ namespace ModernWorkplaceConcierge.Helpers
         private IEnumerable<TargetedManagedAppConfiguration> targetedManagedAppConfigurations;
         private IEnumerable<ManagedDeviceMobileAppConfiguration> managedDeviceMobileAppConfigurations;
         private IEnumerable<RoleScopeTag> scopeTags;
+        private IEnumerable<RoleDefinition> roleDefinitions;
         private GraphIntune graphIntune;
         private OverwriteBehaviour overwriteBehaviour;
         private SignalRMessage signalRMessage;
@@ -803,8 +804,89 @@ namespace ModernWorkplaceConcierge.Helpers
                     await graphIntune.AddWindowsInformationProtectionsAsync(windowsInformationProtectionUnmanaged);
                     break;
 
+                case string odataValue when odataValue.Contains("#microsoft.graph.deviceAndAppManagementRoleDefinition"):
+
+                    RoleDefinition roleDefinition = JsonConvert.DeserializeObject<RoleDefinition>(result);
+
+                    // Translate scope tag with table
+                    List<string> roleDefinitionScopeTagMapping = new List<string>();
+
+                    foreach (string roleScopeTagId in roleDefinition.RoleScopeTagIds)
+                    {
+                        try
+                        {
+                            roleDefinitionScopeTagMapping.Add(scopeTagMigrationTable[roleScopeTagId].ToString());
+                        }
+                        catch
+                        {
+                            roleDefinitionScopeTagMapping.Add("0");
+                        }
+                    }
+
+                    // Replace assigned scope tags with conversion
+                    roleDefinition.RoleScopeTagIds = roleDefinitionScopeTagMapping;
+
+                    if (overwriteBehaviour != OverwriteBehaviour.IMPORT_AS_DUPLICATE && roleDefinitions == null)
+                    {
+                        roleDefinitions = await graphIntune.GetRoleDefinitionsAsync();
+                    }
+
+                    switch (overwriteBehaviour)
+                    {
+                        case OverwriteBehaviour.DISCARD:
+                            if (roleDefinitions.All(p => !p.Id.Contains(roleDefinition.Id)) && roleDefinitions.All(p => !p.DisplayName.Contains(roleDefinition.DisplayName)))
+                            {
+                                await graphIntune.AddRoleDefinitionAsync(roleDefinition);
+                            }
+                            else
+                            {
+                                if (roleDefinitions.Any(p => p.Id.Contains(roleDefinition.Id)))
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{roleDefinition.DisplayName}' ({roleDefinition.Id}) already exists!");
+                                }
+                                else
+                                {
+                                    signalRMessage.sendMessage($"Discarding configuration '{roleDefinition.DisplayName}' - configuration with this name already exists!");
+                                }
+                            }
+                            break;
+
+                        case OverwriteBehaviour.IMPORT_AS_DUPLICATE:
+                            await graphIntune.AddRoleDefinitionAsync(roleDefinition);
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_ID:
+
+                            // match by object ID
+                            if (roleDefinitions.Any(p => p.Id.Contains(roleDefinition.Id)))
+                            {
+                                await graphIntune.PatchRoleDefinitionAsync(roleDefinition);
+                            }
+                            // Create a new policy
+                            else
+                            {
+                                await graphIntune.AddRoleDefinitionAsync(roleDefinition);
+                            }
+                            break;
+
+                        case OverwriteBehaviour.OVERWRITE_BY_NAME:
+                            if (roleDefinitions.Any(policy => policy.DisplayName.Equals(roleDefinition.DisplayName)))
+                            {
+                                string replaceObjectId = roleDefinitions.Where(policy => policy.DisplayName.Equals(roleDefinition.DisplayName)).Select(policy => policy.Id).First();
+                                roleDefinition.Id = replaceObjectId;
+                                await graphIntune.PatchRoleDefinitionAsync(roleDefinition);
+                            }
+                            else
+                            {
+                                await graphIntune.AddRoleDefinitionAsync(roleDefinition);
+                            }
+                            break;
+                    }
+
+                    break;
+
                 default:
-                    throw new System.Exception($"Unsupported configuration type {json.OdataValue}");
+                    throw new Exception($"Unsupported configuration type {json.OdataValue}");
             }
         }
 
