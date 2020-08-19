@@ -1,0 +1,75 @@
+﻿@model  Microsoft.Graph.WindowsAutopilotDeploymentProfile
+
+@{
+    ViewBag.Current = "IntuneAutoPilotConfiguration";
+}
+
+@if (Model.DisplayName != null)
+{
+
+    <h1>Autopilot Profile Details</h1>
+
+    <table class="table table-borderless table-responsive-sm table-sm mt-5">
+        <thead class="thead">
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tr>
+            <td>DisplayName</td>
+            <td>@Model.DisplayName</td>
+        </tr>
+        <tr>
+            <td>DeviceType</td>
+            <td>@Model.DeviceType</td>
+        </tr>
+        <tr>
+            <td>DeviceNameTemplate</td>
+            <td>@Model.DeviceNameTemplate</td>
+        </tr>
+        <tr>
+            <td>EnableWhiteGlove</td>
+            <td>@Model.EnableWhiteGlove</td>
+        </tr>
+        <tr>
+            <td>OutOfBoxExperienceSettings.DeviceUsageType</td>
+            <td>@Model.OutOfBoxExperienceSettings.DeviceUsageType</td>
+        </tr>
+        <tr>
+            <td>OutOfBoxExperienceSettings.HideEULA</td>
+            <td>@Model.OutOfBoxExperienceSettings.HideEULA</td>
+        </tr>
+        <tr>
+            <td>OutOfBoxExperienceSettings.HidePrivacySettings</td>
+            <td>@Model.OutOfBoxExperienceSettings.HidePrivacySettings</td>
+        </tr>
+        <tr>
+            <td>OutOfBoxExperienceSettings.SkipKeyboardSelectionPage</td>
+            <td>@Model.OutOfBoxExperienceSettings.SkipKeyboardSelectionPage</td>
+        </tr>
+        <tr>
+            <td>OutOfBoxExperienceSettings.UserType</td>
+            <td>@Model.OutOfBoxExperienceSettings.UserType</td>
+        </tr>
+        <tr>
+            <td>Language</td>
+            <td>@Model.Language</td>
+        </tr>
+        <tr>
+            <td>Id</td>
+            <td>@Model.Id</td>
+        </tr>
+    </table>
+    <br />
+
+    @Html.ActionLink("Back", "Index", "AutoPilotConfiguration", new { area = "" }, new { @class = "btn btn-outline-light" })
+}
+else
+{
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Error</h4>
+        Could not fetch WindowsAutopilotDeploymentProfile.
+    </div>
+}
+

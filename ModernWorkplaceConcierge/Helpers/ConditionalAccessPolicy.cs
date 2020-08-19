@@ -43,6 +43,8 @@ namespace ModernWorkplaceConcierge.Helpers
     public class Conditions
     {
         public object[] signInRiskLevels { get; set; }
+        public object[] userRiskLevels { get; set; }
+
         public object[] clientAppTypes { get; set; }
         public Platforms platforms { get; set; }
         public Locations locations { get; set; }
