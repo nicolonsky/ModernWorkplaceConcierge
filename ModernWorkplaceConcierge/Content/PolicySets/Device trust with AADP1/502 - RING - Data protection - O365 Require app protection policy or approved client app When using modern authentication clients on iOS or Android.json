@@ -1,5 +1,5 @@
 {
-    "displayName": "504 - <RING> - Data protection - O365: Require trusted device When using modern authentication clients on Windows and macOS",
+    "displayName": "502 - <RING> - Data protection - O365: Require app protection policy or approved client app When using modern authentication clients on iOS or Android",
     "createdDateTime": null,
     "modifiedDateTime": null,
     "state": "enabledForReportingButNotEnforced",
@@ -34,8 +34,8 @@
         },
         "platforms": {
             "includePlatforms": [
-                "windows",
-                "macOS"
+                "android",
+                "iOS"
             ],
             "excludePlatforms": []
         }
@@ -43,8 +43,8 @@
     "grantControls": {
         "operator": "OR",
         "builtInControls": [
-            "compliantDevice",
-            "domainJoinedDevice"
+            "compliantApplication",
+            "approvedApplication"
         ],
         "customAuthenticationFactors": [],
         "termsOfUse": []

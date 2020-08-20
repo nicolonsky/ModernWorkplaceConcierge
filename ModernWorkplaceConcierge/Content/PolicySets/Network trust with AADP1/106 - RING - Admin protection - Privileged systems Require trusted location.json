@@ -1,5 +1,5 @@
 {
-    "displayName": "504 - <RING> - Data protection - O365: Require trusted device When using modern authentication clients on Windows and macOS",
+    "displayName": "106 - <RING> - Admin protection - Privileged systems: Require trusted location",
     "createdDateTime": null,
     "modifiedDateTime": null,
     "state": "enabledForReportingButNotEnforced",
@@ -7,13 +7,14 @@
     "conditions": {
         "signInRiskLevels": [],
         "clientAppTypes": [
+            "browser",
             "mobileAppsAndDesktopClients"
         ],
-        "locations": null,
+        "platforms": null,
         "deviceStates": null,
         "applications": {
             "includeApplications": [
-                "Office365"
+                "797f4846-ba00-4fd7-ba43-dac1f8f63013"
             ],
             "excludeApplications": [],
             "includeUserActions": []
@@ -32,19 +33,19 @@
             "includeRoles": [],
             "excludeRoles": []
         },
-        "platforms": {
-            "includePlatforms": [
-                "windows",
-                "macOS"
+        "locations": {
+            "includeLocations": [
+                "All"
             ],
-            "excludePlatforms": []
+            "excludeLocations": [
+                "AllTrusted"
+            ]
         }
     },
     "grantControls": {
         "operator": "OR",
         "builtInControls": [
-            "compliantDevice",
-            "domainJoinedDevice"
+            "block"
         ],
         "customAuthenticationFactors": [],
         "termsOfUse": []

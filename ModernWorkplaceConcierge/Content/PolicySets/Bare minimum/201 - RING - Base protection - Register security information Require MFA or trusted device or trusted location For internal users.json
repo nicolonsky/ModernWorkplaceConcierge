@@ -1,5 +1,5 @@
 {
-    "displayName": "504 - <RING> - Data protection - O365: Require trusted device When using modern authentication clients on Windows and macOS",
+    "displayName": "201 - <RING> - Base protection - Register security information: Require MFA or trusted device or trusted location For internal users",
     "createdDateTime": null,
     "modifiedDateTime": null,
     "state": "enabledForReportingButNotEnforced",
@@ -7,22 +7,25 @@
     "conditions": {
         "signInRiskLevels": [],
         "clientAppTypes": [
+            "browser",
             "mobileAppsAndDesktopClients"
         ],
-        "locations": null,
+        "platforms": null,
         "deviceStates": null,
         "applications": {
-            "includeApplications": [
-                "Office365"
-            ],
+            "includeApplications": [],
             "excludeApplications": [],
-            "includeUserActions": []
+            "includeUserActions": [
+                "urn:user:registersecurityinfo"
+            ]
         },
         "users": {
             "includeUsers": [
                 "All"
             ],
-            "excludeUsers": [],
+            "excludeUsers": [
+                "GuestsOrExternalUsers"
+            ],
             "includeGroups": [],
             "excludeGroups": [
                 "<ExclusionTempGroup>",
@@ -32,17 +35,19 @@
             "includeRoles": [],
             "excludeRoles": []
         },
-        "platforms": {
-            "includePlatforms": [
-                "windows",
-                "macOS"
+        "locations": {
+            "includeLocations": [
+                "All"
             ],
-            "excludePlatforms": []
+            "excludeLocations": [
+                "AllTrusted"
+            ]
         }
     },
     "grantControls": {
         "operator": "OR",
         "builtInControls": [
+            "mfa",
             "compliantDevice",
             "domainJoinedDevice"
         ],

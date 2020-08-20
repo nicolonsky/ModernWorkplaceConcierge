@@ -1,19 +1,24 @@
 {
-    "displayName": "504 - <RING> - Data protection - O365: Require trusted device When using modern authentication clients on Windows and macOS",
+    "displayName": "202 - <RING> - Base protection - All apps: Require MFA For internal users When medium or above sign-in risk is detected",
     "createdDateTime": null,
     "modifiedDateTime": null,
     "state": "enabledForReportingButNotEnforced",
     "sessionControls": null,
     "conditions": {
-        "signInRiskLevels": [],
+        "signInRiskLevels": [
+            "medium",
+            "high"
+        ],
         "clientAppTypes": [
+            "browser",
             "mobileAppsAndDesktopClients"
         ],
+        "platforms": null,
         "locations": null,
         "deviceStates": null,
         "applications": {
             "includeApplications": [
-                "Office365"
+                "All"
             ],
             "excludeApplications": [],
             "includeUserActions": []
@@ -22,7 +27,9 @@
             "includeUsers": [
                 "All"
             ],
-            "excludeUsers": [],
+            "excludeUsers": [
+                "GuestsOrExternalUsers"
+            ],
             "includeGroups": [],
             "excludeGroups": [
                 "<ExclusionTempGroup>",
@@ -31,20 +38,12 @@
             ],
             "includeRoles": [],
             "excludeRoles": []
-        },
-        "platforms": {
-            "includePlatforms": [
-                "windows",
-                "macOS"
-            ],
-            "excludePlatforms": []
         }
     },
     "grantControls": {
         "operator": "OR",
         "builtInControls": [
-            "compliantDevice",
-            "domainJoinedDevice"
+            "mfa"
         ],
         "customAuthenticationFactors": [],
         "termsOfUse": []
