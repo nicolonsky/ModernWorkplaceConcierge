@@ -141,24 +141,24 @@ namespace ModernWorkplaceConcierge.Helpers
             return conditionalAccessPolicies.Value;
         }
 
-        public async Task ClearConditonalAccessPolicies()
-        {
-            var policies = await graphServiceClient.ConditionalAccess.Policies.Request().GetAsync();
+        //public async Task ClearConditonalAccessPolicies()
+        //{
+        //    var policies = await GetConditionalAccessPoliciesAsync();
 
-            foreach (Microsoft.Graph.ConditionalAccessPolicy policy in policies)
-            {
-                string requestUrl = $"{graphEndpoint}/conditionalAccess/policies/{policy.Id}";
+        //    foreach (ConditionalAccessPolicy policy in policies)
+        //    {
+        //        string requestUrl = $"{graphEndpoint}/identity/conditionalAccess/policies/{policy.id}";
 
-                HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
+        //        HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
 
-                signalRMessage.sendMessage($"{hrm.Method}:  { requestUrl}");
+        //        signalRMessage.sendMessage($"{hrm.Method}:  { requestUrl}");
 
-                // Authenticate (add access token) our HttpRequestMessage
-                await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+        //        // Authenticate (add access token) our HttpRequestMessage
+        //        await graphServiceClient.AuthenticationProvider.AuthenticateRequestAsync(hrm);
 
-                // Send the request and get the response.
-                HttpResponseMessage response = await graphServiceClient.HttpProvider.SendAsync(hrm);
-            }
-        }
+        //        // Send the request and get the response.
+        //        HttpResponseMessage response = await graphServiceClient.HttpProvider.SendAsync(hrm);
+        //    }
+        //}
     }
 }
