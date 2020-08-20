@@ -297,15 +297,15 @@ namespace ModernWorkplaceConcierge.Controllers
             return View();
         }
 
-        //public async Task<ActionResult> ClearAll(bool confirm = false)
-        //{
-        //    GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(null);
-        //    if (confirm)
-        //    {
-        //        await graphConditionalAccess.ClearConditonalAccessPolicies();
-        //    }
-        //    return new HttpStatusCodeResult(204);
-        //}
+        public async Task<ActionResult> ClearAll(bool confirm = false)
+        {
+            GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(null);
+            if (confirm)
+            {
+                await graphConditionalAccess.ClearConditonalAccessPolicies();
+            }
+            return new HttpStatusCodeResult(204);
+        }
 
         public async Task<ActionResult> CreateDocumentation(string clientId = null)
         {

@@ -143,11 +143,11 @@ namespace ModernWorkplaceConcierge.Helpers
 
         public async Task ClearConditonalAccessPolicies()
         {
-            var policies = await graphServiceClient.ConditionalAccess.Policies.Request().GetAsync();
+            var policies = await GetConditionalAccessPoliciesAsync();
 
-            foreach (Microsoft.Graph.ConditionalAccessPolicy policy in policies)
+            foreach (ConditionalAccessPolicy policy in policies)
             {
-                string requestUrl = $"{graphEndpoint}/conditionalAccess/policies/{policy.Id}";
+                string requestUrl = $"{graphEndpoint}/identity/conditionalAccess/policies/{policy.id}";
 
                 HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Delete, requestUrl);
 
