@@ -19,6 +19,7 @@ variables:
   artifactName: 'drop'
   azureSubscription: 'AzureServiceConnection'
   webAppName: 'mwconcierge'
+  resourceGroupName: 'intuneconcierge'
 
 stages:
 - stage: Build
@@ -63,6 +64,7 @@ stages:
       inputs:
         ConnectionType: 'AzureRM'
         azureSubscription: '$(azureSubscription)'
+        ResourceGroupName: '$(resourceGroupName)'
         appType: 'webApp'
         WebAppName: '$(webAppName)'
         deployToSlotOrASE: true
