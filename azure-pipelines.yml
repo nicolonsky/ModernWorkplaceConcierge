@@ -18,7 +18,7 @@ variables:
   buildConfiguration: 'Release'
   artifactName: 'drop'
   azureSubscription: 'AzureServiceConnection'
-  webAppName: 'mwconciergedev'
+  webAppName: 'mwconcierge'
 
 stages:
 - stage: Build
@@ -66,7 +66,7 @@ stages:
         appType: 'webApp'
         WebAppName: '$(webAppName)'
         deployToSlotOrASE: true
-        packageForLinux: '$(System.DefaultWorkingDirectory)\**\*.zip'
+        packageForLinux: '$(System.ArtifactsDirectory)\**\*.zip'
         AppSettings: '-CommitID $(Build.SourceVersion) -Repository $(BUILD.REPOSITORY.NAME) -Branch $(BUILD.SOURCEBRANCHNAME) -DeploymentTime "$(RELEASE.DEPLOYMENT.STARTTIME)"'
         enableCustomDeployment: true
         TakeAppOfflineFlag: false
