@@ -30,7 +30,13 @@ stages:
       - task: NuGetCommand@2
         inputs:
           restoreSolution: '$(solution)'
-
+      - task: VersionAssemblies@2
+        inputs:
+          Path: '$(Build.SourcesDirectory)'
+          VersionNumber: '$(Build.BuildNumber)'
+          InjectVersion: False
+          FilenamePattern: 'AssemblyInfo.*'
+          OutputVersion: 'OutputedVersion'
       - task: VSBuild@1
         inputs:
           solution: '$(solution)'
