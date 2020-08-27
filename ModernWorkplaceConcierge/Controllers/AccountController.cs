@@ -5,12 +5,14 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using ModernWorkplaceConcierge.TokenStorage;
+using System.Configuration;
 using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 
 namespace ModernWorkplaceConcierge.Controllers
 {
+    [AllowAnonymous]
     public class AccountController : Controller
     {
         public void SignIn()
@@ -28,13 +30,10 @@ namespace ModernWorkplaceConcierge.Controllers
         {
             if (Request.IsAuthenticated)
             {
-                var tokenStore = new SessionTokenStore(null,
-                    System.Web.HttpContext.Current, ClaimsPrincipal.Current);
-
-                tokenStore.Clear();
-
-                Request.GetOwinContext().Authentication.SignOut(
-                    CookieAuthenticationDefaults.AuthenticationType);
+                HttpContext.GetOwinContext().Authentication.SignOut(
+                new AuthenticationProperties { RedirectUri = ConfigurationManager.AppSettings["RedirectUri"] },
+                OpenIdConnectAuthenticationDefaults.AuthenticationType,
+                CookieAuthenticationDefaults.AuthenticationType);
             }
 
             return RedirectToAction("Index", "Home");

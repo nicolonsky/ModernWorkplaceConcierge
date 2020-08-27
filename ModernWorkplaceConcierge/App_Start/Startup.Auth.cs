@@ -31,6 +31,7 @@ namespace ModernWorkplaceConcierge
 
         public void ConfigureAuth(IAppBuilder app)
         {
+
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions());

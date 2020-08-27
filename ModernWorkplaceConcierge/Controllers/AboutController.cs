@@ -2,6 +2,7 @@
 
 namespace ModernWorkplaceConcierge.Controllers
 {
+    [AllowAnonymous]
     public class AboutController : BaseController
     {
         // GET: About
