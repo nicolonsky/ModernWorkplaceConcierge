@@ -20,12 +20,19 @@ variables:
   azureSubscription: 'AzureServiceConnection'
   webAppName: 'mwconcierge'
   resourceGroupName: 'intuneconcierge'
+  deploymentTime: ''
 
 stages:
 - stage: Build
   jobs:
   - job: Build
     steps:
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: |
+            $date=$(Get-Date -Format o);
+            Write-Host "##vso[task.setvariable variable=deploymentTime]$date"
       - task: NuGetToolInstaller@1
       - task: NuGetCommand@2
         inputs:
@@ -75,7 +82,7 @@ stages:
         WebAppName: '$(webAppName)'
         deployToSlotOrASE: true
         packageForLinux: '$(System.ArtifactsDirectory)\**\*.zip'
-        AppSettings: '-CommitID $(Build.SourceVersion) -Repository $(BUILD.REPOSITORY.NAME) -Branch $(BUILD.SOURCEBRANCHNAME) -DeploymentTime "$(RELEASE.DEPLOYMENT.STARTTIME)"'
+        AppSettings: '-CommitID $(Build.SourceVersion) -Repository $(BUILD.REPOSITORY.NAME) -Branch $(BUILD.SOURCEBRANCHNAME) -DeploymentTime "$(deploymentTime)"'
         enableCustomDeployment: true
         TakeAppOfflineFlag: false
         RemoveAdditionalFilesFlag: true
