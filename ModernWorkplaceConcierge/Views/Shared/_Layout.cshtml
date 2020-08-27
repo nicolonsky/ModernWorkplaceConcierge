@@ -48,8 +48,6 @@
                         @Html.ActionLink("Home", "Index", "Home", new { area = "" },
                             new { @class = ViewBag.Current == "Home" ? "nav-link active" : "nav-link" })
                     </li>
-                    @if (Request.IsAuthenticated)
-                    {
                         <li class="nav-item dropdown">
                             <a class="dropdown-toggle @((ViewBag.Current.StartsWith("Intune") ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
                             <div class="dropdown-menu dropdown-menu-right">
@@ -95,7 +93,6 @@
 
                             </div>
                         </li>
-                    }
                     <li class="nav-item dropdown">
                         <a class="dropdown-toggle @((ViewBag.Current.StartsWith("About") ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">About</a>
                         <div class="dropdown-menu dropdown-menu-right">
@@ -127,11 +124,12 @@
                                     <i class="far fa-user-circle fa-lg rounded-circle align-self-center mr-2" style="width: 32px;"></i>
                                 }
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right bg-dark">
-                                <h5 class="dropdown-item-text mb-0 text-white">@ViewBag.User.DisplayName</h5>
-                                <p class="dropdown-item-text text-muted mb-0 text-white">@ViewBag.User.Email</p>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <h5 class="dropdown-item-text mb-0">@ViewBag.User.DisplayName</h5>
+                                <p class="dropdown-item-text text-muted mb-0">@ViewBag.User.Email</p>
+                                <p class="dropdown-item-text text-muted mb-0"><code class="text-black-50">@ViewBag.User.TenantID</code></p>
                                 <div class="dropdown-divider"></div>
-                                @Html.ActionLink("Sign Out", "SignOut", "Account", new { area = "" }, new { @class = "dropdown-item text-white" })
+                                @Html.ActionLink("Sign Out", "SignOut", "Account", new { area = "" }, new { @class = "dropdown-item" })
                             </div>
                         </li>
                     }
@@ -170,8 +168,6 @@
                         <button class="btn collapsed" data-toggle="collapse" data-target="#liveMessages" aria-expanded="false" aria-controls="collapseOne">
                             Notifications <span class="badge badge-success" id="notificationCount">1</span>
                         </button>
-
-                        
 
                         <a id="downloadLogs" href="" class="align-middle float-right" download="ModernWorkplaceConcierge.log">
                             <i class="fa fa-download" aria-hidden="true"></i>

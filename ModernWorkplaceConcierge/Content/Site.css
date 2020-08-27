@@ -5,6 +5,10 @@
  *    !#23364A;
  */
 
+a.btn.btn-large.SignInButton {
+    background-color: #2F2F2F;
+}
+
 .fa-download:before {
     color: gray;
 }
