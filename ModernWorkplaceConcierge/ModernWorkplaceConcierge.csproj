@@ -242,6 +242,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AboutController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdvancedController.cs" />
     <Compile Include="Controllers\AutoPilotConfigurationController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ConditionalAccessController.cs" />
@@ -257,6 +258,7 @@
     <Compile Include="Helpers\AzureADApplicationIdentifiers.cs" />
     <Compile Include="Helpers\AzureADIDCache.cs" />
     <Compile Include="Helpers\ConditionalAccessPolicy.cs" />
+    <Compile Include="Helpers\CustomAuthorization.cs" />
     <Compile Include="Helpers\DeviceManagementScripts.cs" />
     <Compile Include="Helpers\FilenameHelper.cs" />
     <Compile Include="Helpers\GraphClient.cs" />
@@ -505,6 +507,7 @@
     <Content Include="Scripts\popper.js.map" />
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
+    <Content Include="Views\Advanced\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
