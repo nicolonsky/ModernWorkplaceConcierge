@@ -37,7 +37,16 @@
 <body>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <div class="container">
-            @Html.ActionLink("Modern Workplace Concierge", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+
+            @if (User.IsInRole("AdvancedUser"))
+            {
+                @Html.ActionLink("Modern Workplace Concierge", "Index", "Home", new { area = "" }, new { @class = "navbar-brand btn btn-outline-warning" })
+            }
+            else
+            {
+                @Html.ActionLink("Modern Workplace Concierge", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            }
+
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                     aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -48,51 +57,51 @@
                         @Html.ActionLink("Home", "Index", "Home", new { area = "" },
                             new { @class = ViewBag.Current == "Home" ? "nav-link active" : "nav-link" })
                     </li>
-                        <li class="nav-item dropdown">
-                            <a class="dropdown-toggle @((ViewBag.Current.StartsWith("Intune") ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                @Html.ActionLink("Export", "Index", "Intune", new { area = "" },
-                                new { @class = ViewBag.Current == "IntuneExport" ? "dropdown-item active" : "dropdown-item" })
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-toggle @((ViewBag.Current.StartsWith("Intune") ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @Html.ActionLink("Export", "Index", "Intune", new { area = "" },
+                            new { @class = ViewBag.Current == "IntuneExport" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("Import", "Import", "Intune", new { area = "" },
-                               new { @class = ViewBag.Current == "IntuneImport" ? "dropdown-item active" : "dropdown-item" })
+                            @Html.ActionLink("Import", "Import", "Intune", new { area = "" },
+                           new { @class = ViewBag.Current == "IntuneImport" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("PowerShell Scripts", "DeviceManagementScripts", "Intune", new { area = "" },
-                                new { @class = ViewBag.Current == "IntuneDeviceManagementScripts" ? "dropdown-item active" : "dropdown-item" })
+                            @Html.ActionLink("PowerShell Scripts", "DeviceManagementScripts", "Intune", new { area = "" },
+                            new { @class = ViewBag.Current == "IntuneDeviceManagementScripts" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("Win32 App Detection Scripts", "Win32AppDetectionScripts", "Intune", new { area = "" },
-                                new { @class = ViewBag.Current == "IntuneWin32AppDetectionScripts" ? "dropdown-item active" : "dropdown-item" })
+                            @Html.ActionLink("Win32 App Detection Scripts", "Win32AppDetectionScripts", "Intune", new { area = "" },
+                            new { @class = ViewBag.Current == "IntuneWin32AppDetectionScripts" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("Offline Autopilot Profiles", "Index", "AutoPilotConfiguration", new { area = "" },
-                               new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
-                            </div>
-                        </li>
+                            @Html.ActionLink("Offline Autopilot Profiles", "Index", "AutoPilotConfiguration", new { area = "" },
+                           new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
+                        </div>
+                    </li>
 
-                        <li class="nav-item dropdown">
-                            <a class="dropdown-toggle @((ViewBag.Current.StartsWith("ConditionalAccess")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ConditionalAccess</a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                @Html.ActionLink("Baseline Policies", "DeployBaseline", "ConditionalAccess", new { area = "" },
-                                new { @class = ViewBag.Current == "ConditionalAccessDeployBasline" ? "dropdown-item active" : "dropdown-item" })
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-toggle @((ViewBag.Current.StartsWith("ConditionalAccess")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ConditionalAccess</a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @Html.ActionLink("Baseline Policies", "DeployBaseline", "ConditionalAccess", new { area = "" },
+                            new { @class = ViewBag.Current == "ConditionalAccessDeployBasline" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("Documentation", "Documentation", "ConditionalAccess", new { area = "" },
-                                new { @class = ViewBag.Current == "ConditionalAccessDocumentation" ? "dropdown-item active" : "dropdown-item" })
+                            @Html.ActionLink("Documentation", "Documentation", "ConditionalAccess", new { area = "" },
+                            new { @class = ViewBag.Current == "ConditionalAccessDocumentation" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("Export", "Index", "ConditionalAccess", new { area = "" },
-                                new { @class = ViewBag.Current == "ConditionalAccessExport" ? "dropdown-item active" : "dropdown-item" })
+                            @Html.ActionLink("Export", "Index", "ConditionalAccess", new { area = "" },
+                            new { @class = ViewBag.Current == "ConditionalAccessExport" ? "dropdown-item active" : "dropdown-item" })
 
-                                @Html.ActionLink("Import", "Import", "ConditionalAccess", new { area = "" },
-                               new { @class = ViewBag.Current == "ConditionalAccessImport" ? "dropdown-item active" : "dropdown-item" })
-                            </div>
-                        </li>
+                            @Html.ActionLink("Import", "Import", "ConditionalAccess", new { area = "" },
+                           new { @class = ViewBag.Current == "ConditionalAccessImport" ? "dropdown-item active" : "dropdown-item" })
+                        </div>
+                    </li>
 
-                        <li class="nav-item dropdown">
-                            <a class="dropdown-toggle @((ViewBag.Current.StartsWith("Planner")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Office 365</a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                @Html.ActionLink("Import Planner Tasks", "Index", "Planner", new { area = "" },
-                                new { @class = ViewBag.Current == "PlannerImport" ? "dropdown-item active" : "dropdown-item" })
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-toggle @((ViewBag.Current.StartsWith("Planner")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Office 365</a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @Html.ActionLink("Import Planner Tasks", "Index", "Planner", new { area = "" },
+                            new { @class = ViewBag.Current == "PlannerImport" ? "dropdown-item active" : "dropdown-item" })
 
-                            </div>
-                        </li>
+                        </div>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="dropdown-toggle @((ViewBag.Current.StartsWith("About") ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">About</a>
                         <div class="dropdown-menu dropdown-menu-right">
@@ -128,6 +137,11 @@
                                 <h5 class="dropdown-item-text mb-0">@ViewBag.User.DisplayName</h5>
                                 <p class="dropdown-item-text text-muted mb-0">@ViewBag.User.Email</p>
                                 <p class="dropdown-item-text text-muted mb-0"><code class="text-black-50">@ViewBag.User.TenantID</code></p>
+                                @if (User.IsInRole("AdvancedUser"))
+                                {
+                                    <div class="dropdown-divider"></div>
+                                    @Html.ActionLink("Advanced", "Index", "Advanced", new { area = "" }, new { @class = "dropdown-item" })
+                                }
                                 <div class="dropdown-divider"></div>
                                 @Html.ActionLink("Sign Out", "SignOut", "Account", new { area = "" }, new { @class = "dropdown-item" })
                             </div>
@@ -208,7 +222,7 @@
     <footer class="footer mt-auto fixed-bottom py-2">
         <div class="container">
             <span class="badge badge-secondary">@System.Configuration.ConfigurationManager.AppSettings["InstanceType"].ToString()</span>
-            <span class="float-md-right text-nowrap">Presented by Nicola Suter</span>
+            <span class="float-md-right text-nowrap">Presented by <a href="https://tech.nicolonsky.ch" target="_blank">Nicola Suter</a></span>
         </div>
     </footer>
     @Scripts.Render("~/bundles/jquery")
