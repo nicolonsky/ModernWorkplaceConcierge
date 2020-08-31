@@ -300,12 +300,20 @@ namespace ModernWorkplaceConcierge.Controllers
         [CustomAuthorization(Roles = ("AdvancedUser"))]
         public async Task<ActionResult> ClearAll(bool confirm = false)
         {
-            GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(null);
-            if (confirm)
+            try
             {
-                await graphConditionalAccess.ClearConditonalAccessPolicies();
+                GraphConditionalAccess graphConditionalAccess = new GraphConditionalAccess(null);
+                if (confirm)
+                {
+                    await graphConditionalAccess.ClearConditonalAccessPolicies();
+                }
+                return new HttpStatusCodeResult(204);
             }
-            return new HttpStatusCodeResult(204);
+            catch (Exception e)
+            {
+                Flash(e.Message);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         public async Task<ActionResult> CreateDocumentation(string clientId = null)

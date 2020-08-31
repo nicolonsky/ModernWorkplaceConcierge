@@ -24,13 +24,32 @@ namespace ModernWorkplaceConcierge.Helpers
             this.graphServiceClient = GetAuthenticatedClient();
         }
 
-        public async Task ClearDeviceConfigurations()
+        public async Task ClearIntuneTenant()
         {
+            // Delete device configurations
             var deviceConfigurations = await graphServiceClient.DeviceManagement.DeviceConfigurations.Request().GetAsync();
-            foreach (DeviceConfiguration deviceConfiguration in deviceConfigurations)
-            {
-                await graphServiceClient.DeviceManagement.DeviceConfigurations[deviceConfiguration.Id].Request().DeleteAsync();
-            }
+            deviceConfigurations.ForEach(deviceConfig => graphServiceClient.DeviceManagement.DeviceConfigurations[deviceConfig.Id].Request().DeleteAsync());
+
+            // Delete device compliance policies
+            var compliancePolicies = await graphServiceClient.DeviceManagement.DeviceCompliancePolicies.Request().GetAsync();
+            compliancePolicies.ForEach(compliancePolicy => graphServiceClient.DeviceManagement.DeviceCompliancePolicies[compliancePolicy.Id].Request().DeleteAsync());
+
+            // Delete ADMX templates
+
+            var admxTemplates = await graphServiceClient.DeviceManagement.GroupPolicyConfigurations.Request().GetAsync();
+            admxTemplates.ForEach(admx => graphServiceClient.DeviceManagement.GroupPolicyConfigurations[admx.Id].Request().DeleteAsync());
+
+            // Scripts
+            var deviceManagementScripts = await graphServiceClient.DeviceManagement.DeviceManagementScripts.Request().GetAsync();
+            deviceManagementScripts.ForEach(script => graphServiceClient.DeviceManagement.DeviceManagementScripts[script.Id].Request().DeleteAsync());
+
+            //Delete App Config policies
+            var appProtection = await graphServiceClient.DeviceAppManagement.ManagedAppPolicies.Request().GetAsync();
+            appProtection.ForEach(config => graphServiceClient.DeviceAppManagement.ManagedAppPolicies[config.Id].Request().DeleteAsync());
+
+            //Delete App protection policies
+            var appProtectionPol = await graphServiceClient.DeviceAppManagement.DefaultManagedAppProtections.Request().GetAsync();
+            appProtectionPol.ForEach(pol => graphServiceClient.DeviceAppManagement.DefaultManagedAppProtections[pol.Id].Request().DeleteAsync());
         }
 
         public static string ConvertToApppProtectionAssignment(string AppProtectionPolicy)
