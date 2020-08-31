@@ -261,14 +261,23 @@ namespace ModernWorkplaceConcierge.Controllers
             }
         }
 
-        //public async Task<ActionResult> ClearAll(bool confirm = false)
-        //{
-        //    GraphIntune graphIntune = new GraphIntune(null);
-        //    if (confirm)
-        //    {
-        //        await graphIntune.ClearDeviceConfigurations();
-        //    }
-        //    return new HttpStatusCodeResult(204);
-        //}
+        public async Task<ActionResult> ClearAll(bool confirm = false)
+        {
+            try
+            {
+                GraphIntune graphIntune = new GraphIntune(null);
+                if (confirm)
+                {
+                    await graphIntune.ClearIntuneTenant();
+                }
+                return new HttpStatusCodeResult(204);
+            }
+            catch (Exception e)
+            {
+                Flash(e.Message);
+                return RedirectToAction("Index", "Home");
+            }
+            
+        }
     }
 }
