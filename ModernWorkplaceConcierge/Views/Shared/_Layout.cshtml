@@ -45,39 +45,126 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="container">
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">Disabled</a>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
+            @if (User.IsInRole("AdvancedUser"))
+            {
+                @Html.ActionLink("Modern Workplace Concierge", "Index", "Home", new { area = "" }, new { @class = "navbar-brand btn btn-outline-warning" })
+            }
+            else
+            {
+                @Html.ActionLink("Modern Workplace Concierge", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            }
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        @Html.ActionLink("Home", "Index", "Home", new { area = "" },
+                            new { @class = ViewBag.Current == "Home" ? "nav-link active" : "nav-link" })
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-toggle @((ViewBag.Current.StartsWith("Intune") ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Intune</a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @Html.ActionLink("Export", "Index", "Intune", new { area = "" },
+                            new { @class = ViewBag.Current == "IntuneExport" ? "dropdown-item active" : "dropdown-item" })
+
+                            @Html.ActionLink("Import", "Import", "Intune", new { area = "" },
+                           new { @class = ViewBag.Current == "IntuneImport" ? "dropdown-item active" : "dropdown-item" })
+
+                            @Html.ActionLink("PowerShell Scripts", "DeviceManagementScripts", "Intune", new { area = "" },
+                            new { @class = ViewBag.Current == "IntuneDeviceManagementScripts" ? "dropdown-item active" : "dropdown-item" })
+
+                            @Html.ActionLink("Win32 App Detection Scripts", "Win32AppDetectionScripts", "Intune", new { area = "" },
+                            new { @class = ViewBag.Current == "IntuneWin32AppDetectionScripts" ? "dropdown-item active" : "dropdown-item" })
+
+                            @Html.ActionLink("Offline Autopilot Profiles", "Index", "AutoPilotConfiguration", new { area = "" },
+                           new { @class = ViewBag.Current == "IntuneAutoPilotConfiguration" ? "dropdown-item active" : "dropdown-item" })
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-toggle @((ViewBag.Current.StartsWith("ConditionalAccess")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ConditionalAccess</a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @Html.ActionLink("Baseline Policies", "DeployBaseline", "ConditionalAccess", new { area = "" },
+                            new { @class = ViewBag.Current == "ConditionalAccessDeployBasline" ? "dropdown-item active" : "dropdown-item" })
+
+                            @Html.ActionLink("Documentation", "Documentation", "ConditionalAccess", new { area = "" },
+                            new { @class = ViewBag.Current == "ConditionalAccessDocumentation" ? "dropdown-item active" : "dropdown-item" })
+
+                            @Html.ActionLink("Export", "Index", "ConditionalAccess", new { area = "" },
+                            new { @class = ViewBag.Current == "ConditionalAccessExport" ? "dropdown-item active" : "dropdown-item" })
+
+                            @Html.ActionLink("Import", "Import", "ConditionalAccess", new { area = "" },
+                           new { @class = ViewBag.Current == "ConditionalAccessImport" ? "dropdown-item active" : "dropdown-item" })
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-toggle @((ViewBag.Current.StartsWith("Planner")  ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Office 365</a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @Html.ActionLink("Import Planner Tasks", "Index", "Planner", new { area = "" },
+                            new { @class = ViewBag.Current == "PlannerImport" ? "dropdown-item active" : "dropdown-item" })
+
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="dropdown-toggle @((ViewBag.Current.StartsWith("About") ? "nav-link active" : "nav-link"))" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">About</a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @Html.ActionLink("Info", "Index", "About", new { area = "" },
+                            new { @class = ViewBag.Current == "AboutIndex" ? "dropdown-item active" : "dropdown-item" })
+                            @Html.ActionLink("Terms & Conditions", "Terms", "About", new { area = "" },
+                            new { @class = ViewBag.Current == "AboutTerms" ? "dropdown-item active" : "dropdown-item" })
+
+                        </div>
+                    </li>
+                </ul>
+                <ul class="navbar-nav justify-content-end">
+                    <li class="nav-item">
+                        <a href="https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki" target="_blank" class="nav-link">
+                            <i class="fas fa-book"></i>
+                            <span>Documentation</span>
+                        </a>
+                    </li>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                @if (!string.IsNullOrEmpty(ViewBag.User.Avatar))
+                                {
+                                    <img src="@ViewBag.User.Avatar" class="rounded-circle align-self-center mr-2" style="width: 24px;">
+                                }
+                                else
+                                {
+                                    <i class="far fa-user-circle fa-lg rounded-circle align-self-center mr-2" style="width: 32px;"></i>
+                                }
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <h5 class="dropdown-item-text mb-0">@ViewBag.User.DisplayName</h5>
+                                <p class="dropdown-item-text text-muted mb-0">@ViewBag.User.Email</p>
+                                <p class="dropdown-item-text text-muted mb-0"><code class="text-black-50">@ViewBag.User.TenantID</code></p>
+                                @if (User.IsInRole("AdvancedUser"))
+                                {
+                                    <div class="dropdown-divider"></div>
+                                    @Html.ActionLink("Advanced", "Index", "Advanced", new { area = "" }, new { @class = "dropdown-item" })
+                                }
+                                <div class="dropdown-divider"></div>
+                                @Html.ActionLink("Sign Out", "SignOut", "Account", new { area = "" }, new { @class = "dropdown-item" })
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Sign In", "SignIn", "Account", new { area = "" }, new { @class = "nav-link" })
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
     </nav>
     <main role="main" class="container overflow-auto">
@@ -110,7 +197,7 @@
                             <i class="fa fa-download" aria-hidden="true"></i>
                         </a>
                     </h5>
-                    
+
                 </div>
                 <div id="liveMessages" class="collapse hide" aria-labelledby="headingOne" data-parent="#signalRLiveMessages">
                     <div class="card-body">
@@ -156,19 +243,14 @@
         $(function () {
             $('#tenant').tooltip()
         })
-
-
         // log download
         $('#downloadLogs').click(function () {
-
             var logs = "";
-
             $('#messages li').each(function (index, obj) {
                 var line = $(this).text()
                 var output = line + "\n"
                 logs += output;
             });
-
             this.href = "data:text/plain;charset=UTF-8," + logs;
         });
     </script>
