@@ -363,6 +363,7 @@
     <Content Include="Content\PolicySets\Network trust with AADP2\301 - RING - Attack surface reduction - All apps Block access When using active sync.json" />
     <Content Include="Content\PolicySets\Network trust with AADP2\400 - RING - Application protection - Specific apps Require MFA.json" />
     <Content Include="Content\PolicySets\Network trust with AADP2\402 - RING - Application protection - Specific apps Block access When on untrusted location.json" />
+    <Content Include="Manifest.json" />
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\mwconciergedev - Web Deploy.pubxml" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -473,6 +474,7 @@
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
+    <Content Include="pwabuilder-sw.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
