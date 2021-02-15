@@ -22,8 +22,8 @@ namespace ModernWorkplaceConcierge.Helpers
 
         public async Task<IEnumerable<NamedLocation>> GetNamedLocationsAsync(string clientId = null)
         {
-            signalRMessage.sendMessage("GET: " + graphServiceClient.ConditionalAccess.NamedLocations.Request().RequestUrl);
-            var namedLocations = await graphServiceClient.ConditionalAccess.NamedLocations.Request().GetAsync();
+            signalRMessage.sendMessage("GET: " + graphServiceClient.Identity.ConditionalAccess.NamedLocations.Request().RequestUrl);
+            var namedLocations = await graphServiceClient.Identity.ConditionalAccess.NamedLocations.Request().GetAsync();
             return namedLocations.CurrentPage;
         }
 

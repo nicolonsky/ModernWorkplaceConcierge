@@ -711,5 +711,21 @@ namespace ModernWorkplaceConcierge.Helpers
             signalRMessage.sendMessage($"Success: updated {autopilotDeploymentProfile.ODataType} '{autopilotDeploymentProfile.DisplayName}'");
             return response;
         }
+
+        public async Task<IEnumerable<DeviceManagementIntent>> GetDeviceManagementEndpointSecurityTemplate()
+        {
+            var resource = graphServiceClient.DeviceManagement.Intents.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var response = await resource.GetAsync();
+            return response.CurrentPage;
+        }
+
+        public async Task<IDeviceManagementIntentSettingsCollectionPage> GetDeviceManagementEndpointSecuritySettings(string id)
+        {
+            var resource = graphServiceClient.DeviceManagement.Intents[id].Settings.Request();
+            signalRMessage.sendMessage($"GET: {resource.RequestUrl}");
+            var response = await resource.GetAsync();
+            return response;
+        }
     }
 }
