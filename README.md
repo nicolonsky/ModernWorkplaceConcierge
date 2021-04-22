@@ -31,7 +31,7 @@ The app uses Azure application insights and traces performance markers [what-doe
 If you are not allowed to or don't like to use the public instance of the Modern Workplace Concierge you can deploy an instance in your Azure tenant & setup an app registration.
 [Wiki documentation for Self-hosting a custom instance](https://github.com/nicolonsky/ModernWorkplaceConcierge/wiki/Self-hosting-a-custom-instance).
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://azuredeploy.net/?repository=https://github.com/nicolonsky/ModernWorkplaceConcierge/tree/master)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fnicolonsky%2FModernWorkplaceConcierge%2Fmaster%2Fazuredeploy.json)
 
 <a href="http://armviz.io/#/?load=https://raw.githubusercontent.com/nicolonsky/ModernWorkplaceConcierge/master/azuredeploy.json" target="_blank">
   <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true"/>
