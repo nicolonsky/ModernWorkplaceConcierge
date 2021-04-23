@@ -154,7 +154,10 @@ namespace ModernWorkplaceConcierge.Controllers
                                 JToken[] assignedToId = task.SelectTokens("idMembers[*]").ToArray();
 
                                 plannerTask.Assignments = new PlannerAssignments();
-
+                               
+                                // workaround: https://github.com/nicolonsky/ModernWorkplaceConcierge/issues/75#issuecomment-821622465
+                                plannerTask.Assignments.ODataType = null;
+                                
                                 foreach (JToken currentUser in assignedToId)
                                 {
                                     if (!string.IsNullOrEmpty((string)currentUser))
