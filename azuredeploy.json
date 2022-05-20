@@ -30,7 +30,7 @@
     },
     "repoUrl": {
       "type": "string",
-      "defaultValue": "https://github.com/nicolonsky/ModernWorkplaceConcierge/tree/master"
+      "defaultValue": "https://github.com/nicolonsky/ModernWorkplaceConcierge"
     },
     "branch": {
       "type": "string",
