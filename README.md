@@ -1,5 +1,8 @@
 [![Build Status](https://dev.azure.com/nicolonsky/ModernWorkplaceTools/_apis/build/status/nicolonsky.IntuneConcierge?branchName=master)](https://dev.azure.com/nicolonsky/ModernWorkplaceTools/_build/latest?definitionId=2&branchName=master)
 
+| :exclamation:  Thank you for using the Modern Workplace Concierge and your support. This project is archived and not actively being maintained. Feel free to fork the project or deploy it to your own Azure tenant   |
+|-----------------------------------------|
+
 # About
 
 The [Modern Workplace Concierge](https://mwconcierge.azurewebsites.net/) is a helper tool to simplify your daily work with Microsoft 365 services. It allows you to:
